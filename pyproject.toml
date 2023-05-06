@@ -32,15 +32,19 @@ dependencies = [
     'toolcli >=0.6.13, <0.7',
     'toolstr >=0.9.1, <0.10',
     'requests >=2.20.0, <3',
-    # 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
+# 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
 ]
 
 [project.optional-dependencies]
 test = [
     'mypy ==1.2.0',
     'mypy_extensions >= 1.0.0, <1.1.0',
+    'pytest >=6, <7',
     'types-tqdm >= 4.65.0.1, <5',
 ]
+
+[project.scripts]
+rpc_bench = "rpc_bench.cli.cli_run:run_cli"
 
 [tool.flit.module]
 name = "rpc_bench"
@@ -51,6 +55,9 @@ strict = true
 implicit_reexport = true
 files = ["rpc_bench"]
 
-[project.scripts]
-rpc_bench = "rpc_bench.cli.cli_run:run_cli"
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+asyncio_mode = 'auto'
 
