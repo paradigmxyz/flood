@@ -1,59 +1,32 @@
 from __future__ import annotations
 
-import argparse
-import typing
+import toolcli
 
-from rpc_bench import benchmark
-
-
-def run_cli() -> None:
-    args = parse_args()
-    benchmark.run_latency_benchmark(
-        nodes=args['nodes'],
-        methods=args['methods'],
-        samples=args['samples'],
-        random_seed=args['random_seed'],
-        output_file=args['output_file'],
-    )
+import rpc_bench
 
 
-def parse_args() -> typing.Mapping[str, typing.Any]:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'nodes',
-        nargs='+',
-        help='nodes to test',
-    )
-    parser.add_argument(
-        '--methods',
-        nargs='+',
-        help='RPC methods to test',
-    )
-    parser.add_argument(
-        '-n',
-        '--n-samples',
-        type=int,
-        dest='samples',
-        default=1,
-        help='number of times to call each method',
-    )
-    parser.add_argument(
-        '--seed',
-        dest='random_seed',
-        help='random seed to use for call parameters',
-    )
-    parser.add_argument(
-        '--output',
-        dest='output_file',
-        help='output JSON file where to save results',
-    )
-    args = parser.parse_args()
-
-    return {
-        'nodes': args.nodes,
-        'methods': args.methods,
-        'samples': args.samples,
-        'random_seed': args.random_seed,
-        'output_file': args.output_file,
+def run_cli(raw_command: str | None = None) -> None:
+    command_index: toolcli.CommandIndex = {
+        (): 'rpc_bench.cli.root_command',
+        (
+            'version',
+        ): 'toolcli.command_utils.standard_subcommands.version_command',
+        ('help',): 'toolcli.command_utils.standard_subcommands.help_command',
     }
+
+    config: toolcli.CLIConfig = {
+        'base_command': 'rpc_bench',
+        'description': rpc_bench.__doc__,
+        'version': rpc_bench.__version__,
+        'default_command_sequence': (),
+        'root_help_arguments': True,
+        'root_help_subcommands': False,
+        'include_debug_arg': True,
+        'style_theme': rpc_bench.styles,
+    }
+
+    toolcli.run_cli(
+        command_index=command_index,
+        config=config,
+    )
 
