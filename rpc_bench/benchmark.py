@@ -15,6 +15,8 @@ def run_latency_benchmark(
     nodes: typing.Sequence[str] | typing.Mapping[str, str],
     methods: typing.Sequence[str] | None,
     samples: int | None = None,
+    calls: spec.MethodCalls | None = None,
+    calls_file: str | None = None,
     verbose: bool = True,
     output_file: str | None = None,
     random_seed: int | None = None,
@@ -24,12 +26,22 @@ def run_latency_benchmark(
     # parse inputs
     if not isinstance(nodes, dict):
         nodes = _parse_nodes(nodes)
-    if samples is None:
-        samples = 1
-    if methods is None:
-        methods = rpc_methods.get_all_methods()
-    if random_seed is None:
-        random_seed = 0
+
+    # create calls
+    if calls is None:
+        if calls_file is not None:
+            with open(calls_file, 'r') as f:
+                calls = json.load(f)
+        else:
+            if samples is None:
+                samples = 1
+            if methods is None:
+                methods = rpc_methods.get_all_methods()
+            if random_seed is None:
+                random_seed = 0
+            calls = rpc_methods.create_calls(
+                methods=methods, samples=samples, random_seed=random_seed
+            )
 
     # print prelude
     if verbose:
@@ -37,18 +49,14 @@ def run_latency_benchmark(
             nodes=nodes,
             methods=methods,
             samples=samples,
-            output_file=output_file,
             random_seed=random_seed,
+            calls=calls,
+            output_file=output_file,
         )
-
-    # create calls
-    calls = rpc_methods.create_calls(
-        methods=methods, samples=samples, random_seed=random_seed
-    )
 
     # perform calls
     latencies = _perform_calls(
-        nodes=nodes, methods=methods, calls=calls, verbose=verbose
+        nodes=nodes, calls=calls, verbose=verbose
     )
 
     # print summary
@@ -59,7 +67,7 @@ def run_latency_benchmark(
     if output_file is not None:
         summary: spec.LatencyBenchmarkResults = {
             'nodes': nodes,
-            'methods': methods,
+            'methods': list(calls.keys()),
             'samples': samples,
             'calls': calls,
             'latencies': latencies,
@@ -89,7 +97,6 @@ def _parse_nodes(
 
 def _perform_calls(
     nodes: typing.Mapping[str, str],
-    methods: typing.Sequence[str],
     calls: spec.MethodCalls,
     verbose: bool,
 ) -> spec.NodeMethodLatencies:
@@ -109,6 +116,7 @@ def _perform_calls(
     }
 
     # perform calls
+    methods = list(calls.keys())
     latencies: spec.NodeMethodLatencies = {
         name: {method: [] for method in methods} for name in nodes.keys()
     }

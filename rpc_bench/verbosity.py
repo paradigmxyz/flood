@@ -12,8 +12,9 @@ def _print_benchmark_prelude(
     *,
     nodes: typing.Mapping[str, str],
     methods: typing.Sequence[str] | None,
-    samples: int,
-    random_seed: int,
+    samples: int | None,
+    random_seed: int | str | None,
+    calls: spec.MethodCalls,
     output_file: str | None = None,
 ) -> None:
     import toolstr
@@ -49,14 +50,19 @@ def _print_benchmark_prelude(
     else:
         raise Exception('no nodes specified')
 
-    if methods is not None:
-        toolstr.print_bullet(
-            key='methods', value=', '.join(methods), styles=spec.styles
-        )
-    else:
-        toolstr.print_bullet(key='methods', value='all', styles=spec.styles)
+    if methods is None:
+        methods = sorted(list(calls.keys()))
+    toolstr.print_bullet(
+        key='methods', value=', '.join(methods), styles=spec.styles
+    )
 
+    if samples is None:
+        example_calls = next(iter(calls.values()))
+        samples = len(example_calls)
     toolstr.print_bullet(key='samples', value=samples, styles=spec.styles)
+
+    if random_seed is None:
+        random_seed = 'unknown'
     toolstr.print_bullet(
         key='random_seed', value=random_seed, styles=spec.styles
     )

@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
     class LatencyBenchmarkResults(typing.TypedDict):
         nodes: typing.Mapping[str, str]
         methods: typing.Sequence[str]
-        samples: int
+        samples: int | None
         calls: typing.Mapping[str, typing.Sequence[str]]
         latencies: NodeMethodLatencies
 
