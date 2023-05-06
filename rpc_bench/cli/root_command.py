@@ -9,18 +9,18 @@ import rpc_bench
 help_message = """Benchmark a set of node endpoints
 
 [bold][title]Node Specification[/bold][/title]
-Basic node syntax is [metavar]url[/metavar] or [metavar]name=url[/metavar]
+- Nodes are specified as a space-separated list
+- Basic node syntax is [metavar]url[/metavar] or [metavar]name=url[/metavar]
 - The [metavar]name[/metavar] of each node is used for benchmark summary report
-- Can specify multiple nodes in space-separated list
 
 [bold][title]Remote Usage[/bold][/title]
-[metavar]rpc_bench[/metavar] can be invoked on remote machines
+- [metavar]rpc_bench[/metavar] can be invoked on remote machines
 - Use node syntax [metavar]user@remote:node_url[/metavar] or [metavar]name=user@remote:node_url[/metavar]
 - Can omit the [metavar]user@[/metavar] prefix if ssh config has username specified
 - [metavar]rpc_bench[/metavar] must already be installed on each remote machine
 
 [bold][title]Parameter Randomization[/bold][/title]
-[metavar]rpc_bench[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
+- [metavar]rpc_bench[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
 - For each call, parameters are randomized to minimize caching effects
 - Specify random seed [metavar]-s <seed>[/metavar] for repeatable set of randomized calls"""
 
@@ -38,7 +38,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['-m', '--methods'],
                 'nargs': '+',
-                'help': 'RPC methods to test, space separated list',
+                'help': 'RPC methods to test, space-separated list',
             },
             {
                 'name': ['-n', '--n-samples'],
@@ -55,7 +55,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['-c', '--calls'],
                 'dest': 'calls_file',
-                'help': 'calls plan JSON file',
+                'help': 'use the call schedule from a previous run',
             },
             {
                 'name': ['-o', '--output'],
