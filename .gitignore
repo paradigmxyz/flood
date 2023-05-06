@@ -1,0 +1,23 @@
+
+# specific files
+CHANGELOG.md
+ROADMAP.md
+TODO.md
+pytestdebug.log
+tuna.log
+
+# filetypes
+*.egg-info
+*.pyc
+
+# folders
+*/.hypothesis
+.coverage_html/*
+.hypothesis/
+.tox/*
+__pycache__/*
+build/*
+dist/*
+notebooks/*
+roadmap/*
+todo/*

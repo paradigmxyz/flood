@@ -1,0 +1,55 @@
+
+[build-system]
+requires = ["flit_core >=3.2, <4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "rpc_bench"
+readme = "README.md"
+requires-python = ">=3.7"
+dynamic = ["version", "description"]
+license = {text = "MIT OR Apache-2.0"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Typing :: Typed",
+]
+dependencies = [
+    'typing-extensions >=4.2.0, <5',
+    'toolstr >=0.9.1, <0.10',
+    'requests >=2.20.0, <3',
+    # 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
+]
+
+[project.optional-dependencies]
+test = [
+    'mypy ==1.2.0',
+    'mypy_extensions >= 1.0.0, <1.1.0',
+    'types-tqdm >= 4.65.0.1, <5',
+]
+
+[tool.flit.module]
+name = "rpc_bench"
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+implicit_reexport = true
+files = ["rpc_bench"]
+
+[project.scripts]
+rpc_bench = "rpc_bench.cli.cli_run:run_cli"
+
