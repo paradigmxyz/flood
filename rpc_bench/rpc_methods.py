@@ -15,21 +15,39 @@ def get_all_methods() -> typing.Sequence[str]:
 
 
 def create_calls(
-    methods: typing.Sequence[str],
-    samples: int,
+    methods: typing.Sequence[str] | None = None,
+    samples: int | None = None,
     *,
     random_seed: int | None = None,
+    calls_file: str | None = None,
 ) -> spec.MethodCalls:
 
+    calls: spec.MethodCalls
+
+    # load calls from file
+    if calls_file is not None:
+        import json
+
+        with open(calls_file, 'r') as f:
+            calls = json.load(f)
+            return calls
+
+    # parse inputs
+    if samples is None:
+        samples = 1
+    if methods is None:
+        methods = get_all_methods()
     if random_seed is None:
         random_seed = 0
 
-    calls: spec.MethodCalls = {method: [] for method in methods}
+    # generate calls
+    calls = {method: [] for method in methods}
     for method in methods:
         call_creator = _get_call_creator(method)
         for sample in range(samples):
             call = call_creator()
             calls[method].append(call)  # type: ignore
+
     return calls
 
 

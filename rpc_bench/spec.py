@@ -8,11 +8,24 @@ if typing.TYPE_CHECKING:
     MethodCalls = typing.Mapping[str, typing.Sequence[typing.Any]]
 
     NodeMethodLatencies = typing.Mapping[
-        str, typing.Mapping[str, typing.Sequence[str]]
+        str,
+        typing.Mapping[str, typing.Sequence[str]],
+    ]
+
+    class Node(typing.TypedDict):
+        name: str
+        url: str
+        remote: str | None
+
+    NodesShorthand = typing.Union[
+        typing.Sequence[str],
+        typing.Sequence[Node],
+        typing.Mapping[str, str],
+        typing.Mapping[str, Node],
     ]
 
     class LatencyBenchmarkResults(typing.TypedDict):
-        nodes: typing.Mapping[str, str]
+        nodes: typing.Mapping[str, Node]
         methods: typing.Sequence[str]
         samples: int | None
         calls: typing.Mapping[str, typing.Sequence[str]]

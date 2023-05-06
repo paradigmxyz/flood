@@ -5,14 +5,14 @@ import typing
 
 import requests
 
-from rpc_bench import spec
-from rpc_bench import rpc_methods
-from rpc_bench import verbosity
+from . import rpc_methods
+from . import spec
+from . import verbosity
 
 
 def run_latency_benchmark(
     *,
-    nodes: typing.Sequence[str] | typing.Mapping[str, str],
+    nodes: spec.NodesShorthand,
     methods: typing.Sequence[str] | None,
     samples: int | None = None,
     calls: spec.MethodCalls | None = None,
@@ -29,19 +29,12 @@ def run_latency_benchmark(
 
     # create calls
     if calls is None:
-        if calls_file is not None:
-            with open(calls_file, 'r') as f:
-                calls = json.load(f)
-        else:
-            if samples is None:
-                samples = 1
-            if methods is None:
-                methods = rpc_methods.get_all_methods()
-            if random_seed is None:
-                random_seed = 0
-            calls = rpc_methods.create_calls(
-                methods=methods, samples=samples, random_seed=random_seed
-            )
+        calls = rpc_methods.create_calls(
+            methods=methods,
+            samples=samples,
+            random_seed=random_seed,
+            calls_file=calls_file,
+        )
 
     # print prelude
     if verbose:
@@ -55,9 +48,7 @@ def run_latency_benchmark(
         )
 
     # perform calls
-    latencies = _perform_calls(
-        nodes=nodes, calls=calls, verbose=verbose
-    )
+    latencies = _perform_calls(nodes=nodes, calls=calls, verbose=verbose)
 
     # print summary
     if verbose:
@@ -76,27 +67,73 @@ def run_latency_benchmark(
             json.dump(summary, f)
 
 
-def _parse_nodes(
-    nodes: typing.Sequence[str] | typing.Mapping[str, str]
-) -> typing.Mapping[str, str]:
+def _parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
     """parse given nodes according to input specification"""
+    new_nodes: typing.MutableMapping[str, spec.Node] = {}
     if isinstance(nodes, list):
-        new_nodes = {}
         for node in nodes:
-            if '=' in node:
-                name, url = node.split('=')
-                new_nodes[name] = url
-            else:
-                new_nodes[name] = url
-        return new_nodes
+            new_node = _parse_node(node)
+            new_nodes[new_node['name']] = new_node
     elif isinstance(nodes, dict):
-        return nodes
+        for key, value in nodes.items():
+            new_nodes[key] = value
     else:
         raise Exception('invalid format for nodes')
+    return new_nodes
+
+
+def _parse_node(node: str | spec.Node) -> spec.Node:
+    prefixes = ['http', 'https', 'ws', 'wss']
+
+    if isinstance(node, dict):
+        return node
+    elif isinstance(node, str):
+        # parse name
+        if '=' in node:
+            name, url = node.split('=')
+        else:
+            name = node
+            url = node
+
+        # parse remote and url
+        if ':' in url:
+            head, tail = url.split(':', 1)
+            if head in prefixes:
+                remote = None
+                url = head + ':' + tail
+            else:
+                if tail.split('/')[0].isdecimal():
+                    remote = None
+                    url = url
+                else:
+                    remote = head
+                    url = tail
+        else:
+            remote = None
+
+        # add missing prefix
+        if not any(url.startswith(prefix) for prefix in prefixes):
+            if (
+                url.startswith('localhost')
+                or url.startswith('0.0.0.0')
+                or url.startswith('127.0.0.1')
+            ):
+                url = 'http://' + url
+            else:
+                url = 'https://' + url
+
+        return {
+            'name': name,
+            'url': url,
+            'remote': remote,
+        }
+
+    else:
+        raise Exception('invalid node format')
 
 
 def _perform_calls(
-    nodes: typing.Mapping[str, str],
+    nodes: typing.Mapping[str, spec.Node],
     calls: spec.MethodCalls,
     verbose: bool,
 ) -> spec.NodeMethodLatencies:
@@ -107,7 +144,9 @@ def _perform_calls(
     # print prelude and get progress bars
     if verbose:
         start_time = verbosity._print_call_prelude()
-    node_bar, method_bar, sample_bar = verbosity._get_progress_bars(verbose)
+    node_bar, method_bar, sample_bar = verbosity._get_progress_bars(
+        nodes=nodes, verbose=verbose
+    )
 
     # specify headers
     headers = {
@@ -120,11 +159,11 @@ def _perform_calls(
     latencies: spec.NodeMethodLatencies = {
         name: {method: [] for method in methods} for name in nodes.keys()
     }
-    for name, url in tqdm.tqdm(nodes.items(), **node_bar):
+    for name, node in tqdm.tqdm(nodes.items(), **node_bar):
         for method in tqdm.tqdm(methods, **method_bar):
             for call in tqdm.tqdm(calls[method], **sample_bar):
                 response = requests.post(
-                    url=_get_url(url),
+                    url=node['url'],
                     data=json.dumps(call),
                     headers=headers,
                 )
@@ -136,19 +175,4 @@ def _perform_calls(
         verbosity._print_call_summary(start_time)
 
     return latencies
-
-
-def _get_url(node: str) -> str:
-    """add http or https to hostname as needed"""
-    if not node.startswith('http'):
-        if (
-            node.startswith('localhost')
-            or node.startswith('0.0.0.0')
-            or node.startswith('127.0.0.1')
-        ):
-            return 'http://' + node
-        else:
-            return 'https://' + node
-    else:
-        return node
 

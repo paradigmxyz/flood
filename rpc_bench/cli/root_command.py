@@ -22,7 +22,7 @@ Basic node syntax is [metavar]url[/metavar] or [metavar]name=url[/metavar]
 [bold][title]Parameter Randomization[/bold][/title]
 [metavar]rpc_bench[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
 - For each call, parameters are randomized to minimize caching effects
-- Specify random seed for repeatable set of randomized calls [metavar]-s <seed>[/metavar]"""
+- Specify random seed [metavar]-s <seed>[/metavar] for repeatable set of randomized calls"""
 
 
 def get_command_spec() -> toolcli.CommandSpec:

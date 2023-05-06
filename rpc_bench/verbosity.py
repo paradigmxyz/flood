@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 
 def _print_benchmark_prelude(
     *,
-    nodes: typing.Mapping[str, str],
+    nodes: typing.Mapping[str, spec.Node],
     methods: typing.Sequence[str] | None,
     samples: int | None,
     random_seed: int | str | None,
@@ -26,7 +26,9 @@ def _print_benchmark_prelude(
     )
 
     if len(nodes) == 1:
-        [[name, url]] = list(nodes.items())
+        node = list(nodes.values())[0]
+        name = node['name']
+        url = node['url']
         if name == url:
             label = url
         else:
@@ -34,7 +36,9 @@ def _print_benchmark_prelude(
         toolstr.print_bullet(key='node', value=label, styles=spec.styles)
     elif len(nodes) > 1:
         toolstr.print_bullet(key='nodes', value='', styles=spec.styles)
-        for name, url in nodes.items():
+        for node in nodes.values():
+            name = node['name']
+            url = node['url']
             if name == url:
                 label = name
             else:
@@ -152,25 +156,31 @@ def _print_call_summary(start_time: datetime.datetime) -> None:
 
 
 def _get_progress_bars(
+    nodes: typing.Mapping[str, spec.Node],
     verbose: bool,
 ) -> tuple[spec.ProgressBar, spec.ProgressBar, spec.ProgressBar]:
+    if len(nodes) == 1:
+        positions = [None, 0, 1]
+    else:
+        positions = [0, 1, 2]
     node_bar: spec.ProgressBar = {
         'desc': '  nodes',
-        'position': 0,
+        'position': positions[0],
         'leave': False,
         'colour': spec.styles['content'],
-        'disable': not verbose,
+        'disable': (not verbose) or (len(nodes) == 1),
     }
     method_bar: spec.ProgressBar = {
         'desc': 'methods',
-        'position': 1,
+        'position': positions[1],
         'leave': False,
         'colour': spec.styles['content'],
         'disable': not verbose,
     }
     sample_bar: spec.ProgressBar = {
         'desc': 'samples',
-        'position': 2,
+        'position': positions[2],
+        'leave': False,
         'leave': False,
         'colour': spec.styles['content'],
         'disable': not verbose,
