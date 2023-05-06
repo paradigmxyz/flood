@@ -21,7 +21,6 @@ def create_calls(
     random_seed: int | None = None,
     calls_file: str | None = None,
 ) -> spec.MethodCalls:
-
     calls: spec.MethodCalls
 
     # load calls from file
@@ -29,8 +28,11 @@ def create_calls(
         import json
 
         with open(calls_file, 'r') as f:
-            calls = json.load(f)
-            return calls
+            calls_data = json.load(f)
+            return {
+                method: calls_data['calls'][method]
+                for method in calls_data['methods']
+            }
 
     # parse inputs
     if samples is None:

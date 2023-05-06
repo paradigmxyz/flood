@@ -7,11 +7,6 @@ if typing.TYPE_CHECKING:
 
     MethodCalls = typing.Mapping[str, typing.Sequence[typing.Any]]
 
-    NodeMethodLatencies = typing.Mapping[
-        str,
-        typing.Mapping[str, typing.Sequence[str]],
-    ]
-
     class Node(typing.TypedDict):
         name: str
         url: str
@@ -24,16 +19,19 @@ if typing.TYPE_CHECKING:
         typing.Mapping[str, Node],
     ]
 
+    NodeMethodLatencies = typing.Mapping[str, typing.Sequence[float]]
+    NodesMethodLatencies = typing.Mapping[str, NodeMethodLatencies]
+
     class LatencyBenchmarkResults(typing.TypedDict):
         nodes: typing.Mapping[str, Node]
         methods: typing.Sequence[str]
         samples: int | None
         calls: typing.Mapping[str, typing.Sequence[str]]
-        latencies: NodeMethodLatencies
+        latencies: NodesMethodLatencies
 
     class ProgressBar(typing.TypedDict):
         desc: str
-        position: int
+        position: int | None
         leave: bool
         colour: str
         disable: bool

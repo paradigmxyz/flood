@@ -3,9 +3,8 @@ from __future__ import annotations
 import json
 import typing
 
-import requests
-
-from . import rpc_methods
+from . import call_creation
+from . import call_execution
 from . import spec
 from . import verbosity
 
@@ -29,7 +28,7 @@ def run_latency_benchmark(
 
     # create calls
     if calls is None:
-        calls = rpc_methods.create_calls(
+        calls = call_creation.create_calls(
             methods=methods,
             samples=samples,
             random_seed=random_seed,
@@ -48,7 +47,9 @@ def run_latency_benchmark(
         )
 
     # perform calls
-    latencies = _perform_calls(nodes=nodes, calls=calls, verbose=verbose)
+    latencies = call_execution.execute_calls(
+        nodes=nodes, calls=calls, verbose=verbose
+    )
 
     # print summary
     if verbose:
@@ -83,6 +84,7 @@ def _parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
 
 
 def _parse_node(node: str | spec.Node) -> spec.Node:
+    """parse node according to input specification"""
     prefixes = ['http', 'https', 'ws', 'wss']
 
     if isinstance(node, dict):
@@ -130,49 +132,4 @@ def _parse_node(node: str | spec.Node) -> spec.Node:
 
     else:
         raise Exception('invalid node format')
-
-
-def _perform_calls(
-    nodes: typing.Mapping[str, spec.Node],
-    calls: spec.MethodCalls,
-    verbose: bool,
-) -> spec.NodeMethodLatencies:
-    """perform RPC calls"""
-
-    import tqdm
-
-    # print prelude and get progress bars
-    if verbose:
-        start_time = verbosity._print_call_prelude()
-    node_bar, method_bar, sample_bar = verbosity._get_progress_bars(
-        nodes=nodes, verbose=verbose
-    )
-
-    # specify headers
-    headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'rpc_bench',
-    }
-
-    # perform calls
-    methods = list(calls.keys())
-    latencies: spec.NodeMethodLatencies = {
-        name: {method: [] for method in methods} for name in nodes.keys()
-    }
-    for name, node in tqdm.tqdm(nodes.items(), **node_bar):
-        for method in tqdm.tqdm(methods, **method_bar):
-            for call in tqdm.tqdm(calls[method], **sample_bar):
-                response = requests.post(
-                    url=node['url'],
-                    data=json.dumps(call),
-                    headers=headers,
-                )
-                latency = response.elapsed.total_seconds()
-                latencies[name][method].append(latency)  # type: ignore
-
-    # print summary
-    if verbose:
-        verbosity._print_call_summary(start_time)
-
-    return latencies
 

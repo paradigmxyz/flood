@@ -66,7 +66,7 @@ def _print_benchmark_prelude(
     toolstr.print_bullet(key='samples', value=samples, styles=spec.styles)
 
     if random_seed is None:
-        random_seed = 'unknown'
+        random_seed = 'not specified'
     toolstr.print_bullet(
         key='random_seed', value=random_seed, styles=spec.styles
     )
@@ -76,18 +76,20 @@ def _print_benchmark_prelude(
 
 
 def _print_benchmark_summary(
-    latencies: spec.NodeMethodLatencies,
+    latencies: spec.NodesMethodLatencies,
     calls: spec.MethodCalls,
 ) -> None:
     import numpy as np
     import toolstr
 
     # print table of latency per provider
+    all_latencies = []
     rows = []
     for method in calls.keys():
         row = [method]
         for node in latencies.keys():
             array = np.array(latencies[node][method])
+            all_latencies.extend(latencies[node][method])
             row.append(array.mean())
 
         if len(latencies.keys()) == 2:
@@ -106,6 +108,11 @@ def _print_benchmark_summary(
     if len(latencies) == 2:
         labels.append(node_names[0] + ' / ' + node_names[1])
 
+    if any(latency < 0.001 for latency in all_latencies):
+        decimals = 4
+    else:
+        decimals = 3
+
     toolstr.print_table(
         rows,
         indent=4,
@@ -113,7 +120,7 @@ def _print_benchmark_summary(
         border=spec.styles['content'],
         label_style=spec.styles['metavar'],
         column_styles={'method': spec.styles['metavar']},
-        column_formats={name: {'decimals': 3} for name in node_names},
+        column_formats={name: {'decimals': decimals} for name in node_names},
     )
 
 
@@ -125,7 +132,7 @@ def _print_call_prelude() -> datetime.datetime:
     print()
     print()
     toolstr.print_text_box(
-        toolstr.add_style('Performing Benchmark...', spec.styles['metavar']),
+        toolstr.add_style('Performing Local Benchmarks...', spec.styles['metavar']),
         style=spec.styles['content'],
     )
     start_time = datetime.datetime.fromtimestamp(int(time.time()))
