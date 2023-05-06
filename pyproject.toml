@@ -32,6 +32,7 @@ dependencies = [
     'toolcli >=0.6.13, <0.7',
     'toolstr >=0.9.1, <0.10',
     'requests >=2.20.0, <3',
+    'tqdm >=4.65.0, <5',
 # 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
 ]
 
