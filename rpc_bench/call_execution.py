@@ -43,7 +43,7 @@ def _execute_local_calls(
 
     # print prelude and get progress bars
     if verbose:
-        start_time = verbosity._print_call_prelude()
+        start_time = verbosity._print_local_execution_prelude()
     node_bar, method_bar, sample_bar = verbosity._get_progress_bars(
         nodes=nodes, verbose=verbose
     )
@@ -72,7 +72,7 @@ def _execute_local_calls(
 
     # print summary
     if verbose:
-        verbosity._print_call_summary(start_time)
+        verbosity._print_local_execution_summary(start_time)
 
     return latencies
 
@@ -83,6 +83,19 @@ def _execute_remote_calls(
     verbose: bool,
 ) -> spec.NodesMethodLatencies:
     """perform remote RPC calls"""
+
+    import toolstr
+
+    if verbose and len(nodes) > 0:
+        print()
+        print()
+        toolstr.print_header(
+            toolstr.add_style(
+                'Performing Remote Benchmarks...', spec.styles['metavar']
+            ),
+            style=spec.styles['content'],
+        )
+
     latencies: typing.MutableMapping[
         str,
         typing.Mapping[str, typing.Sequence[float]],
@@ -92,13 +105,17 @@ def _execute_remote_calls(
         remote = node['remote']
         if remote is None:
             raise Exception('not a remote node')
-        result = _execute_node_remote_calls(node=node, calls=calls)
+        result = _execute_node_remote_calls(
+            node=node, calls=calls, verbose=verbose
+        )
         latencies[name] = result
     return latencies
 
 
 def _execute_node_remote_calls(
-    node: spec.Node, calls: spec.MethodCalls
+    node: spec.Node,
+    calls: spec.MethodCalls,
+    verbose: bool,
 ) -> spec.NodeMethodLatencies:
     """perform remote RPC calls on particular node"""
 
@@ -106,6 +123,7 @@ def _execute_node_remote_calls(
     import os
     import subprocess
     import uuid
+    import toolstr
 
     # parse node specification
     remote = node['remote']
@@ -122,12 +140,27 @@ def _execute_node_remote_calls(
         json.dump(calls_data, f)
 
     # send call data to remote server
+    if verbose:
+        toolstr.print(
+            toolstr.add_style('- ', spec.styles['title'])
+            + toolstr.add_style(node['name'], spec.styles['metavar'])
+            + toolstr.add_style(':', spec.styles['title'])
+            + ' host'
+            + toolstr.add_style('=', spec.styles['title'])
+            + toolstr.add_style(node['remote'], spec.styles['metavar'])
+            + ', url'
+            + toolstr.add_style('=', spec.styles['title'])
+            + toolstr.add_style(node['url'], spec.styles['metavar'])
+        )
+        print('    Sending call schedule')
     cmd = 'ssh {host} mkdir {tempdir}'.format(host=remote, tempdir=tempdir)
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
     cmd = 'rsync ' + calls_path + ' ' + remote + ':' + calls_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # initiate benchmarks
+    if verbose:
+        print('    Executing remote calls')
     results_path = os.path.join(tempdir, 'results.json')
     cmd = 'ssh {host} python3 -m rpc_bench {url} --calls {calls_path} --output {output}'.format(
         host=remote,
@@ -138,6 +171,8 @@ def _execute_node_remote_calls(
     subprocess.check_output(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # retrieve benchmark results
+    if verbose:
+        print('    Retrieving results')
     cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 

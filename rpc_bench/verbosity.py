@@ -77,13 +77,41 @@ def _print_benchmark_prelude(
 
 def _print_benchmark_summary(
     latencies: spec.NodesMethodLatencies,
+    start_time: datetime.datetime,
     calls: spec.MethodCalls,
 ) -> None:
+    import datetime
+    import time
     import numpy as np
     import toolstr
 
+    print()
+    print()
+    toolstr.print_header(
+        toolstr.add_style(
+            'Benchmark Summary', spec.styles['metavar']
+        ),
+        style=spec.styles['content'],
+    )
+    end_time = datetime.datetime.fromtimestamp(int(time.time()))
+    toolstr.print_bullet(
+        key='start_time',
+        value=start_time,
+        styles=spec.styles,
+    )
+    toolstr.print_bullet(
+        key='end_time',
+        value='  ' + str(end_time),
+        styles=spec.styles,
+    )
+    toolstr.print_bullet(
+        key='duration',
+        value='  ' + str(end_time - start_time).split('.')[0],
+        styles=spec.styles,
+    )
+
     # print table of latency per provider
-    all_latencies = []
+    all_latencies: list[float] = []
     rows = []
     for method in calls.keys():
         row = [method]
@@ -124,42 +152,19 @@ def _print_benchmark_summary(
     )
 
 
-def _print_call_prelude() -> datetime.datetime:
-    import datetime
-    import time
+def _print_local_execution_prelude() -> None:
     import toolstr
 
     print()
     print()
-    toolstr.print_text_box(
+    toolstr.print_header(
         toolstr.add_style('Performing Local Benchmarks...', spec.styles['metavar']),
         style=spec.styles['content'],
     )
-    start_time = datetime.datetime.fromtimestamp(int(time.time()))
-    toolstr.print_bullet(
-        key='start_time',
-        value=start_time,
-        styles=spec.styles,
-    )
-    return start_time
 
 
-def _print_call_summary(start_time: datetime.datetime) -> None:
-    import datetime
-    import time
-    import toolstr
-
-    end_time = datetime.datetime.fromtimestamp(int(time.time()))
-    toolstr.print_bullet(
-        key='end_time',
-        value='  ' + str(end_time),
-        styles=spec.styles,
-    )
-    toolstr.print_bullet(
-        key='duration',
-        value='  ' + str(end_time - start_time).split('.')[0],
-        styles=spec.styles,
-    )
+def _print_local_execution_summary(start_time: datetime.datetime) -> None:
+    pass
 
 
 def _get_progress_bars(
@@ -173,21 +178,20 @@ def _get_progress_bars(
     node_bar: spec.ProgressBar = {
         'desc': '  nodes',
         'position': positions[0],
-        'leave': False,
+        'leave': True,
         'colour': spec.styles['content'],
         'disable': (not verbose) or (len(nodes) == 1),
     }
     method_bar: spec.ProgressBar = {
         'desc': 'methods',
         'position': positions[1],
-        'leave': False,
+        'leave': len(nodes) == 1,
         'colour': spec.styles['content'],
         'disable': not verbose,
     }
     sample_bar: spec.ProgressBar = {
         'desc': 'samples',
         'position': positions[2],
-        'leave': False,
         'leave': False,
         'colour': spec.styles['content'],
         'disable': not verbose,

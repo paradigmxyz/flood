@@ -22,9 +22,13 @@ def run_latency_benchmark(
 ) -> None:
     """run latency benchmark on specified nodes and methods"""
 
+    import datetime
+    import time
+
     # parse inputs
     if not isinstance(nodes, dict):
         nodes = _parse_nodes(nodes)
+    start_time = datetime.datetime.fromtimestamp(int(time.time()))
 
     # create calls
     if calls is None:
@@ -53,7 +57,9 @@ def run_latency_benchmark(
 
     # print summary
     if verbose:
-        verbosity._print_benchmark_summary(latencies=latencies, calls=calls)
+        verbosity._print_benchmark_summary(
+            latencies=latencies, calls=calls, start_time=start_time
+        )
 
     # output file
     if output_file is not None:
