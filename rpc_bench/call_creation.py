@@ -63,3 +63,87 @@ def _get_call_creator(method: str) -> typing.Callable[..., typing.Any]:
     else:
         raise ValueError('unknown method: ' + str(method))
 
+
+def choose_random_blocks(
+    n: int,
+    start_block: int,
+    end_block: int,
+    *,
+    replace: bool = False,
+    sort: bool = False,
+) -> typing.Sequence[int]:
+    import numpy as np
+
+    all_blocks = np.arange(start_block, end_block + 1)
+    chosen = np.random.choice(all_blocks, size=n, replace=replace)
+    if sort:
+        return sorted(chosen)
+    else:
+        return list(chosen)
+
+
+def choose_random_block_ranges(
+    *,
+    n: int,
+    range_size: int,
+    start_block: int,
+    end_block: int,
+    non_overlapping: bool = True,
+    sort: bool = False,
+    n_attempts: int = 1_000_000,
+) -> typing.Sequence[tuple[int, int]]:
+    import random
+
+    # create starting sample
+    start_blocks = choose_random_blocks(
+        n=n,
+        start_block=start_block,
+        end_block=end_block,
+        replace=non_overlapping,
+    )
+    candidates = iter(start_blocks)
+
+    # create ranges
+    attempt = 0
+    ranges: set[tuple[int, int]] = set()
+    while len(ranges) < n:
+        attempt += 1
+        if attempt > n_attempts:
+            raise Exception(
+                'could not find block range set after '
+                + str(n_attempts)
+                + ' attempts'
+            )
+
+        # ceate new candidate
+        try:
+            start = next(candidates)
+        except StopIteration:
+            start = random.randint(start_block, end_block)
+        end = start + range_size
+        candidate = (start, end)
+
+        # check whether candidate is valid
+        if candidate in ranges:
+            continue
+        if end > end_block:
+            continue
+        if non_overlapping:
+            skip = False
+            for other_start, other_end in ranges:
+                if other_start <= end and other_end >= start:
+                    skip = True
+                    break
+            if skip:
+                continue
+
+        ranges.add(candidate)
+
+    # sort
+    if sort:
+        return sorted(ranges)
+    else:
+        ranges_list = list(ranges)
+        random.shuffle(ranges_list)
+        return ranges_list
+
