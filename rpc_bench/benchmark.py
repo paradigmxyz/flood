@@ -103,6 +103,16 @@ def _parse_node(node: str | spec.Node) -> spec.Node:
             name = node
             url = node
 
+        # check if node is in ctc aliases
+        try:
+            import ctc.config
+
+            ctc_providers = ctc.config.get_providers()
+            if url in ctc_providers:
+                url = ctc_providers[url]['url']
+        except ImportError:
+            pass
+
         # parse remote and url
         if ':' in url:
             head, tail = url.split(':', 1)
