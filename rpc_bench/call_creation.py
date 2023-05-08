@@ -5,6 +5,9 @@ import typing
 
 from rpc_bench import spec
 
+if typing.TYPE_CHECKING:
+    import numpy as np
+
 
 def get_all_methods() -> typing.Sequence[str]:
     return [
@@ -71,11 +74,21 @@ def choose_random_blocks(
     *,
     replace: bool = False,
     sort: bool = False,
+    seed: int | np.random._generator.Generator | None = None,
 ) -> typing.Sequence[int]:
     import numpy as np
 
+    # seed a generator
+    if seed is None:
+        seed = 0
+    if isinstance(seed, int):
+        gen = np.random.Generator(np.random.PCG64(seed))
+
+    # generate blocks
     all_blocks = np.arange(start_block, end_block + 1)
-    chosen = np.random.choice(all_blocks, size=n, replace=replace)
+    chosen = gen.choice(all_blocks, size=n, replace=replace)
+
+    # sort
     if sort:
         return sorted(chosen)
     else:
@@ -91,8 +104,15 @@ def choose_random_block_ranges(
     non_overlapping: bool = True,
     sort: bool = False,
     n_attempts: int = 1_000_000,
+    seed: int | np.random._generator.Generator | None = None,
 ) -> typing.Sequence[tuple[int, int]]:
-    import random
+    import numpy as np
+
+    # seed a generator
+    if seed is None:
+        seed = 0
+    if isinstance(seed, int):
+        gen = np.random.Generator(np.random.PCG64(seed))
 
     # create starting sample
     start_blocks = choose_random_blocks(
@@ -107,6 +127,7 @@ def choose_random_block_ranges(
     attempt = 0
     ranges: set[tuple[int, int]] = set()
     while len(ranges) < n:
+        # record attempt
         attempt += 1
         if attempt > n_attempts:
             raise Exception(
@@ -115,11 +136,11 @@ def choose_random_block_ranges(
                 + ' attempts'
             )
 
-        # ceate new candidate
+        # create new candidate
         try:
             start = next(candidates)
         except StopIteration:
-            start = random.randint(start_block, end_block)
+            start = gen.integers(start_block, end_block)
         end = start + range_size
         candidate = (start, end)
 
@@ -144,6 +165,6 @@ def choose_random_block_ranges(
         return sorted(ranges)
     else:
         ranges_list = list(ranges)
-        random.shuffle(ranges_list)
+        gen.random.shuffle(ranges_list)
         return ranges_list
 

@@ -1,6 +1,8 @@
 """tool for benchmarking RPC endpoints"""
 
 from .benchmark import *
+from .call_creation import *
+from .call_execution import *
 from .spec import *
 
 
