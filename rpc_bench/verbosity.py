@@ -16,6 +16,7 @@ def _print_benchmark_prelude(
     random_seed: int | str | None,
     calls: spec.MethodCalls,
     output_file: str | None = None,
+    start_time: datetime.datetime,
 ) -> None:
     import toolstr
 
@@ -72,6 +73,11 @@ def _print_benchmark_prelude(
     )
     toolstr.print_bullet(
         key='output_file', value=output_file, styles=spec.styles
+    )
+    toolstr.print_bullet(
+        key='start_time',
+        value=start_time,
+        styles=spec.styles,
     )
 
 
@@ -163,7 +169,7 @@ def _print_local_execution_prelude() -> None:
     )
 
 
-def _print_local_execution_summary(start_time: datetime.datetime) -> None:
+def _print_local_execution_summary() -> None:
     pass
 
 

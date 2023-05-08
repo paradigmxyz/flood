@@ -48,6 +48,7 @@ def run_latency_benchmark(
             random_seed=random_seed,
             calls=calls,
             output_file=output_file,
+            start_time=start_time,
         )
 
     # perform calls

@@ -43,7 +43,7 @@ def _execute_local_calls(
 
     # print prelude and get progress bars
     if verbose:
-        start_time = verbosity._print_local_execution_prelude()
+        verbosity._print_local_execution_prelude()
     node_bar, method_bar, sample_bar = verbosity._get_progress_bars(
         nodes=nodes, verbose=verbose
     )
@@ -72,7 +72,7 @@ def _execute_local_calls(
 
     # print summary
     if verbose:
-        verbosity._print_local_execution_summary(start_time)
+        verbosity._print_local_execution_summary()
 
     return latencies
 
@@ -147,7 +147,7 @@ def _execute_node_remote_calls(
             + toolstr.add_style(':', spec.styles['title'])
             + ' host'
             + toolstr.add_style('=', spec.styles['title'])
-            + toolstr.add_style(node['remote'], spec.styles['metavar'])
+            + toolstr.add_style(remote, spec.styles['metavar'])
             + ', url'
             + toolstr.add_style('=', spec.styles['title'])
             + toolstr.add_style(node['url'], spec.styles['metavar'])
