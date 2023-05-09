@@ -165,6 +165,6 @@ def choose_random_block_ranges(
         return sorted(ranges)
     else:
         ranges_list = list(ranges)
-        gen.random.shuffle(ranges_list)
+        gen.shuffle(ranges_list)
         return ranges_list
 
