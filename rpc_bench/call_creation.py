@@ -74,15 +74,15 @@ def choose_random_blocks(
     *,
     replace: bool = False,
     sort: bool = False,
-    seed: int | np.random._generator.Generator | None = None,
+    random_seed: int | np.random._generator.Generator | None = None,
 ) -> typing.Sequence[int]:
     import numpy as np
 
     # seed a generator
-    if seed is None:
-        seed = 0
-    if isinstance(seed, int):
-        gen = np.random.Generator(np.random.PCG64(seed))
+    if random_seed is None:
+        random_seed = 0
+    if isinstance(random_seed, int):
+        gen = np.random.Generator(np.random.PCG64(random_seed))
 
     # generate blocks
     all_blocks = np.arange(start_block, end_block + 1)
@@ -104,15 +104,15 @@ def choose_random_block_ranges(
     non_overlapping: bool = True,
     sort: bool = False,
     n_attempts: int = 1_000_000,
-    seed: int | np.random._generator.Generator | None = None,
+    random_seed: int | np.random._generator.Generator | None = None,
 ) -> typing.Sequence[tuple[int, int]]:
     import numpy as np
 
     # seed a generator
-    if seed is None:
-        seed = 0
-    if isinstance(seed, int):
-        gen = np.random.Generator(np.random.PCG64(seed))
+    if random_seed is None:
+        random_seed = 0
+    if isinstance(random_seed, int):
+        gen = np.random.Generator(np.random.PCG64(random_seed))
 
     # create starting sample
     start_blocks = choose_random_blocks(

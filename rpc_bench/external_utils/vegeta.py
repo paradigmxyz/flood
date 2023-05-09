@@ -4,8 +4,10 @@ import typing
 
 if typing.TYPE_CHECKING:
 
-    class VegetaReport(typing.TypedDict):
-        latencies: typing.Mapping[str, str]
+    import polars as pl
+
+    class RawVegetaTestOutput(typing.TypedDict):
+        latencies: typing.Mapping[str, float]
         bytes_in: typing.Mapping[str, int]
         bytes_out: typing.Mapping[str, int]
         earliest: str
@@ -20,13 +22,84 @@ if typing.TYPE_CHECKING:
         status_codes: typing.Mapping[str, int]
         errors: typing.Sequence[str]
 
+    class VegetaTestOutput(typing.TypedDict):
+        target_rate: int
+        actual_rate: float
+        requests: int
+        throughput: float
+        success: float
+        min: float
+        mean: float
+        p50: float
+        p90: float
+        p95: float
+        p99: float
+        max: float
 
-def run_vegeta_loadtest(
-    calls: typing.Sequence[typing.Any],
+    class VegetaTestsOutput(typing.TypedDict):
+        target_rate: typing.Sequence[int]
+        actual_rate: typing.Sequence[float]
+        requests: typing.Sequence[int]
+        throughput: typing.Sequence[float]
+        success: typing.Sequence[float]
+        min: typing.Sequence[float]
+        mean: typing.Sequence[float]
+        p50: typing.Sequence[float]
+        p90: typing.Sequence[float]
+        p95: typing.Sequence[float]
+        p99: typing.Sequence[float]
+        max: typing.Sequence[float]
+
+
+def run_loadtests(
     url: str,
-    duration: int | None = None,
-    rate: int | None = None,
-) -> VegetaReport:
+    rates: typing.Sequence[int],
+    calls: typing.Sequence[typing.Any],
+    duration: int = 5,
+    verbose: bool = True,
+    output_format: typing.Literal['dict', 'polars'] = 'dict',
+) -> VegetaTestsOutput | pl.DataFrame:
+
+    # validate inputs
+    if len(rates) == 0:
+        raise Exception('must specify at least one rate')
+
+    # perform tests
+    reports = []
+    for rate in rates:
+        if verbose:
+            print('running loadtest, rate =', rate)
+        report = run_loadtest(
+            calls=calls,
+            url=url,
+            duration=duration,
+            rate=rate,
+        )
+        reports.append(report)
+
+    # format output
+    if output_format == 'dict':
+        return {  # type: ignore
+            key: [report[key] for report in reports]  # type: ignore
+            for key in reports[0].keys()
+        }
+
+    elif output_format == 'polars':
+        import polars as pl
+
+        return pl.DataFrame(reports)
+
+    else:
+        raise Exception('invalid output_format: ' + str(output_format))
+
+
+def run_loadtest(
+    url: str,
+    rate: int,
+    calls: typing.Sequence[typing.Any],
+    *,
+    duration: int = 5,
+) -> VegetaTestOutput:
     attack = _construct_vegeta_attack(
         calls=calls,
         url=url,
@@ -37,7 +110,10 @@ def run_vegeta_loadtest(
         duration=duration,
         rate=rate,
     )
-    report = _create_vegeta_report(attack_output=attack_output)
+    report = _create_vegeta_report(
+        attack_output=attack_output,
+        target_rate=rate,
+    )
     return report
 
 
@@ -134,7 +210,9 @@ def _run_vegeta_attack(
     return subprocess.check_output(cmd.split(' '))
 
 
-def _create_vegeta_report(attack_output: bytes) -> VegetaReport:
+def _create_vegeta_report(
+    attack_output: bytes, target_rate: int
+) -> VegetaTestOutput:
     import json
     import subprocess
 
@@ -144,6 +222,19 @@ def _create_vegeta_report(attack_output: bytes) -> VegetaReport:
         .decode()
         .strip()
     )
-    report: VegetaReport = json.loads(report_output)
-    return report
+    report: RawVegetaTestOutput = json.loads(report_output)
+    return {
+        'target_rate': target_rate,
+        'actual_rate': report['rate'],
+        'requests': report['requests'],
+        'throughput': report['throughput'],
+        'success': float(report['success']),
+        'min': report['latencies']['min'] / 1e9,
+        'mean': report['latencies']['mean'] / 1e9,
+        'p50': report['latencies']['50th'] / 1e9,
+        'p90': report['latencies']['90th'] / 1e9,
+        'p95': report['latencies']['95th'] / 1e9,
+        'p99': report['latencies']['99th'] / 1e9,
+        'max': report['latencies']['max'] / 1e9,
+    }
 
