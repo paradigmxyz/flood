@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing
 
 if typing.TYPE_CHECKING:
-
     import polars as pl
 
     class RawVegetaTestOutput(typing.TypedDict):
@@ -59,18 +58,27 @@ def run_loadtests(
     verbose: bool = True,
     output_format: typing.Literal['dict', 'polars'] = 'dict',
 ) -> VegetaTestsOutput | pl.DataFrame:
-
     # validate inputs
     if len(rates) == 0:
         raise Exception('must specify at least one rate')
 
+    # partition calls into tests
+    calls_iter = iter(calls)
+    tests_calls = []
+    for rate in rates:
+        n_test_calls = rate * duration
+        test_calls = []
+        for i in range(n_test_calls):
+            test_calls.append(next(calls_iter))
+        tests_calls.append(test_calls)
+
     # perform tests
     reports = []
-    for rate in rates:
+    for rate, test_calls in zip(rates, tests_calls):
         if verbose:
             print('running loadtest, rate =', rate)
         report = run_loadtest(
-            calls=calls,
+            calls=test_calls,
             url=url,
             duration=duration,
             rate=rate,
@@ -190,12 +198,10 @@ def _run_vegeta_attack(
     # construct command
     cmd = 'vegeta attack'
     cmd += ' -targets=' + os.path.join(schedule_dir, 'vegeta_targets')
-    if duration is not None:
-        cmd += ' -duration=' + str(duration)
     if rate is not None:
         cmd += ' -rate=' + str(rate)
     if duration is not None:
-        cmd += ' -duration=' + str(duration)
+        cmd += ' -duration=' + str(duration) + 's'
     if max_connections is not None:
         cmd += ' -max-connections=' + str(max_connections)
     if max_workers is not None:
