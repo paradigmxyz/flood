@@ -22,7 +22,7 @@ def test_eth_get_logs_by_contract(
     rates: typing.Sequence[int],
     duration: int,
     range_size: int,
-) -> typing.Mapping[str, rpc_bench.Test]:
+) -> typing.Mapping[str, rpc_bench.LoadTest]:
     """test: Transfers of USDC vs DAI vs LUSD"""
 
     n_calls = rpc_bench.estimate_total_test_calls(
@@ -36,7 +36,7 @@ def test_eth_get_logs_by_contract(
         range_size=range_size,
     )
 
-    tests: typing.MutableMapping[str, rpc_bench.Test] = {}
+    tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for name, contract_address in contracts.items():
         calls = rpc_bench.create_calls_eth_get_logs(
             contract_address=contract_address,
@@ -58,14 +58,14 @@ def test_eth_get_logs_by_block_range_size(
     rates: typing.Sequence[int],
     duration: int,
     range_sizes: typing.Sequence[int],
-) -> typing.Mapping[str, rpc_bench.Test]:
+) -> typing.Mapping[str, rpc_bench.LoadTest]:
     """test: tiny vs small vs medium vs large block ranges"""
 
     n_calls = rpc_bench.estimate_total_test_calls(
         rates=rates, duration=duration
     )
 
-    tests: typing.MutableMapping[str, rpc_bench.Test] = {}
+    tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for range_size in range_sizes:
         block_ranges = rpc_bench.choose_random_block_ranges(
             start_block=12_178_594,
@@ -94,14 +94,14 @@ def test_eth_get_logs_by_block_age(
     rates: typing.Sequence[int],
     duration: int,
     block_bounds: typing.Mapping[str, tuple[int, int]],
-) -> typing.Mapping[str, rpc_bench.Test]:
+) -> typing.Mapping[str, rpc_bench.LoadTest]:
     """test old vs new blocks"""
 
     n_calls = rpc_bench.estimate_total_test_calls(
         rates=rates, duration=duration
     )
 
-    tests: typing.MutableMapping[str, rpc_bench.Test] = {}
+    tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for name, (start_block, end_block) in block_bounds.items():
         block_ranges = rpc_bench.choose_random_block_ranges(
             start_block=start_block,

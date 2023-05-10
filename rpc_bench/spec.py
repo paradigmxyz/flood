@@ -43,13 +43,13 @@ if typing.TYPE_CHECKING:
         colour: str
         disable: bool
 
-    class Test(typing.TypedDict):
+    class LoadTest(typing.TypedDict):
         url: str
         rates: typing.Sequence[int]
         duration: int
         calls: typing.Sequence[typing.Any]
 
-    class RawVegetaTestOutput(typing.TypedDict):
+    class RawLoadTestOutputDatum(typing.TypedDict):
         latencies: typing.Mapping[str, float]
         bytes_in: typing.Mapping[str, int]
         bytes_out: typing.Mapping[str, int]
@@ -65,7 +65,7 @@ if typing.TYPE_CHECKING:
         status_codes: typing.Mapping[str, int]
         errors: typing.Sequence[str]
 
-    class VegetaTestOutput(typing.TypedDict):
+    class LoadTestOutputDatum(typing.TypedDict):
         target_rate: int
         actual_rate: float
         target_duration: int
@@ -81,7 +81,7 @@ if typing.TYPE_CHECKING:
         p99: float
         max: float
 
-    class VegetaTestsOutput(typing.TypedDict):
+    class LoadTestOutput(typing.TypedDict):
         target_rate: typing.Sequence[int]
         actual_rate: typing.Sequence[float]
         target_duration: typing.Sequence[int]
@@ -96,9 +96,6 @@ if typing.TYPE_CHECKING:
         p95: typing.Sequence[float]
         p99: typing.Sequence[float]
         max: typing.Sequence[float]
-
-    LoadTestOutput = VegetaTestsOutput
-
 
 
 styles: toolcli.StyleTheme = {

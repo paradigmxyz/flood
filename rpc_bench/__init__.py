@@ -3,6 +3,7 @@
 from .benchmark import *
 from .call_creation import *
 from .call_execution import *
+from .loadtests import *
 from .spec import *
 from .external_utils.vegeta import *
 
