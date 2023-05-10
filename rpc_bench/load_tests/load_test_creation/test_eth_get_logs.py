@@ -17,7 +17,46 @@ event_hashes = {
 }
 
 
-def test_eth_get_logs_by_contract(
+def create_load_tests_eth_get_logs_by_url(
+    urls: typing.Sequence[str] | typing.Mapping[str, str],
+    rates: typing.Sequence[int],
+    duration: int,
+) -> typing.Mapping[str, rpc_bench.LoadTest]:
+
+    if isinstance(urls, list):
+        urls = {url: url for url in urls}
+    if not isinstance(urls, dict):
+        raise Exception('could not convert urls')
+
+    n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
+
+    block_ranges = rpc_bench.choose_random_block_ranges(
+        start_block=10_000_000,
+        end_block=16_000_000,
+        n=n_calls,
+        range_size=100,
+        random_seed=0,
+    )
+
+    calls = rpc_bench.create_calls_eth_get_logs(
+        contract_address=contracts['USDC'],
+        topics=[event_hashes['Transfer']],
+        block_ranges=block_ranges,
+    )
+
+    tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
+    for name, url in urls.items():
+        tests[name] = {
+            'url': url,
+            'rates': rates,
+            'duration': duration,
+            'calls': calls,
+        }
+
+    return tests
+
+
+def create_load_tests_eth_get_logs_by_contract(
     url: str,
     rates: typing.Sequence[int],
     duration: int,
@@ -25,9 +64,7 @@ def test_eth_get_logs_by_contract(
 ) -> typing.Mapping[str, rpc_bench.LoadTest]:
     """test: Transfers of USDC vs DAI vs LUSD"""
 
-    n_calls = rpc_bench.estimate_total_test_calls(
-        rates=rates, duration=duration
-    )
+    n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
 
     block_ranges = rpc_bench.choose_random_block_ranges(
         start_block=12_178_594,
@@ -53,7 +90,7 @@ def test_eth_get_logs_by_contract(
     return tests
 
 
-def test_eth_get_logs_by_block_range_size(
+def create_load_tests_eth_get_logs_by_block_range_size(
     url: str,
     rates: typing.Sequence[int],
     duration: int,
@@ -61,9 +98,7 @@ def test_eth_get_logs_by_block_range_size(
 ) -> typing.Mapping[str, rpc_bench.LoadTest]:
     """test: tiny vs small vs medium vs large block ranges"""
 
-    n_calls = rpc_bench.estimate_total_test_calls(
-        rates=rates, duration=duration
-    )
+    n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
 
     tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for range_size in range_sizes:
@@ -89,7 +124,7 @@ def test_eth_get_logs_by_block_range_size(
     return tests
 
 
-def test_eth_get_logs_by_block_age(
+def create_load_tests_eth_get_logs_by_block_age(
     url: str,
     rates: typing.Sequence[int],
     duration: int,
@@ -97,9 +132,7 @@ def test_eth_get_logs_by_block_age(
 ) -> typing.Mapping[str, rpc_bench.LoadTest]:
     """test old vs new blocks"""
 
-    n_calls = rpc_bench.estimate_total_test_calls(
-        rates=rates, duration=duration
-    )
+    n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
 
     tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for name, (start_block, end_block) in block_bounds.items():

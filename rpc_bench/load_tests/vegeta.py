@@ -5,7 +5,7 @@ import typing
 from .. import spec
 
 
-def run_loadtest_datum(
+def run_vegeta_attack(
     *,
     url: str,
     rate: int,
@@ -17,7 +17,7 @@ def run_loadtest_datum(
         url=url,
         verbose=False,
     )
-    attack_output = _run_vegeta_attack(
+    attack_output = _vegeta_attack(
         schedule_dir=attack['schedule_dir'],
         duration=duration,
         rate=rate,
@@ -40,7 +40,7 @@ def _construct_vegeta_attack(
     import os
     import tempfile
 
-    headers = {"Content-Type": "application/json"}
+    headers = {'Content-Type': 'application/json'}
 
     # determine output directory
     if schedule_dir is None:
@@ -50,31 +50,31 @@ def _construct_vegeta_attack(
     call_paths = []
     for c, call in enumerate(calls):
         vegeta_calls_path = os.path.join(
-            schedule_dir, "vegeta_calls_" + str(c) + ".json"
+            schedule_dir, 'vegeta_calls_' + str(c) + '.json'
         )
         with open(vegeta_calls_path, 'w') as f:
             f.write(json.dumps(call))
         call_paths.append(vegeta_calls_path)
 
     # create targets specification
-    vegeta_targets_path = os.path.join(schedule_dir, "vegeta_targets")
-    with open(vegeta_targets_path, "w") as f:
+    vegeta_targets_path = os.path.join(schedule_dir, 'vegeta_targets')
+    with open(vegeta_targets_path, 'w') as f:
         for c, call in enumerate(calls):
-            f.write("POST " + url + '\n')
+            f.write('POST ' + url + '\n')
             for key, value in headers.items():
-                f.write(key + ": " + value + '\n')
-            f.write("@" + call_paths[c] + '\n')
+                f.write(key + ': ' + value + '\n')
+            f.write('@' + call_paths[c] + '\n')
             f.write('\n')
 
     # output summary
     if verbose:
-        print("created files:")
+        print('created files:')
         print('- targets:', vegeta_targets_path)
         print('- calls:', vegeta_calls_path)
         print()
-        print("run using:")
+        print('run using:')
         print(
-            "vegeta attack -targets "
+            'vegeta attack -targets '
             + vegeta_targets_path
             + ' -duration=5s | vegeta report'
         )
@@ -86,7 +86,7 @@ def _construct_vegeta_attack(
     }
 
 
-def _run_vegeta_attack(
+def _vegeta_attack(
     schedule_dir: str,
     *,
     duration: int | None = None,
@@ -138,7 +138,7 @@ def _create_vegeta_report(
     report: spec.RawLoadTestOutputDatum = json.loads(report_output)
     return {
         'target_rate': target_rate,
-        'actual_rate': report['rate'],
+        'actual_rate': report['rate'] / 1e9,
         'target_duration': target_duration,
         'actual_duration': report['duration'],
         'requests': report['requests'],

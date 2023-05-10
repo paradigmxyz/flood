@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from . import spec
-from . import verbosity
+from rpc_bench import spec
+from . import latency_test_outputs
 
 
 def execute_calls(
@@ -43,8 +43,8 @@ def _execute_local_calls(
 
     # print prelude and get progress bars
     if verbose:
-        verbosity._print_local_execution_prelude()
-    node_bar, method_bar, sample_bar = verbosity._get_progress_bars(
+        latency_test_outputs._print_local_execution_prelude()
+    node_bar, method_bar, sample_bar = latency_test_outputs._get_progress_bars(
         nodes=nodes, verbose=verbose
     )
 
@@ -72,7 +72,7 @@ def _execute_local_calls(
 
     # print summary
     if verbose:
-        verbosity._print_local_execution_summary()
+        latency_test_outputs._print_local_execution_summary()
 
     return latencies
 

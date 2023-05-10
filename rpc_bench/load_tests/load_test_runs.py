@@ -2,51 +2,20 @@ from __future__ import annotations
 
 import typing
 
-from . import spec
-from . import verbosity
-from .external_utils import vegeta
+from rpc_bench import spec
+from rpc_bench import outputs
+from . import vegeta
 
 
-#
-# # loadtest creation
-#
-
-def estimate_total_test_calls(
-    rates: typing.Sequence[int],
-    duration: int = 5,
-    *,
-    n_repeats: int | None = None,
-) -> int:
-    n_calls = sum(duration * rate for rate in rates)
-    if n_repeats is not None:
-        n_calls *= n_repeats
-    return n_calls
-
-
-def create_loadtests(
-    url: str | None = None,
-    urls: typing.Sequence[str] | None = None,
-    calls: typing.Sequence[spec.Call] | None = None,
-    calls_lists: typing.Sequence[typing.Sequence[spec.Call]] | None = None,
-    duration: int | None = None,
-    durations: typing.Sequence[int] | typing.Mapping[str, int] | None = None,
-    rates: int | None = None,
-    rates_list: typing.Sequence[int] | typing.Mapping[str, int] | None = None,
-) -> typing.Mapping[str, spec.LoadTest]:
-    raise NotADirectoryError()
-
-
-#
-# # loadtest running
-#
-
-def run_loadtests(
+def run_load_tests(
     tests: typing.Mapping[str, spec.LoadTest],
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
     results = {}
-    tqdm = verbosity._get_tqdm()
-    for name, test in tqdm.tqdm(tests, desc='nodes', leave=False, position=0):
-        results[name] = run_loadtest(
+    tqdm = outputs._get_tqdm()
+    for name, test in tqdm.tqdm(
+        tests.items(), desc='nodes', leave=False, position=0
+    ):
+        results[name] = run_load_test(
             url=test['url'],
             rates=test['rates'],
             calls=test['calls'],
@@ -58,7 +27,7 @@ def run_loadtests(
     return results
 
 
-def run_loadtest(
+def run_load_test(
     *,
     url: str,
     rates: typing.Sequence[int],
@@ -83,14 +52,14 @@ def run_loadtest(
 
     # perform tests
     reports = []
-    tqdm = verbosity._get_tqdm()
+    tqdm = outputs._get_tqdm()
     for rate, test_calls in tqdm.tqdm(
         list(zip(rates, tests_calls)),
         leave=False,
         desc='rates',
         position=tqdm_position,
     ):
-        report = vegeta.run_loadtest_datum(
+        report = vegeta.run_vegeta_attack(
             calls=test_calls,
             url=url,
             duration=duration,

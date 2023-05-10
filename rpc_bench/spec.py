@@ -1,3 +1,5 @@
+"""type definitions for typing annotations"""
+
 from __future__ import annotations
 
 import typing
@@ -5,12 +7,11 @@ import typing
 if typing.TYPE_CHECKING:
     import toolcli
 
-    # class Call(typing.TypedDict):
-    #     jsonrpc: typing.Literal['2.0']
-    #     method: str
-    #     params: typing.Sequence[typing.Any]
-    #     id: int
-    Call = typing.Mapping[str, typing.Any]
+    #
+    # # generic types
+    #
+
+    Call = typing.Mapping[str, typing.Mapping[str, typing.Any]]
 
     MethodCalls = typing.Mapping[str, typing.Sequence[typing.Any]]
 
@@ -26,6 +27,17 @@ if typing.TYPE_CHECKING:
         typing.Mapping[str, Node],
     ]
 
+    class ProgressBar(typing.TypedDict):
+        desc: str
+        position: int | None
+        leave: bool
+        colour: str
+        disable: bool
+
+    #
+    # # latency test types
+    #
+
     NodeMethodLatencies = typing.Mapping[str, typing.Sequence[float]]
     NodesMethodLatencies = typing.Mapping[str, NodeMethodLatencies]
 
@@ -36,12 +48,9 @@ if typing.TYPE_CHECKING:
         calls: typing.Mapping[str, typing.Sequence[str]]
         latencies: NodesMethodLatencies
 
-    class ProgressBar(typing.TypedDict):
-        desc: str
-        position: int | None
-        leave: bool
-        colour: str
-        disable: bool
+    #
+    # # load test types
+    #
 
     class LoadTest(typing.TypedDict):
         url: str

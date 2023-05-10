@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 import typing
 
-from . import call_creation
-from . import call_execution
-from . import spec
-from . import verbosity
+from rpc_bench import call_creation
+from rpc_bench import spec
+from . import latency_test_execution
+from . import latency_test_outputs
 
 
 def run_latency_benchmark(
@@ -41,7 +41,7 @@ def run_latency_benchmark(
 
     # print prelude
     if verbose:
-        verbosity._print_benchmark_prelude(
+        latency_test_outputs._print_benchmark_prelude(
             nodes=nodes,
             methods=methods,
             samples=samples,
@@ -52,13 +52,13 @@ def run_latency_benchmark(
         )
 
     # perform calls
-    latencies = call_execution.execute_calls(
+    latencies = latency_test_execution.execute_calls(
         nodes=nodes, calls=calls, verbose=verbose
     )
 
     # print summary
     if verbose:
-        verbosity._print_benchmark_summary(
+        latency_test_outputs._print_benchmark_summary(
             latencies=latencies, calls=calls, start_time=start_time
         )
 
