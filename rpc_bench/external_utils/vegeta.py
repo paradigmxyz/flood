@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from .. import verbosity
+
 if typing.TYPE_CHECKING:
     import polars as pl
 
@@ -50,6 +52,44 @@ if typing.TYPE_CHECKING:
         max: typing.Sequence[float]
 
 
+def estimate_total_test_calls(
+    rates: typing.Sequence[int], duration: int = 5
+) -> int:
+    return sum(duration * rate for rate in rates)
+
+
+def run_multi_node_loadtests(
+    urls: typing.Sequence[str] | typing.Mapping[str, str],
+    rates: typing.Sequence[int],
+    calls: typing.Sequence[typing.Any],
+    duration: int = 5,
+    verbose: bool = True,
+    output_format: typing.Literal['dict', 'polars'] = 'dict',
+) -> typing.Mapping[str, VegetaTestsOutput | pl.DataFrame]:
+
+    if isinstance(urls, list):
+        urls = {url: url for url in urls}
+    if not isinstance(urls, dict):
+        raise Exception('urls could not be converted to dict')
+
+    results = {}
+    tqdm = verbosity._get_tqdm()
+    for name, url in tqdm.tqdm(
+        urls.items(), desc='nodes', leave=False, position=0
+    ):
+        results[name] = run_loadtests(
+            url=url,
+            rates=rates,
+            calls=calls,
+            duration=duration,
+            verbose=verbose,
+            output_format=output_format,
+            tqdm_position=1,
+        )
+
+    return results
+
+
 def run_loadtests(
     url: str,
     rates: typing.Sequence[int],
@@ -57,6 +97,7 @@ def run_loadtests(
     duration: int = 5,
     verbose: bool = True,
     output_format: typing.Literal['dict', 'polars'] = 'dict',
+    tqdm_position: int = 0,
 ) -> VegetaTestsOutput | pl.DataFrame:
     # validate inputs
     if len(rates) == 0:
@@ -74,9 +115,13 @@ def run_loadtests(
 
     # perform tests
     reports = []
-    for rate, test_calls in zip(rates, tests_calls):
-        if verbose:
-            print('running loadtest, rate =', rate)
+    tqdm = verbosity._get_tqdm()
+    for rate, test_calls in tqdm.tqdm(
+        list(zip(rates, tests_calls)),
+        leave=False,
+        desc='rates',
+        position=tqdm_position,
+    ):
         report = run_loadtest(
             calls=test_calls,
             url=url,

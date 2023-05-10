@@ -5,6 +5,13 @@ import typing
 if typing.TYPE_CHECKING:
     import toolcli
 
+    # class Call(typing.TypedDict):
+    #     jsonrpc: typing.Literal['2.0']
+    #     method: str
+    #     params: typing.Sequence[typing.Any]
+    #     id: int
+    Call = typing.Mapping[str, typing.Any]
+
     MethodCalls = typing.Mapping[str, typing.Sequence[typing.Any]]
 
     class Node(typing.TypedDict):
@@ -35,6 +42,12 @@ if typing.TYPE_CHECKING:
         leave: bool
         colour: str
         disable: bool
+
+    class Test(typing.TypedDict):
+        url: str
+        rates: typing.Sequence[int]
+        duration: int
+        calls: typing.Sequence[typing.Any]
 
 
 styles: toolcli.StyleTheme = {

@@ -9,6 +9,22 @@ if typing.TYPE_CHECKING:
     import numpy as np
 
 
+def create_calls_eth_get_logs(
+    contract_address: str,
+    topics: typing.Sequence[str | None],
+    block_ranges: typing.Sequence[tuple[int, int]],
+) -> typing.Sequence[spec.Call]:
+    return [
+        ctc.rpc.construct_eth_get_logs(
+            address=contract_address,
+            topics=topics,
+            start_block=start_block,
+            end_block=end_block,
+        )
+        for start_block, end_block in block_ranges
+    ]
+
+
 def get_all_methods() -> typing.Sequence[str]:
     return [
         'eth_blockNumber',
