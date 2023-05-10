@@ -2,60 +2,23 @@ from __future__ import annotations
 
 import typing
 
+from .. import spec
 from .. import verbosity
 
 if typing.TYPE_CHECKING:
     import polars as pl
 
-    class RawVegetaTestOutput(typing.TypedDict):
-        latencies: typing.Mapping[str, float]
-        bytes_in: typing.Mapping[str, int]
-        bytes_out: typing.Mapping[str, int]
-        earliest: str
-        latest: str
-        end: str
-        duration: int
-        wait: int
-        requests: int
-        rate: float
-        throughput: float
-        success: int
-        status_codes: typing.Mapping[str, int]
-        errors: typing.Sequence[str]
-
-    class VegetaTestOutput(typing.TypedDict):
-        target_rate: int
-        actual_rate: float
-        requests: int
-        throughput: float
-        success: float
-        min: float
-        mean: float
-        p50: float
-        p90: float
-        p95: float
-        p99: float
-        max: float
-
-    class VegetaTestsOutput(typing.TypedDict):
-        target_rate: typing.Sequence[int]
-        actual_rate: typing.Sequence[float]
-        requests: typing.Sequence[int]
-        throughput: typing.Sequence[float]
-        success: typing.Sequence[float]
-        min: typing.Sequence[float]
-        mean: typing.Sequence[float]
-        p50: typing.Sequence[float]
-        p90: typing.Sequence[float]
-        p95: typing.Sequence[float]
-        p99: typing.Sequence[float]
-        max: typing.Sequence[float]
-
 
 def estimate_total_test_calls(
-    rates: typing.Sequence[int], duration: int = 5
+    rates: typing.Sequence[int],
+    duration: int = 5,
+    *,
+    n_repeats: int | None = None,
 ) -> int:
-    return sum(duration * rate for rate in rates)
+    n_calls = sum(duration * rate for rate in rates)
+    if n_repeats is not None:
+        n_calls *= n_repeats
+    return n_calls
 
 
 def run_multi_node_loadtests(
@@ -65,8 +28,7 @@ def run_multi_node_loadtests(
     duration: int = 5,
     verbose: bool = True,
     output_format: typing.Literal['dict', 'polars'] = 'dict',
-) -> typing.Mapping[str, VegetaTestsOutput | pl.DataFrame]:
-
+) -> typing.Mapping[str, spec.VegetaTestsOutput | pl.DataFrame]:
     if isinstance(urls, list):
         urls = {url: url for url in urls}
     if not isinstance(urls, dict):
@@ -98,7 +60,7 @@ def run_loadtests(
     verbose: bool = True,
     output_format: typing.Literal['dict', 'polars'] = 'dict',
     tqdm_position: int = 0,
-) -> VegetaTestsOutput | pl.DataFrame:
+) -> spec.VegetaTestsOutput | pl.DataFrame:
     # validate inputs
     if len(rates) == 0:
         raise Exception('must specify at least one rate')
@@ -152,7 +114,7 @@ def run_loadtest(
     calls: typing.Sequence[typing.Any],
     *,
     duration: int = 5,
-) -> VegetaTestOutput:
+) -> spec.VegetaTestOutput:
     attack = _construct_vegeta_attack(
         calls=calls,
         url=url,
@@ -166,6 +128,7 @@ def run_loadtest(
     report = _create_vegeta_report(
         attack_output=attack_output,
         target_rate=rate,
+        target_duration=duration,
     )
     return report
 
@@ -262,8 +225,10 @@ def _run_vegeta_attack(
 
 
 def _create_vegeta_report(
-    attack_output: bytes, target_rate: int
-) -> VegetaTestOutput:
+    attack_output: bytes,
+    target_rate: int,
+    target_duration: int,
+) -> spec.VegetaTestOutput:
     import json
     import subprocess
 
@@ -273,10 +238,12 @@ def _create_vegeta_report(
         .decode()
         .strip()
     )
-    report: RawVegetaTestOutput = json.loads(report_output)
+    report: spec.RawVegetaTestOutput = json.loads(report_output)
     return {
         'target_rate': target_rate,
         'actual_rate': report['rate'],
+        'target_duration': target_duration,
+        'actual_duration': report['duration'],
         'requests': report['requests'],
         'throughput': report['throughput'],
         'success': float(report['success']),

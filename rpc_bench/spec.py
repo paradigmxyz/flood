@@ -49,6 +49,57 @@ if typing.TYPE_CHECKING:
         duration: int
         calls: typing.Sequence[typing.Any]
 
+    class RawVegetaTestOutput(typing.TypedDict):
+        latencies: typing.Mapping[str, float]
+        bytes_in: typing.Mapping[str, int]
+        bytes_out: typing.Mapping[str, int]
+        earliest: str
+        latest: str
+        end: str
+        duration: int
+        wait: int
+        requests: int
+        rate: float
+        throughput: float
+        success: int
+        status_codes: typing.Mapping[str, int]
+        errors: typing.Sequence[str]
+
+    class VegetaTestOutput(typing.TypedDict):
+        target_rate: int
+        actual_rate: float
+        target_duration: int
+        actual_duration: float
+        requests: int
+        throughput: float
+        success: float
+        min: float
+        mean: float
+        p50: float
+        p90: float
+        p95: float
+        p99: float
+        max: float
+
+    class VegetaTestsOutput(typing.TypedDict):
+        target_rate: typing.Sequence[int]
+        actual_rate: typing.Sequence[float]
+        target_duration: typing.Sequence[int]
+        actual_duration: typing.Sequence[float]
+        requests: typing.Sequence[int]
+        throughput: typing.Sequence[float]
+        success: typing.Sequence[float]
+        min: typing.Sequence[float]
+        mean: typing.Sequence[float]
+        p50: typing.Sequence[float]
+        p90: typing.Sequence[float]
+        p95: typing.Sequence[float]
+        p99: typing.Sequence[float]
+        max: typing.Sequence[float]
+
+    LoadTestOutput = VegetaTestsOutput
+
+
 
 styles: toolcli.StyleTheme = {
     'title': 'bold #00e100',
