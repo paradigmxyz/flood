@@ -5,7 +5,6 @@ from __future__ import annotations
 import typing
 
 if typing.TYPE_CHECKING:
-    import toolcli
 
     #
     # # generic types
@@ -105,14 +104,4 @@ if typing.TYPE_CHECKING:
         p95: typing.Sequence[float]
         p99: typing.Sequence[float]
         max: typing.Sequence[float]
-
-
-styles: toolcli.StyleTheme = {
-    'title': 'bold #00e100',
-    'metavar': 'bold #e5e9f0',
-    'description': '#aaaaaa',
-    'content': '#00B400',
-    'option': 'bold #e5e9f0',
-    'comment': '#888888',
-}
 

@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import typing
 
+import rpc_bench
 from rpc_bench import spec
 
 if typing.TYPE_CHECKING:
     import datetime
-    import types
-
 
 
 def _print_benchmark_prelude(
@@ -23,8 +22,8 @@ def _print_benchmark_prelude(
     import toolstr
 
     toolstr.print_text_box(
-        toolstr.add_style('RPC Benchmark', spec.styles['metavar']),
-        style=spec.styles['content'],
+        toolstr.add_style('RPC Benchmark', rpc_bench.styles['metavar']),
+        style=rpc_bench.styles['content'],
         double=True,
     )
 
@@ -36,9 +35,9 @@ def _print_benchmark_prelude(
             label = url
         else:
             label = name + ' (' + url + ')'
-        toolstr.print_bullet(key='node', value=label, styles=spec.styles)
+        toolstr.print_bullet(key='node', value=label, styles=rpc_bench.styles)
     elif len(nodes) > 1:
-        toolstr.print_bullet(key='nodes', value='', styles=spec.styles)
+        toolstr.print_bullet(key='nodes', value='', styles=rpc_bench.styles)
         for node in nodes.values():
             name = node['name']
             url = node['url']
@@ -51,8 +50,8 @@ def _print_benchmark_prelude(
                 value='',
                 colon_str='',
                 indent=4,
-                styles=spec.styles,
-                key_style=spec.styles['description'],
+                styles=rpc_bench.styles,
+                key_style=rpc_bench.styles['description'],
             )
     else:
         raise Exception('no nodes specified')
@@ -60,26 +59,26 @@ def _print_benchmark_prelude(
     if methods is None:
         methods = sorted(list(calls.keys()))
     toolstr.print_bullet(
-        key='methods', value=', '.join(methods), styles=spec.styles
+        key='methods', value=', '.join(methods), styles=rpc_bench.styles
     )
 
     if samples is None:
         example_calls = next(iter(calls.values()))
         samples = len(example_calls)
-    toolstr.print_bullet(key='samples', value=samples, styles=spec.styles)
+    toolstr.print_bullet(key='samples', value=samples, styles=rpc_bench.styles)
 
     if random_seed is None:
         random_seed = 'not specified'
     toolstr.print_bullet(
-        key='random_seed', value=random_seed, styles=spec.styles
+        key='random_seed', value=random_seed, styles=rpc_bench.styles
     )
     toolstr.print_bullet(
-        key='output_file', value=output_file, styles=spec.styles
+        key='output_file', value=output_file, styles=rpc_bench.styles
     )
     toolstr.print_bullet(
         key='start_time',
         value=start_time,
-        styles=spec.styles,
+        styles=rpc_bench.styles,
     )
 
 
@@ -96,26 +95,24 @@ def _print_benchmark_summary(
     print()
     print()
     toolstr.print_header(
-        toolstr.add_style(
-            'Benchmark Summary', spec.styles['metavar']
-        ),
-        style=spec.styles['content'],
+        toolstr.add_style('Benchmark Summary', rpc_bench.styles['metavar']),
+        style=rpc_bench.styles['content'],
     )
     end_time = datetime.datetime.fromtimestamp(int(time.time()))
     toolstr.print_bullet(
         key='start_time',
         value=start_time,
-        styles=spec.styles,
+        styles=rpc_bench.styles,
     )
     toolstr.print_bullet(
         key='end_time',
         value='  ' + str(end_time),
-        styles=spec.styles,
+        styles=rpc_bench.styles,
     )
     toolstr.print_bullet(
         key='duration',
         value='  ' + str(end_time - start_time).split('.')[0],
-        styles=spec.styles,
+        styles=rpc_bench.styles,
     )
 
     # print table of latency per provider
@@ -135,8 +132,10 @@ def _print_benchmark_summary(
     print()
     print()
     toolstr.print_text_box(
-        toolstr.add_style('Mean Latencies (seconds)', spec.styles['metavar']),
-        style=spec.styles['content'],
+        toolstr.add_style(
+            'Mean Latencies (seconds)', rpc_bench.styles['metavar']
+        ),
+        style=rpc_bench.styles['content'],
     )
 
     node_names = list(latencies.keys())
@@ -153,9 +152,9 @@ def _print_benchmark_summary(
         rows,
         indent=4,
         labels=labels,
-        border=spec.styles['content'],
-        label_style=spec.styles['metavar'],
-        column_styles={'method': spec.styles['metavar']},
+        border=rpc_bench.styles['content'],
+        label_style=rpc_bench.styles['metavar'],
+        column_styles={'method': rpc_bench.styles['metavar']},
         column_formats={name: {'decimals': decimals} for name in node_names},
     )
 
@@ -166,8 +165,10 @@ def _print_local_execution_prelude() -> None:
     print()
     print()
     toolstr.print_header(
-        toolstr.add_style('Performing Local Benchmarks...', spec.styles['metavar']),
-        style=spec.styles['content'],
+        toolstr.add_style(
+            'Performing Local Benchmarks...', rpc_bench.styles['metavar']
+        ),
+        style=rpc_bench.styles['content'],
     )
 
 
@@ -187,21 +188,21 @@ def _get_progress_bars(
         'desc': '  nodes',
         'position': positions[0],
         'leave': True,
-        'colour': spec.styles['content'],
+        'colour': rpc_bench.styles['content'],
         'disable': (not verbose) or (len(nodes) == 1),
     }
     method_bar: spec.ProgressBar = {
         'desc': 'methods',
         'position': positions[1],
         'leave': len(nodes) == 1,
-        'colour': spec.styles['content'],
+        'colour': rpc_bench.styles['content'],
         'disable': not verbose,
     }
     sample_bar: spec.ProgressBar = {
         'desc': 'samples',
         'position': positions[2],
         'leave': False,
-        'colour': spec.styles['content'],
+        'colour': rpc_bench.styles['content'],
         'disable': not verbose,
     }
     return node_bar, method_bar, sample_bar

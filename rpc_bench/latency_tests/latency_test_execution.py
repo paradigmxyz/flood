@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import rpc_bench
 from rpc_bench import spec
 from . import latency_test_outputs
 
@@ -91,9 +92,9 @@ def _execute_remote_calls(
         print()
         toolstr.print_header(
             toolstr.add_style(
-                'Performing Remote Benchmarks...', spec.styles['metavar']
+                'Performing Remote Benchmarks...', rpc_bench.styles['metavar']
             ),
-            style=spec.styles['content'],
+            style=rpc_bench.styles['content'],
         )
 
     latencies: typing.MutableMapping[
@@ -142,15 +143,15 @@ def _execute_node_remote_calls(
     # send call data to remote server
     if verbose:
         toolstr.print(
-            toolstr.add_style('- ', spec.styles['title'])
-            + toolstr.add_style(node['name'], spec.styles['metavar'])
-            + toolstr.add_style(':', spec.styles['title'])
+            toolstr.add_style('- ', rpc_bench.styles['title'])
+            + toolstr.add_style(node['name'], rpc_bench.styles['metavar'])
+            + toolstr.add_style(':', rpc_bench.styles['title'])
             + ' host'
-            + toolstr.add_style('=', spec.styles['title'])
-            + toolstr.add_style(remote, spec.styles['metavar'])
+            + toolstr.add_style('=', rpc_bench.styles['title'])
+            + toolstr.add_style(remote, rpc_bench.styles['metavar'])
             + ', url'
-            + toolstr.add_style('=', spec.styles['title'])
-            + toolstr.add_style(node['url'], spec.styles['metavar'])
+            + toolstr.add_style('=', rpc_bench.styles['title'])
+            + toolstr.add_style(node['url'], rpc_bench.styles['metavar'])
         )
         print('    Sending call schedule')
     cmd = 'ssh {host} mkdir {tempdir}'.format(host=remote, tempdir=tempdir)

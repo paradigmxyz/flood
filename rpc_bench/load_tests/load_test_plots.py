@@ -14,14 +14,14 @@ def plot_success(
 
     plot_test_results(
         results=results,
-        metrics=['throughput'],
+        metrics=['success'],
         colors=colors,
         test_name=test_name,
         title='Success Rate vs Request Rate\n(higher is better)',
         ylabel='success rate',
     )
     plt.legend(loc='center right')
-    plt.xlim([-0.03, 1.03])
+    plt.ylim([-0.03, 1.03])
 
 
 def plot_throughput(
