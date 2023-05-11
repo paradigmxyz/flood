@@ -11,7 +11,7 @@ from rpc_bench import spec
 #
 
 
-def create_calls_eth_get_block_by_number(
+def generate_calls_eth_get_block_by_number(
     block_numbers: typing.Sequence[int],
 ) -> typing.Sequence[spec.Call]:
     return [
@@ -20,7 +20,7 @@ def create_calls_eth_get_block_by_number(
     ]
 
 
-def create_calls_eth_get_block_by_hash(
+def generate_calls_eth_get_block_by_hash(
     block_hashes: typing.Sequence[str],
 ) -> typing.Sequence[spec.Call]:
     return [
@@ -34,7 +34,7 @@ def create_calls_eth_get_block_by_hash(
 #
 
 
-def create_calls_eth_get_eth_balance(
+def generate_calls_eth_get_eth_balance(
     addresses: typing.Sequence[str],
     block_numbers: typing.Sequence[int],
 ) -> typing.Sequence[spec.Call]:
@@ -46,7 +46,7 @@ def create_calls_eth_get_eth_balance(
     ]
 
 
-def create_calls_eth_get_eth_transaction_count(
+def generate_calls_eth_get_eth_transaction_count(
     addresses: typing.Sequence[str],
     block_numbers: typing.Sequence[int],
 ) -> typing.Sequence[spec.Call]:
@@ -63,7 +63,7 @@ def create_calls_eth_get_eth_transaction_count(
 #
 
 
-def create_calls_eth_get_transaction_by_hash(
+def generate_calls_eth_get_transaction_by_hash(
     transaction_hashes: typing.Sequence[str],
 ) -> typing.Sequence[spec.Call]:
     return [
@@ -74,7 +74,7 @@ def create_calls_eth_get_transaction_by_hash(
     ]
 
 
-def create_calls_eth_get_transaction_receipt(
+def generate_calls_eth_get_transaction_receipt(
     transaction_hashes: typing.Sequence[str],
 ) -> typing.Sequence[spec.Call]:
     return [
@@ -90,7 +90,7 @@ def create_calls_eth_get_transaction_receipt(
 #
 
 
-def create_calls_eth_get_logs(
+def generate_calls_eth_get_logs(
     contract_address: str,
     topics: typing.Sequence[str | None],
     block_ranges: typing.Sequence[tuple[int, int]],
@@ -111,7 +111,7 @@ def create_calls_eth_get_logs(
 #
 
 
-def create_calls_eth_get_code(
+def generate_calls_eth_get_code(
     addresses: typing.Sequence[str],
     block_numbers: typing.Sequence[int | typing.Literal['latest']] | None,
 ) -> typing.Sequence[spec.Call]:
@@ -125,7 +125,7 @@ def create_calls_eth_get_code(
     ]
 
 
-def create_calls_eth_get_storage_at(
+def generate_calls_eth_get_storage_at(
     slots: typing.Sequence[tuple[str, str]],
     block_numbers: typing.Sequence[int | typing.Literal['latest']] | None,
 ) -> typing.Sequence[spec.Call]:
@@ -138,7 +138,8 @@ def create_calls_eth_get_storage_at(
         for (address, slot), block_number in zip(slots, block_numbers)
     ]
 
-# def create_calls_eth_call(
+
+# def generate_calls_eth_call(
 #     addresses: typing.Sequence[str],
 #     block_numbers: typing.Sequence[int] | None,
 # ) -> typing.Sequence[spec.Call]:

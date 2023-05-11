@@ -17,7 +17,7 @@ event_hashes = {
 }
 
 
-def create_load_tests_eth_get_logs_by_url(
+def generate_tests_eth_get_logs_by_url(
     urls: typing.Sequence[str] | typing.Mapping[str, str],
     rates: typing.Sequence[int],
     duration: int,
@@ -38,7 +38,7 @@ def create_load_tests_eth_get_logs_by_url(
         random_seed=0,
     )
 
-    calls = rpc_bench.create_calls_eth_get_logs(
+    calls = rpc_bench.generate_calls_eth_get_logs(
         contract_address=contracts['USDC'],
         topics=[event_hashes['Transfer']],
         block_ranges=block_ranges,
@@ -56,7 +56,7 @@ def create_load_tests_eth_get_logs_by_url(
     return tests
 
 
-def create_load_tests_eth_get_logs_by_contract(
+def generate_tests_eth_get_logs_by_contract(
     url: str,
     rates: typing.Sequence[int],
     duration: int,
@@ -75,7 +75,7 @@ def create_load_tests_eth_get_logs_by_contract(
 
     tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for name, contract_address in contracts.items():
-        calls = rpc_bench.create_calls_eth_get_logs(
+        calls = rpc_bench.generate_calls_eth_get_logs(
             contract_address=contract_address,
             topics=[event_hashes['Transfer']],
             block_ranges=block_ranges,
@@ -90,7 +90,7 @@ def create_load_tests_eth_get_logs_by_contract(
     return tests
 
 
-def create_load_tests_eth_get_logs_by_block_range_size(
+def generate_tests_eth_get_logs_by_block_range_size(
     url: str,
     rates: typing.Sequence[int],
     duration: int,
@@ -108,7 +108,7 @@ def create_load_tests_eth_get_logs_by_block_range_size(
             n=n_calls,
             range_size=range_size,
         )
-        calls = rpc_bench.create_calls_eth_get_logs(
+        calls = rpc_bench.generate_calls_eth_get_logs(
             contract_address=contracts['USDC'],
             topics=[event_hashes['Transfer']],
             block_ranges=block_ranges,
@@ -124,7 +124,7 @@ def create_load_tests_eth_get_logs_by_block_range_size(
     return tests
 
 
-def create_load_tests_eth_get_logs_by_block_age(
+def generate_tests_eth_get_logs_by_block_age(
     url: str,
     rates: typing.Sequence[int],
     duration: int,
@@ -142,7 +142,7 @@ def create_load_tests_eth_get_logs_by_block_age(
             n=n_calls,
             range_size=100,
         )
-        calls = rpc_bench.create_calls_eth_get_logs(
+        calls = rpc_bench.generate_calls_eth_get_logs(
             contract_address=contracts['USDC'],
             topics=[event_hashes['Transfer']],
             block_ranges=block_ranges,
