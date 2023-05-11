@@ -1,3 +1,4 @@
+"""wrapper around the vegeta load testing tool"""
 from __future__ import annotations
 
 import typing

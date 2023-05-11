@@ -5,7 +5,7 @@ import typing
 import rpc_bench
 
 
-def generate_tests_eth_get_balance(
+def generate_tests_eth_get_balance_by_url(
     urls: typing.Sequence[str] | typing.Mapping[str, str],
     rates: typing.Sequence[int],
     duration: int,
@@ -43,7 +43,7 @@ def generate_tests_eth_get_balance(
     return tests
 
 
-def generate_tests_eth_get_transaction_count(
+def generate_tests_eth_get_transaction_count_by_url(
     urls: typing.Sequence[str] | typing.Mapping[str, str],
     rates: typing.Sequence[int],
     duration: int,

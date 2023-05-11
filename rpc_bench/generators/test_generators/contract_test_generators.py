@@ -42,7 +42,7 @@ def generate_tests_eth_get_code_by_url(
     return tests
 
 
-def generate_tests_eth_storage_at_by_url(
+def generate_tests_eth_get_storage_at_by_url(
     urls: typing.Sequence[str] | typing.Mapping[str, str],
     rates: typing.Sequence[int],
     duration: int,

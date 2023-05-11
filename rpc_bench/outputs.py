@@ -22,22 +22,27 @@ styles: toolcli.StyleTheme = {
 
 
 colors = {
-    'streetlight': [
-        'limegreen',
-        'goldenrod',
-        'crimson',
+    'orange_shades': [
+        'darkgoldenrod',
+        'darkorange',
+        'gold',
     ],
     'blue_shades': [
-        'lightskyblue',
-        'dodgerblue',
         'blue',
+        'dodgerblue',
+        'lightskyblue',
     ],
-    'orange_shades': [
-        'gold',
-        'darkorange',
-        'darkgoldenrod',
+    'streetlight': [
+        'crimson',
+        'goldenrod',
+        'limegreen',
     ],
 }
+
+color_defaults = [
+    'darkorange',
+    'dodgerblue',
+]
 
 
 def _get_tqdm() -> types.ModuleType:
