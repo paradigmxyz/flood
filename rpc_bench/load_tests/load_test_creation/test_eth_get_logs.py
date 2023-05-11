@@ -30,7 +30,7 @@ def create_load_tests_eth_get_logs_by_url(
 
     n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
 
-    block_ranges = rpc_bench.choose_random_block_ranges(
+    block_ranges = rpc_bench.generate_block_ranges(
         start_block=10_000_000,
         end_block=16_000_000,
         n=n_calls,
@@ -66,7 +66,7 @@ def create_load_tests_eth_get_logs_by_contract(
 
     n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
 
-    block_ranges = rpc_bench.choose_random_block_ranges(
+    block_ranges = rpc_bench.generate_block_ranges(
         start_block=12_178_594,
         end_block=17_000_000,
         n=n_calls,
@@ -102,7 +102,7 @@ def create_load_tests_eth_get_logs_by_block_range_size(
 
     tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for range_size in range_sizes:
-        block_ranges = rpc_bench.choose_random_block_ranges(
+        block_ranges = rpc_bench.generate_block_ranges(
             start_block=12_178_594,
             end_block=17_000_000,
             n=n_calls,
@@ -136,7 +136,7 @@ def create_load_tests_eth_get_logs_by_block_age(
 
     tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
     for name, (start_block, end_block) in block_bounds.items():
-        block_ranges = rpc_bench.choose_random_block_ranges(
+        block_ranges = rpc_bench.generate_block_ranges(
             start_block=start_block,
             end_block=end_block,
             n=n_calls,

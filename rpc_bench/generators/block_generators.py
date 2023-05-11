@@ -1,117 +1,12 @@
 from __future__ import annotations
 
-import ctc.rpc
 import typing
-
-from rpc_bench import spec
 
 if typing.TYPE_CHECKING:
     import numpy as np
 
 
-def create_calls_eth_get_logs(
-    contract_address: str,
-    topics: typing.Sequence[str | None],
-    block_ranges: typing.Sequence[tuple[int, int]],
-) -> typing.Sequence[spec.Call]:
-    return [
-        ctc.rpc.construct_eth_get_logs(
-            address=contract_address,
-            topics=topics,
-            start_block=start_block,
-            end_block=end_block,
-        )
-        for start_block, end_block in block_ranges
-    ]
-
-
-def create_calls_eth_get_block_by_number(
-    block_numbers: typing.Sequence[int],
-) -> typing.Sequence[spec.Call]:
-    return [
-        ctc.rpc.construct_eth_get_block_by_number(
-            block_number=block_number
-        )
-        for block_number in block_numbers
-    ]
-
-
-def create_calls_eth_get_block_number(
-    addresses: typing.Sequence[str],
-    block_numbers: typing.Sequence[int],
-) -> typing.Sequence[spec.Call]:
-    return [
-        ctc.rpc.construct_eth_get_balance(
-            address=address,
-            block_number=block_number
-        )
-        for address, block_number in zip(addresses, block_numbers)
-    ]
-
-
-#
-# # old
-#
-
-def get_all_methods() -> typing.Sequence[str]:
-    return [
-        'eth_blockNumber',
-        'eth_chainId',
-        'eth_hashRate',
-    ]
-
-
-def create_calls(
-    methods: typing.Sequence[str] | None = None,
-    samples: int | None = None,
-    *,
-    random_seed: int | None = None,
-    calls_file: str | None = None,
-) -> spec.MethodCalls:
-    calls: spec.MethodCalls
-
-    # load calls from file
-    if calls_file is not None:
-        import json
-
-        with open(calls_file, 'r') as f:
-            calls_data = json.load(f)
-            return {
-                method: calls_data['calls'][method]
-                for method in calls_data['methods']
-            }
-
-    # parse inputs
-    if samples is None:
-        samples = 1
-    if methods is None:
-        methods = get_all_methods()
-    if random_seed is None:
-        random_seed = 0
-
-    # generate calls
-    calls = {method: [] for method in methods}
-    for method in methods:
-        call_creator = _get_call_creator(method)
-        for sample in range(samples):
-            call = call_creator()
-            calls[method].append(call)  # type: ignore
-
-    return calls
-
-
-def _get_call_creator(method: str) -> typing.Callable[..., typing.Any]:
-    if method == 'eth_blockNumber':
-        return ctc.rpc.construct_eth_block_number
-    elif method == 'eth_chainId':
-        return ctc.rpc.construct_eth_chain_id
-    elif method == 'eth_hashRate':
-        return ctc.rpc.construct_eth_hashrate
-    else:
-        raise ValueError('unknown method: ' + str(method))
-
-
-def choose_random_blocks(
+def generate_blocks(
     n: int,
     start_block: int,
     end_block: int,
@@ -139,7 +34,7 @@ def choose_random_blocks(
         return list(chosen)
 
 
-def choose_random_block_ranges(
+def generate_block_ranges(
     *,
     n: int,
     range_size: int,
@@ -152,7 +47,7 @@ def choose_random_block_ranges(
     method: str = 'strides',
 ) -> typing.Sequence[tuple[int, int]]:
     if method == 'strides':
-        return _choose_random_block_ranges_strides(
+        return _generate_block_ranges_strides(
             n=n,
             range_size=range_size,
             start_block=start_block,
@@ -163,7 +58,7 @@ def choose_random_block_ranges(
             random_seed=random_seed,
         )
     elif method == 'individual':
-        return _choose_random_block_ranges_individual(
+        return _generate_block_ranges_individual(
             n=n,
             range_size=range_size,
             start_block=start_block,
@@ -177,7 +72,7 @@ def choose_random_block_ranges(
         raise Exception('unknown method: ' + str(method))
 
 
-def _choose_random_block_ranges_strides(
+def _generate_block_ranges_strides(
     *,
     n: int,
     range_size: int,
@@ -212,7 +107,7 @@ def _choose_random_block_ranges_strides(
     return block_ranges
 
 
-def _choose_random_block_ranges_individual(
+def _generate_block_ranges_individual(
     *,
     n: int,
     range_size: int,
@@ -232,7 +127,7 @@ def _choose_random_block_ranges_individual(
         gen = np.random.Generator(np.random.PCG64(random_seed))
 
     # create starting sample
-    start_blocks = choose_random_blocks(
+    start_blocks = generate_blocks(
         n=n,
         start_block=start_block,
         end_block=end_block,

@@ -3,14 +3,14 @@ from __future__ import annotations
 import json
 import typing
 
-from rpc_bench import call_creation
 from rpc_bench import inputs
 from rpc_bench import spec
+from . import call_creation
 from . import latency_test_execution
 from . import latency_test_outputs
 
 
-def run_latency_benchmark(
+def run_latency_test(
     *,
     nodes: spec.NodesShorthand,
     methods: typing.Sequence[str] | None,

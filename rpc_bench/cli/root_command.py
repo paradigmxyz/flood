@@ -85,7 +85,7 @@ def root_command(
     random_seed: int | None,
     quiet: bool,
 ) -> None:
-    rpc_bench.run_latency_benchmark(
+    rpc_bench.run_latency_test(
         nodes=nodes,
         methods=methods,
         samples=samples,
