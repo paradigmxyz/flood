@@ -33,7 +33,7 @@ def run_latency_test(
 
     # create calls
     if calls is None:
-        calls = call_creation.create_calls(
+        calls = call_creation._create_calls(
             methods=methods,
             samples=samples,
             random_seed=random_seed,
@@ -53,7 +53,7 @@ def run_latency_test(
         )
 
     # perform calls
-    latencies = latency_test_execution.execute_calls(
+    latencies = latency_test_execution._execute_calls(
         nodes=nodes, calls=calls, verbose=verbose
     )
 

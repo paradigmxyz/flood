@@ -7,7 +7,7 @@ from rpc_bench import spec
 from . import latency_test_outputs
 
 
-def execute_calls(
+def _execute_calls(
     nodes: typing.Mapping[str, spec.Node],
     calls: spec.MethodCalls,
     verbose: bool,

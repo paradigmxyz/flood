@@ -6,7 +6,7 @@ import typing
 from rpc_bench import spec
 
 
-def get_all_methods() -> typing.Sequence[str]:
+def _get_all_methods() -> typing.Sequence[str]:
     return [
         'eth_blockNumber',
         'eth_chainId',
@@ -14,7 +14,7 @@ def get_all_methods() -> typing.Sequence[str]:
     ]
 
 
-def create_calls(
+def _create_calls(
     methods: typing.Sequence[str] | None = None,
     samples: int | None = None,
     *,
@@ -38,7 +38,7 @@ def create_calls(
     if samples is None:
         samples = 1
     if methods is None:
-        methods = get_all_methods()
+        methods = _get_all_methods()
     if random_seed is None:
         random_seed = 0
 
