@@ -5,12 +5,26 @@ import typing
 import rpc_bench
 
 
+def summarize_load_tests(
+    outputs: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    test_name: str,
+) -> None:
+    import matplotlib.pyplot as plt  # type: ignore
+
+    plot_success(outputs, test_name=test_name)
+    plt.show()
+    plot_throughput(outputs, test_name=test_name)
+    plt.show()
+    plot_latencies(outputs, test_name=test_name)
+    plt.show()
+
+
 def plot_success(
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
-    import matplotlib.pyplot as plt  # type: ignore
+    import matplotlib.pyplot as plt
 
     plot_test_results(
         results=results,

@@ -10,6 +10,8 @@ from . import vegeta
 
 def run_load_tests(
     tests: typing.Mapping[str, spec.LoadTest],
+    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    verbose: bool = False,
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
     results = {}
     tqdm = outputs._get_tqdm()
@@ -21,8 +23,9 @@ def run_load_tests(
             rates=test['rates'],
             calls=test['calls'],
             duration=test['duration'],
-            verbose=False,
+            verbose=verbose,
             tqdm_position=1,
+            vegeta_kwargs=vegeta_kwargs,
         )
 
     return results
@@ -34,7 +37,8 @@ def run_load_test(
     rates: typing.Sequence[int],
     calls: typing.Sequence[typing.Any],
     duration: int,
-    verbose: bool = True,
+    verbose: bool = False,
+    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     tqdm_position: int = 0,
 ) -> spec.LoadTestOutput:
 
@@ -71,8 +75,12 @@ def run_load_test(
             url=url,
             duration=duration,
             rate=rate,
+            vegeta_kwargs=vegeta_kwargs,
+            verbose=verbose,
         )
         reports.append(report)
+        if verbose:
+            print()
 
     # format output
     return {  # type: ignore

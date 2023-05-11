@@ -5,7 +5,6 @@ from __future__ import annotations
 import typing
 
 if typing.TYPE_CHECKING:
-
     #
     # # generic types
     #
@@ -72,6 +71,10 @@ if typing.TYPE_CHECKING:
         success: int
         status_codes: typing.Mapping[str, int]
         errors: typing.Sequence[str]
+        first_request_timestamp: str
+        last_request_timestamp: str
+        last_response_timestamp: str
+        final_wait_time: int
 
     class LoadTestOutputDatum(typing.TypedDict):
         target_rate: int
@@ -88,6 +91,12 @@ if typing.TYPE_CHECKING:
         p95: float
         p99: float
         max: float
+        status_codes: typing.Mapping[str, int]
+        errors: typing.Sequence[str]
+        first_request_timestamp: str
+        last_request_timestamp: str
+        last_response_timestamp: str
+        final_wait_time: float
 
     class LoadTestOutput(typing.TypedDict):
         target_rate: typing.Sequence[int]
@@ -104,4 +113,10 @@ if typing.TYPE_CHECKING:
         p95: typing.Sequence[float]
         p99: typing.Sequence[float]
         max: typing.Sequence[float]
+        status_codes: typing.Sequence[typing.Mapping[str, int]]
+        errors: typing.Sequence[typing.Sequence[str]]
+        first_request_timestamp: typing.Sequence[str]
+        last_request_timestamp: typing.Sequence[str]
+        last_response_timestamp: typing.Sequence[str]
+        final_wait_time: typing.Sequence[float]
 

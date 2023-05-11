@@ -12,16 +12,20 @@ def run_vegeta_attack(
     rate: int,
     calls: typing.Sequence[typing.Any],
     duration: int,
+    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    verbose: bool = False,
 ) -> spec.LoadTestOutputDatum:
     attack = _construct_vegeta_attack(
         calls=calls,
         url=url,
-        verbose=False,
+        verbose=verbose,
     )
     attack_output = _vegeta_attack(
         schedule_dir=attack['schedule_dir'],
         duration=duration,
         rate=rate,
+        vegeta_kwargs=vegeta_kwargs,
+        verbose=verbose,
     )
     report = _create_vegeta_report(
         attack_output=attack_output,
@@ -35,7 +39,7 @@ def _construct_vegeta_attack(
     calls: typing.Sequence[typing.Any],
     url: str,
     schedule_dir: str | None = None,
-    verbose: bool = True,
+    verbose: bool = False,
 ) -> typing.Mapping[str, str]:
     import json
     import os
@@ -69,16 +73,9 @@ def _construct_vegeta_attack(
 
     # output summary
     if verbose:
-        print('created files:')
+        print('running vegeta attack...')
         print('- targets:', vegeta_targets_path)
         print('- calls:', vegeta_calls_path)
-        print()
-        print('run using:')
-        print(
-            'vegeta attack -targets '
-            + vegeta_targets_path
-            + ' -duration=5s | vegeta report'
-        )
 
     return {
         'schedule_dir': schedule_dir,
@@ -96,7 +93,8 @@ def _vegeta_attack(
     max_workers: int | None = None,
     n_cpus: int | None = None,
     report_path: str | None = None,
-    cli_args: typing.Mapping[str, str | None] | None = None,
+    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    verbose: bool = False,
 ) -> bytes:
     import os
     import subprocess
@@ -112,11 +110,14 @@ def _vegeta_attack(
         cmd += ' -max-connections=' + str(max_connections)
     if max_workers is not None:
         cmd += ' -max-workers=' + str(max_workers)
-    if cli_args is not None:
-        for key, value in cli_args.items():
-            cmd += '-' + key
+    if vegeta_kwargs is not None:
+        for key, value in vegeta_kwargs.items():
+            cmd += ' -' + key
             if value is not None:
                 cmd += '=' + str(value)
+
+    if verbose:
+        print('- command:', cmd)
 
     # run command
     return subprocess.check_output(cmd.split(' '))
@@ -152,5 +153,12 @@ def _create_vegeta_report(
         'p95': report['latencies']['95th'] / 1e9,
         'p99': report['latencies']['99th'] / 1e9,
         'max': report['latencies']['max'] / 1e9,
+        #
+        'status_codes': report['status_codes'],
+        'errors': report['errors'],
+        'first_request_timestamp': report['earliest'],
+        'last_request_timestamp': report['latest'],
+        'last_response_timestamp': report['end'],
+        'final_wait_time': report['wait'] / 1e9,
     }
 

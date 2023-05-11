@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+import typing
+
+import rpc_bench
 
 # def create_loadtests(
 #     url: str | None = None,
@@ -10,4 +15,21 @@
 #     rates_list: typing.Sequence[int] | typing.Mapping[str, int] | None = None,
 # ) -> typing.Mapping[str, spec.LoadTest]:
 #     raise NotImplementedError()
+
+
+# def generate_tests(
+#     constants: typing.Mapping[str, typing.Any],
+#     variables: typing.Mapping[str, typing.Sequence[typing.Any]],
+# ) -> typing.Mapping[str, rpc_bench.LoadTest]:
+#     import itertools
+
+#     all_keys = set()
+
+#     pre_tests = []
+#     combinations = itertools.product(*variables.items())
+#     for combination in combinations:
+#         pre_test = dict(combination, **constants)
+#         pre_tests.append(pre_test)
+
+
 
