@@ -46,7 +46,7 @@ def generate_calls_eth_get_eth_balance(
     ]
 
 
-def generate_calls_eth_get_eth_transaction_count(
+def generate_calls_eth_get_transaction_count(
     addresses: typing.Sequence[str],
     block_numbers: typing.Sequence[int],
 ) -> typing.Sequence[spec.Call]:

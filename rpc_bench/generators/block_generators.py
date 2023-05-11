@@ -6,7 +6,7 @@ if typing.TYPE_CHECKING:
     import numpy as np
 
 
-def generate_blocks(
+def generate_block_numbers(
     n: int,
     start_block: int,
     end_block: int,
@@ -32,6 +32,12 @@ def generate_blocks(
         return sorted(chosen)
     else:
         return list(chosen)
+
+
+def generate_block_hashes(
+    n: int,
+) -> typing.Sequence[str]:
+    raise NotImplementedError()
 
 
 def generate_block_ranges(
@@ -127,7 +133,7 @@ def _generate_block_ranges_individual(
         gen = np.random.Generator(np.random.PCG64(random_seed))
 
     # create starting sample
-    start_blocks = generate_blocks(
+    start_blocks = generate_block_numbers(
         n=n,
         start_block=start_block,
         end_block=end_block,
