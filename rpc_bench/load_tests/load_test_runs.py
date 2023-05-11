@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import typing
 
-from rpc_bench import spec
+from rpc_bench import inputs
 from rpc_bench import outputs
+from rpc_bench import spec
 from . import vegeta
 
 
@@ -36,6 +37,12 @@ def run_load_test(
     verbose: bool = True,
     tqdm_position: int = 0,
 ) -> spec.LoadTestOutput:
+
+    # check if url is ctc alias
+    alias_url = inputs.get_ctc_alias_url(url)
+    if alias_url is not None:
+        url = alias_url
+
     # validate inputs
     if len(rates) == 0:
         raise Exception('must specify at least one rate')

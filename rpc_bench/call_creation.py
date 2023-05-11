@@ -25,6 +25,34 @@ def create_calls_eth_get_logs(
     ]
 
 
+def create_calls_eth_get_block_by_number(
+    block_numbers: typing.Sequence[int],
+) -> typing.Sequence[spec.Call]:
+    return [
+        ctc.rpc.construct_eth_get_block_by_number(
+            block_number=block_number
+        )
+        for block_number in block_numbers
+    ]
+
+
+def create_calls_eth_get_block_number(
+    addresses: typing.Sequence[str],
+    block_numbers: typing.Sequence[int],
+) -> typing.Sequence[spec.Call]:
+    return [
+        ctc.rpc.construct_eth_get_balance(
+            address=address,
+            block_number=block_number
+        )
+        for address, block_number in zip(addresses, block_numbers)
+    ]
+
+
+#
+# # old
+#
+
 def get_all_methods() -> typing.Sequence[str]:
     return [
         'eth_blockNumber',
@@ -112,6 +140,79 @@ def choose_random_blocks(
 
 
 def choose_random_block_ranges(
+    *,
+    n: int,
+    range_size: int,
+    start_block: int,
+    end_block: int,
+    non_overlapping: bool = True,
+    sort: bool = False,
+    n_attempts: int = 1_000_000,
+    random_seed: int | np.random._generator.Generator | None = None,
+    method: str = 'strides',
+) -> typing.Sequence[tuple[int, int]]:
+    if method == 'strides':
+        return _choose_random_block_ranges_strides(
+            n=n,
+            range_size=range_size,
+            start_block=start_block,
+            end_block=end_block,
+            non_overlapping=non_overlapping,
+            sort=sort,
+            n_attempts=n_attempts,
+            random_seed=random_seed,
+        )
+    elif method == 'individual':
+        return _choose_random_block_ranges_individual(
+            n=n,
+            range_size=range_size,
+            start_block=start_block,
+            end_block=end_block,
+            non_overlapping=non_overlapping,
+            sort=sort,
+            n_attempts=n_attempts,
+            random_seed=random_seed,
+        )
+    else:
+        raise Exception('unknown method: ' + str(method))
+
+
+def _choose_random_block_ranges_strides(
+    *,
+    n: int,
+    range_size: int,
+    start_block: int,
+    end_block: int,
+    non_overlapping: bool = True,
+    sort: bool = False,
+    n_attempts: int = 1_000_000,
+    random_seed: int | np.random._generator.Generator | None = None,
+) -> typing.Sequence[tuple[int, int]]:
+    import numpy as np
+
+    if random_seed is None:
+        random_seed = 0
+    if isinstance(random_seed, int):
+        gen = np.random.Generator(np.random.PCG64(random_seed))
+
+    block_ranges: list[tuple[int, int]] = []
+    while len(block_ranges) < n:
+        random_phases = list(range(range_size))
+        gen.shuffle(random_phases)
+        for random_phase in random_phases:
+            strides = np.arange(start_block + random_phase, end_block, range_size)
+            gen.shuffle(strides)
+            n_missing = n - len(block_ranges)
+            if n_missing > 0:
+                for stride in strides[:n_missing]:
+                    block_ranges.append((stride, stride + range_size))
+            else:
+                break
+
+    return block_ranges
+
+
+def _choose_random_block_ranges_individual(
     *,
     n: int,
     range_size: int,
