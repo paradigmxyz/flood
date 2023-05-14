@@ -43,10 +43,10 @@ def run_load_tests(
         return results
 
     # case: multiple nodes and single tests
-    elif node is not None and tests is not None:
+    elif nodes is not None and tests is not None:
         results = {}
-        for name, node in tqdm.tqdm(nodes.items(), **pbar):
-            results[name] = run_load_test(node=node, verbose=verbose, test=test)
+        for name, nd in tqdm.tqdm(nodes.items(), **pbar):
+            results[name] = run_load_test(node=nd, verbose=verbose, test=test)
         return results
 
     # case: multiple nodes and multiple tests
@@ -69,20 +69,22 @@ def run_load_tests(
 def run_load_test(
     *,
     node: spec.NodeShorthand,
-    test: spec.LoadTest | None,
-    rates: typing.Sequence[int],
-    calls: typing.Sequence[typing.Any],
+    test: spec.LoadTest | None = None,
+    rates: typing.Sequence[int] | None = None,
+    calls: typing.Sequence[typing.Any] | None = None,
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     verbose: bool = False,
-    _pbar_kwargs: int = 0,
+    _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test against a single node"""
 
     # parse inputs
-    node = outputs.parse_node(node)
+    node = inputs.parse_node(node)
     if test is None:
+        if (rates is None or calls is None):
+            raise Exception('specify rates and calls')
         test = load_test_construction.construct_load_test(
             rates=rates,
             calls=calls,
@@ -93,14 +95,14 @@ def run_load_test(
 
     # run tests
     if node.get('remote') is None:
-        _run_load_test_locally(
+        return _run_load_test_locally(
             node=node,
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
         )
     else:
-        _run_load_test_remotely(
+        return _run_load_test_remotely(
             node=node,
             test=test,
             verbose=verbose,
@@ -140,16 +142,13 @@ def _run_load_test_locally(
 
     # format output
     keys = results[0].keys()
-    return {key: [result[key] for result in results] for key in keys}
+    return {key: [result[key] for result in results] for key in keys}  # type: ignore
 
 
 def _run_load_test_remotely(
     *,
     node: spec.Node,
-    rates: typing.Sequence[int],
-    calls: typing.Sequence[typing.Any],
-    duration: int,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    test: spec.LoadTest | None,
     verbose: bool = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:

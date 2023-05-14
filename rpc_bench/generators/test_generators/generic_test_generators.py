@@ -21,7 +21,7 @@ def get_test_display_name(test: str) -> str:
 
 
 def get_display_name_test(name: str) -> str:
-    pass
+    raise NotImplementedError()
 
 
 # def generate_tests(

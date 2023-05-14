@@ -38,7 +38,7 @@ def construct_load_test(
     | typing.Sequence[rpc_bench.VegetaKwargs]
     | None = None,
     repeat_calls: bool = False,
-) -> typing.LoadTest:
+) -> rpc_bench.LoadTest:
     # validate inputs
     if len(rates) == 0:
         raise Exception('must specify at least one rate')
@@ -58,12 +58,12 @@ def construct_load_test(
 
     # partition calls into individual attacks
     if not repeat_calls:
-        attacks_calls = []
+        attacks_calls: typing.MutableSequence[typing.Sequence[rpc_bench.Call]] = []
         calls_iter = iter(calls)
-        for rate in rates:
-            n_test_calls = rate * duration
+        for rate, duration in zip(rates, durations):
+            n_attack_calls = rate * duration
             attack_calls = []
-            for i in range(n_test_calls):
+            for i in range(n_attack_calls):
                 attack_calls.append(next(calls_iter))
             attacks_calls.append(attack_calls)
     else:
@@ -71,14 +71,14 @@ def construct_load_test(
     assert len(attacks_calls) == len(rates)
 
     # create load tests
-    load_test = []
-    for rate, duration, attack_calls, attack_kwargs in zip(
+    load_test: list[rpc_bench.VegetaAttack] = []
+    for rate, duration, a_calls, attack_kwargs in zip(
         rates, durations, attacks_calls, vegeta_kwargs
     ):
-        attack = {
+        attack: rpc_bench.VegetaAttack = {
             'rate': rate,
             'duration': duration,
-            'calls': attack_calls,
+            'calls': a_calls,
             'vegeta_kwargs': attack_kwargs,
         }
         load_test.append(attack)

@@ -28,7 +28,7 @@ def run_latency_test(
 
     # parse inputs
     if not isinstance(nodes, dict):
-        nodes = inputs._parse_nodes(nodes)
+        nodes = inputs.parse_nodes(nodes)
     start_time = datetime.datetime.fromtimestamp(int(time.time()))
 
     # create calls

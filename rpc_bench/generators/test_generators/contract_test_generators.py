@@ -12,7 +12,7 @@ def generate_tests_eth_get_code(
     random_seed: rpc_bench.RandomSeed | None = None,
 ) -> rpc_bench.LoadTest:
     n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
-    calls = rpc_bench.generate_calls_eth_get_code(n_cals=n_calls)
+    calls = rpc_bench.generate_calls_eth_get_code(n_calls=n_calls)
     return rpc_bench.construct_load_test(
         calls=calls,
         rates=rates,
