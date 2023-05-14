@@ -37,7 +37,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {
                 'name': 'test',
-                'help': 'test to run ([metavar]rpc_bench ls[/metavar] to list available)',
+                'help': 'test to run (use [metavar]rpc_bench ls[/metavar] for list)',
             },
             {
                 'name': 'nodes',
@@ -95,17 +95,15 @@ def root_command(
     quiet: bool,
 ) -> None:
 
-    raise NotImplementedError()
-
-    # rpc_bench.run(
-    #     test=test,
-    #     mode=mode,
-    #     nodes=nodes,
-    #     random_seed=random_seed,
-    #     verbose=(not quiet),
-    #     rates=rates,
-    #     duration=duration,
-    #     dry=dry,
-    #     output=output,
-    # )
+    rpc_bench.run(
+        test=test,
+        mode=mode,
+        nodes=nodes,
+        random_seed=random_seed,
+        verbose=(not quiet),
+        rates=rates,
+        duration=duration,
+        dry=dry,
+        output=output,
+    )
 

@@ -5,7 +5,7 @@ import typing
 import rpc_bench
 
 
-def generate_tests_eth_get_block_by_number(
+def generate_test_eth_get_block_by_number(
     rates: typing.Sequence[int],
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
@@ -20,7 +20,7 @@ def generate_tests_eth_get_block_by_number(
     )
 
 
-def generate_tests_eth_get_block_by_hash(
+def generate_test_eth_get_block_by_hash(
     rates: typing.Sequence[int],
     duration: int,
 ) -> rpc_bench.LoadTest:

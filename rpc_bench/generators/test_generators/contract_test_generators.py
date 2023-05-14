@@ -5,7 +5,7 @@ import typing
 import rpc_bench
 
 
-def generate_tests_eth_get_code(
+def generate_test_eth_get_code(
     rates: typing.Sequence[int],
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
@@ -20,7 +20,7 @@ def generate_tests_eth_get_code(
     )
 
 
-def generate_tests_eth_get_storage_at_by_url(
+def generate_test_eth_get_storage_at_by_url(
     rates: typing.Sequence[int],
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,

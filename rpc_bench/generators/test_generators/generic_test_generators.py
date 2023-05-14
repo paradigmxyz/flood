@@ -9,19 +9,28 @@ def get_available_tests() -> typing.Sequence[str]:
     return [
         item
         for item in dir(rpc_bench)
-        if item.startswith('generate_tests_')
+        if item.startswith('generate_test_')
     ]
 
 
 def get_test_display_name(test: str) -> str:
-    if not test.startswith('generate_tests_'):
+    if not test.startswith('generate_test_'):
         raise Exception()
-    test = test[len('generate_tests_'):]
+    test = test[len('generate_test_'):]
+
+    head, tail = test.split('_', 1)
+    test = head + '_' + snake_case_to_camel_case(tail)
+
     return test
 
 
 def get_display_name_test(name: str) -> str:
     raise NotImplementedError()
+
+
+def snake_case_to_camel_case(string: str) -> str:
+    pieces = string.split('_')
+    return pieces[0] + ''.join(piece.title() for piece in pieces[1:])
 
 
 # def generate_tests(

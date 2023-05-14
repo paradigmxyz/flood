@@ -5,7 +5,7 @@ import typing
 import rpc_bench
 
 
-def generate_tests_eth_get_transaction_by_hash(
+def generate_test_eth_get_transaction_by_hash(
     rates: typing.Sequence[int],
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
@@ -22,7 +22,7 @@ def generate_tests_eth_get_transaction_by_hash(
     )
 
 
-def generate_tests_eth_get_transaction_receipt(
+def generate_test_eth_get_transaction_receipt(
     rates: typing.Sequence[int],
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
