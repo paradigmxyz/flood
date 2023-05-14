@@ -1,3 +1,8 @@
+"""
+
+TODO
+--methods parameter to specify methods
+"""
 from __future__ import annotations
 
 import typing
@@ -6,7 +11,7 @@ import toolcli
 
 import rpc_bench
 
-help_message = """Benchmark a set of node endpoints
+help_message = """Load test JSON RPC endpoints
 
 [bold][title]Node Specification[/bold][/title]
 - Nodes are specified as a space-separated list
@@ -31,67 +36,76 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': help_message,
         'args': [
             {
+                'name': 'test',
+                'help': 'test to run ([metavar]rpc_bench ls[/metavar] to list available)',
+            },
+            {
                 'name': 'nodes',
                 'nargs': '+',
                 'help': 'nodes to test, see syntax above',
             },
             {
-                'name': ['-m', '--methods'],
-                'nargs': '+',
-                'help': 'RPC methods to test, space-separated list',
-            },
-            {
-                'name': ['-n', '--n-samples'],
-                'type': int,
-                'dest': 'samples',
-                'default': 1,
-                'help': 'number of times to call each method',
-            },
-            {
                 'name': ['-s', '--seed'],
                 'dest': 'random_seed',
-                'help': 'random seed to use for call parameters',
-            },
-            {
-                'name': ['-c', '--calls'],
-                'dest': 'calls_file',
-                'help': 'use the call schedule from a previous run',
-            },
-            {
-                'name': ['-o', '--output'],
-                'dest': 'output_file',
-                'help': 'output JSON file to save results',
+                'help': 'random seed to use, default is current timestamp',
             },
             {
                 'name': ['-q', '--quiet'],
-                'help': 'do not print any output to STDOUT',
+                'help': 'do not print output to [metavar]STDOUT[/metavar]',
                 'action': 'store_true',
+            },
+            {
+                'name': ['-m', '--mode'],
+                'help': 'stress, spike, soak, latency, or equality',
+            },
+            {
+                'name': ['-r', '--rates'],
+                'help': 'rates to use in load test (requests per second)',
+            },
+            {
+                'name': ['-d', '--duration'],
+                'help': 'amount of time to test each rate',
+            },
+            {
+                'name': ['--dry'],
+                'help': 'only construct tests, do not run them',
+                'action': 'store_true',
+            },
+            {
+                'name': ['-o', '--output'],
+                'help': 'directory to save results, default is tmp dir',
             },
         ],
         'examples': [
-            'localhost:8545 localhost:8546 localhost:8547',
-            'localhost:8545 -n 10',
-            'localhost:8545 -o results.json',
+            'eth_getBlockByNumber localhost:8545',
+            'eth_getLogs localhost:8545 localhost:8546 localhost:8547',
         ],
     }
 
 
 def root_command(
+    test: str,
     nodes: typing.Sequence[str],
-    methods: typing.Sequence[str] | None,
-    samples: int | None,
-    calls_file: str | None,
-    output_file: str | None,
+    output: str | None,
+    mode: str | None,
+    rates: typing.Sequence[str] | None,
+    duration: str | None,
     random_seed: int | None,
+    dry: bool | None,
     quiet: bool,
 ) -> None:
-    rpc_bench.run_latency_test(
-        nodes=nodes,
-        methods=methods,
-        samples=samples,
-        calls_file=calls_file,
-        output_file=output_file,
-        random_seed=random_seed,
-        verbose=not quiet,
-    )
+
+    raise NotImplementedError()
+
+    # rpc_bench.run(
+    #     test=test,
+    #     mode=mode,
+    #     nodes=nodes,
+    #     random_seed=random_seed,
+    #     verbose=(not quiet),
+    #     rates=rates,
+    #     duration=duration,
+    #     dry=dry,
+    #     output=output,
+    # )
 

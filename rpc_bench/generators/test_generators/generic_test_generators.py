@@ -4,17 +4,24 @@ import typing
 
 import rpc_bench
 
-# def create_loadtests(
-#     url: str | None = None,
-#     urls: typing.Sequence[str] | None = None,
-#     calls: typing.Sequence[spec.Call] | None = None,
-#     calls_lists: typing.Sequence[typing.Sequence[spec.Call]] | None = None,
-#     duration: int | None = None,
-#     durations: typing.Sequence[int] | typing.Mapping[str, int] | None = None,
-#     rates: int | None = None,
-#     rates_list: typing.Sequence[int] | typing.Mapping[str, int] | None = None,
-# ) -> typing.Mapping[str, spec.LoadTest]:
-#     raise NotImplementedError()
+
+def get_available_tests() -> typing.Sequence[str]:
+    return [
+        item
+        for item in dir(rpc_bench)
+        if item.startswith('generate_tests_')
+    ]
+
+
+def get_test_display_name(test: str) -> str:
+    if not test.startswith('generate_tests_'):
+        raise Exception()
+    test = test[len('generate_tests_'):]
+    return test
+
+
+def get_display_name_test(name: str) -> str:
+    pass
 
 
 # def generate_tests(

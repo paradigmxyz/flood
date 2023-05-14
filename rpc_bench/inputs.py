@@ -17,12 +17,12 @@ def get_ctc_alias_url(url: str) -> str | None:
         return None
 
 
-def _parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
+def parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
     """parse given nodes according to input specification"""
     new_nodes: typing.MutableMapping[str, spec.Node] = {}
     if isinstance(nodes, list):
         for node in nodes:
-            new_node = _parse_node(node)
+            new_node = parse_node(node)
             new_nodes[new_node['name']] = new_node
     elif isinstance(nodes, dict):
         for key, value in nodes.items():
@@ -32,7 +32,7 @@ def _parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
     return new_nodes
 
 
-def _parse_node(node: str | spec.Node) -> spec.Node:
+def parse_node(node: str | spec.Node) -> spec.Node:
     """parse node according to input specification"""
     prefixes = ['http', 'https', 'ws', 'wss']
 

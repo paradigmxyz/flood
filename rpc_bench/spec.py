@@ -18,6 +18,8 @@ if typing.TYPE_CHECKING:
         url: str
         remote: str | None
 
+    NodeShorthand = typing.Union[str, Node]
+
     NodesShorthand = typing.Union[
         typing.Sequence[str],
         typing.Sequence[Node],
@@ -31,6 +33,14 @@ if typing.TYPE_CHECKING:
         leave: bool
         colour: str
         disable: bool
+
+    #
+    # # generators
+    #
+
+    import numpy as np
+
+    RandomSeed = typing.Union[int, np.random._generator.Generator]
 
     #
     # # latency test types
@@ -50,11 +60,21 @@ if typing.TYPE_CHECKING:
     # # load test types
     #
 
-    class LoadTest(typing.TypedDict):
-        url: str
-        rates: typing.Sequence[int]
+    class VegetaAttack(typing.TypedDict):
+        rate: int
         duration: int
         calls: typing.Sequence[typing.Any]
+        vegeta_kwargs: typing.Mapping[str, typing.Any]
+
+    VegetaKwargs = typing.Mapping[str, typing.Union[str, None]]
+
+    LoadTest = typing.Sequence[VegetaAttack]
+
+    Mode = typing.Literal['stress', 'spike', 'soak']
+
+    #
+    # # load tests outputs
+    #
 
     class RawLoadTestOutputDatum(typing.TypedDict):
         latencies: typing.Mapping[str, float]

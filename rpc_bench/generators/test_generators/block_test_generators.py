@@ -5,71 +5,30 @@ import typing
 import rpc_bench
 
 
-def generate_tests_eth_get_block_by_number_by_url(
-    urls: typing.Sequence[str] | typing.Mapping[str, str],
+def generate_tests_eth_get_block_by_number(
     rates: typing.Sequence[int],
     duration: int,
-) -> typing.Mapping[str, rpc_bench.LoadTest]:
-
-    if isinstance(urls, list):
-        urls = {url: url for url in urls}
-    if not isinstance(urls, dict):
-        raise Exception('could not convert urls')
-
+    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    random_seed: rpc_bench.RandomSeed | None = None,
+) -> rpc_bench.LoadTest:
     n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
-
-    block_numbers = rpc_bench.generate_block_numbers(
-        n=n_calls,
-        random_seed=0,
-        start_block=0,
-        end_block=16_000_000,
+    calls = rpc_bench.generate_calls_eth_get_block_by_number(n_calls=n_calls)
+    return rpc_bench.construct_load_test(
+        calls=calls,
+        rates=rates,
+        duration=duration,
     )
 
-    calls = rpc_bench.generate_calls_eth_get_block_by_number(
-        block_numbers=block_numbers,
-    )
 
-    tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
-    for name, url in urls.items():
-        tests[name] = {
-            'url': url,
-            'rates': rates,
-            'duration': duration,
-            'calls': calls,
-        }
-
-    return tests
-
-
-def generate_tests_eth_get_block_by_hash_by_url(
-    urls: typing.Sequence[str] | typing.Mapping[str, str],
+def generate_tests_eth_get_block_by_hash(
     rates: typing.Sequence[int],
     duration: int,
-) -> typing.Mapping[str, rpc_bench.LoadTest]:
-
-    if isinstance(urls, list):
-        urls = {url: url for url in urls}
-    if not isinstance(urls, dict):
-        raise Exception('could not convert urls')
-
+) -> rpc_bench.LoadTest:
     n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
-
-    block_hashes = rpc_bench.generate_block_hashes(
-        n=n_calls,
+    calls = rpc_bench.generate_calls_eth_get_block_by_hash(n_calls=n_calls)
+    return rpc_bench.construct_load_test(
+        calls=calls,
+        rates=rates,
+        duration=duration,
     )
-
-    calls = rpc_bench.generate_calls_eth_get_block_by_hash(
-        block_hashes=block_hashes,
-    )
-
-    tests: typing.MutableMapping[str, rpc_bench.LoadTest] = {}
-    for name, url in urls.items():
-        tests[name] = {
-            'url': url,
-            'rates': rates,
-            'duration': duration,
-            'calls': calls,
-        }
-
-    return tests
 

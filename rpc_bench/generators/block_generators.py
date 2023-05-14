@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import typing
 
-if typing.TYPE_CHECKING:
-    import numpy as np
+import rpc_bench
 
 
 def generate_block_numbers(
@@ -13,7 +12,7 @@ def generate_block_numbers(
     *,
     replace: bool = False,
     sort: bool = False,
-    random_seed: int | np.random._generator.Generator | None = None,
+    random_seed: rpc_bench.RandomSeed | None = None,
 ) -> typing.Sequence[int]:
     import numpy as np
 
@@ -49,7 +48,7 @@ def generate_block_ranges(
     non_overlapping: bool = True,
     sort: bool = False,
     n_attempts: int = 1_000_000,
-    random_seed: int | np.random._generator.Generator | None = None,
+    random_seed: rpc_bench.RandomSeed | None = None,
     method: str = 'strides',
 ) -> typing.Sequence[tuple[int, int]]:
     if method == 'strides':
@@ -87,7 +86,7 @@ def _generate_block_ranges_strides(
     non_overlapping: bool = True,
     sort: bool = False,
     n_attempts: int = 1_000_000,
-    random_seed: int | np.random._generator.Generator | None = None,
+    random_seed: rpc_bench.RandomSeed | None = None,
 ) -> typing.Sequence[tuple[int, int]]:
     import numpy as np
 
@@ -122,7 +121,7 @@ def _generate_block_ranges_individual(
     non_overlapping: bool = True,
     sort: bool = False,
     n_attempts: int = 1_000_000,
-    random_seed: int | np.random._generator.Generator | None = None,
+    random_seed: rpc_bench.RandomSeed | None = None,
 ) -> typing.Sequence[tuple[int, int]]:
     import numpy as np
 

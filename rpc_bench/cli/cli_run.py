@@ -8,6 +8,7 @@ import rpc_bench
 def run_cli(raw_command: str | None = None) -> None:
     command_index: toolcli.CommandIndex = {
         (): 'rpc_bench.cli.root_command',
+        ('ls',): 'rpc_bench.cli.ls_command',
         (
             'version',
         ): 'toolcli.command_utils.standard_subcommands.version_command',
@@ -20,7 +21,7 @@ def run_cli(raw_command: str | None = None) -> None:
         'version': rpc_bench.__version__,
         'default_command_sequence': (),
         'root_help_arguments': True,
-        'root_help_subcommands': False,
+        # 'root_help_subcommands': False,
         'include_debug_arg': True,
         'style_theme': rpc_bench.styles,
     }

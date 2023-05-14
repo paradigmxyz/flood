@@ -4,6 +4,10 @@ import ctc.rpc
 import typing
 
 from rpc_bench import spec
+from . import address_generators
+from . import block_generators
+from . import slot_generators
+from . import transaction_generators
 
 
 #
@@ -12,8 +16,17 @@ from rpc_bench import spec
 
 
 def generate_calls_eth_get_block_by_number(
-    block_numbers: typing.Sequence[int],
+    n_calls: int | None = None,
+    *,
+    block_numbers: typing.Sequence[int] | None = None,
 ) -> typing.Sequence[spec.Call]:
+    if block_numbers is None:
+        block_numbers = block_generators.generate_block_numbers(
+            n=n_calls,
+            random_seed=0,
+            start_block=0,
+            end_block=16_000_000,
+        )
     return [
         ctc.rpc.construct_eth_get_block_by_number(block_number=block_number)
         for block_number in block_numbers
@@ -21,8 +34,14 @@ def generate_calls_eth_get_block_by_number(
 
 
 def generate_calls_eth_get_block_by_hash(
-    block_hashes: typing.Sequence[str],
+    n_calls: int | None = None,
+    *,
+    block_hashes: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[spec.Call]:
+    if block_hashes is None:
+        block_hashes = block_generators.generate_block_hashes(
+            n=n_calls,
+        )
     return [
         ctc.rpc.construct_eth_get_block_by_hash(block_hash=block_hash)
         for block_hash in block_hashes
@@ -35,9 +54,21 @@ def generate_calls_eth_get_block_by_hash(
 
 
 def generate_calls_eth_get_eth_balance(
-    addresses: typing.Sequence[str],
-    block_numbers: typing.Sequence[int],
+    n_calls: int | None = None,
+    *,
+    addresses: typing.Sequence[str] | None = None,
+    block_numbers: typing.Sequence[int] | None = None,
 ) -> typing.Sequence[spec.Call]:
+    if block_numbers is None:
+        block_numbers = block_generators.generate_block_numbers(
+            start_block=10_000_000,
+            end_block=16_000_000,
+            n=n_calls,
+            random_seed=0,
+        )
+    if addresses is None:
+        addresses = address_generators.generate_contract_addresses(n_calls)
+
     return [
         ctc.rpc.construct_eth_get_balance(
             address=address, block_number=block_number
@@ -47,9 +78,21 @@ def generate_calls_eth_get_eth_balance(
 
 
 def generate_calls_eth_get_transaction_count(
-    addresses: typing.Sequence[str],
-    block_numbers: typing.Sequence[int],
+    n_calls: int | None = None,
+    *,
+    addresses: typing.Sequence[str] | None = None,
+    block_numbers: typing.Sequence[int] | None = None,
 ) -> typing.Sequence[spec.Call]:
+    if block_numbers is None:
+        block_numbers = block_numbers.generate_block_numbers(
+            start_block=10_000_000,
+            end_block=16_000_000,
+            n=n_calls,
+            random_seed=0,
+        )
+    if addresses is not None:
+        addresses = address_generators.generate_eoas(n_calls)
+
     return [
         ctc.rpc.construct_eth_get_transaction_count(
             from_address=address, block_number=block_number
@@ -64,8 +107,14 @@ def generate_calls_eth_get_transaction_count(
 
 
 def generate_calls_eth_get_transaction_by_hash(
-    transaction_hashes: typing.Sequence[str],
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[spec.Call]:
+    if transaction_hashes is None:
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n_calls
+        )
     return [
         ctc.rpc.construct_eth_get_transaction_by_hash(
             transaction_hash=transaction_hash
@@ -75,8 +124,14 @@ def generate_calls_eth_get_transaction_by_hash(
 
 
 def generate_calls_eth_get_transaction_receipt(
-    transaction_hashes: typing.Sequence[str],
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[spec.Call]:
+    if transaction_hashes is None:
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n_calls
+        )
     return [
         ctc.rpc.construct_eth_get_transaction_receipt(
             transaction_hash=transaction_hash
@@ -89,12 +144,37 @@ def generate_calls_eth_get_transaction_receipt(
 # # logs
 #
 
+contracts = {
+    'USDC': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    'DAI': '0x6b175474e89094c44da98b954eedeac495271d0f',
+    'LUSD': '0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
+}
+
+event_hashes = {
+    'Transfer': '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+    'Approval': '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
+}
+
 
 def generate_calls_eth_get_logs(
-    contract_address: str,
-    topics: typing.Sequence[str | None],
+    n_calls: int | None = None,
+    *,
+    contract_address: str | None = None,
+    topics: typing.Sequence[str | None] = None,
     block_ranges: typing.Sequence[tuple[int, int]],
 ) -> typing.Sequence[spec.Call]:
+    if contract_address is None:
+        contract_address = contracts['USDC']
+    if block_ranges is None:
+        block_ranges = block_generators.generate_block_ranges(
+            start_block=10_000_000,
+            end_block=16_000_000,
+            n=n_calls,
+            range_size=100,
+            random_seed=0,
+        )
+    if topics is None:
+        topics = [event_hashes['Transfer']]
     return [
         ctc.rpc.construct_eth_get_logs(
             address=contract_address,
@@ -112,11 +192,21 @@ def generate_calls_eth_get_logs(
 
 
 def generate_calls_eth_get_code(
-    addresses: typing.Sequence[str],
-    block_numbers: typing.Sequence[int | typing.Literal['latest']] | None,
+    n_calls: int | None = None,
+    *,
+    addresses: typing.Sequence[str] | None = None,
+    block_numbers: typing.Sequence[int | typing.Literal['latest']]
+    | None = None,
 ) -> typing.Sequence[spec.Call]:
     if block_numbers is None:
-        block_numbers = ['latest'] * len(addresses)
+        block_numbers = block_generators.generate_block_numbers(
+            start_block=10_000_000,
+            end_block=16_000_000,
+            n=n_calls,
+            random_seed=0,
+        )
+    if addresses is None:
+        addresses = address_generators.generate_contract_addresses(n_calls)
     return [
         ctc.rpc.construct_eth_get_code(
             address=address, block_number=block_number
@@ -126,11 +216,20 @@ def generate_calls_eth_get_code(
 
 
 def generate_calls_eth_get_storage_at(
+    n_calls: int | None = None,
+    *,
     slots: typing.Sequence[tuple[str, str]],
     block_numbers: typing.Sequence[int | typing.Literal['latest']] | None,
 ) -> typing.Sequence[spec.Call]:
     if block_numbers is None:
-        block_numbers = ['latest'] * len(slots)
+        block_numbers = block_numbers.generate_block_numbers(
+            start_block=10_000_000,
+            end_block=16_000_000,
+            n=n_calls,
+            random_seed=0,
+        )
+    if slots is None:
+        slots = slot_generators.generate_slots(n_calls)
     return [
         ctc.rpc.construct_eth_get_storage_at(
             address=address, position=slot, block_number=block_number
