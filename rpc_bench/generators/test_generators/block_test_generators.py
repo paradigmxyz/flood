@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from rpc_bench import spec
 import rpc_bench
 
 
@@ -9,7 +10,7 @@ def generate_test_eth_get_block_by_number(
     rates: typing.Sequence[int],
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
-    random_seed: rpc_bench.RandomSeed | None = None,
+    random_seed: spec.RandomSeed | None = None,
 ) -> rpc_bench.LoadTest:
     n_calls = rpc_bench.estimate_call_count(rates=rates, duration=duration)
     calls = rpc_bench.generate_calls_eth_get_block_by_number(n_calls=n_calls)

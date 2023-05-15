@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from rpc_bench import inputs
-from rpc_bench import outputs
+from rpc_bench import user_io
 from rpc_bench import spec
 from . import load_test_construction
 from . import vegeta
@@ -18,16 +17,16 @@ def run_load_tests(
     verbose: bool = False,
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
     """run multiple load tests"""
-    # parse inputs
+    # parse user_io
     if (node is None) == (nodes is None):
         raise Exception('must specify either node or nodes')
     if (test is None) == (tests is None):
         raise Exception('must specify either test or tests')
     if node is not None:
-        node = inputs.parse_node(node)
+        node = user_io.parse_node(node)
     if nodes is not None:
-        nodes = inputs.parse_nodes(nodes)
-    tqdm = outputs._get_tqdm()
+        nodes = user_io.parse_nodes(nodes)
+    tqdm = user_io.outputs._get_tqdm()
     pbar = {'position': 0}
 
     # case: single node and single test
@@ -63,7 +62,7 @@ def run_load_tests(
 
     # case: invalid input
     else:
-        raise Exception('invalid inputs')
+        raise Exception('invalid user_io')
 
 
 def run_load_test(
@@ -80,8 +79,8 @@ def run_load_test(
 ) -> spec.LoadTestOutput:
     """run a load test against a single node"""
 
-    # parse inputs
-    node = inputs.parse_node(node)
+    # parse user_io
+    node = user_io.parse_node(node)
     if test is None:
         if (rates is None or calls is None):
             raise Exception('specify rates and calls')
@@ -122,7 +121,7 @@ def _run_load_test_locally(
     # construct progress bar
     if _pbar_kwargs is None:
         _pbar_kwargs = {}
-    tqdm = outputs._get_tqdm()
+    tqdm = user_io.outputs._get_tqdm()
     tqdm_kwargs = dict(leave=False, desc='samples', **_pbar_kwargs)
 
     # perform tests

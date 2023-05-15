@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import typing
 
-from rpc_bench import inputs
+from rpc_bench import user_io
 from rpc_bench import spec
 from . import call_creation
 from . import latency_test_execution
@@ -28,7 +28,7 @@ def run_latency_test(
 
     # parse inputs
     if not isinstance(nodes, dict):
-        nodes = inputs.parse_nodes(nodes)
+        nodes = user_io.parse_nodes(nodes)
     start_time = datetime.datetime.fromtimestamp(int(time.time()))
 
     # create calls

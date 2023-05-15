@@ -9,6 +9,7 @@ def run_cli(raw_command: str | None = None) -> None:
     command_index: toolcli.CommandIndex = {
         (): 'rpc_bench.cli.root_command',
         ('ls',): 'rpc_bench.cli.ls_command',
+        ('report',): 'rpc_bench.cli.report_command',
         (
             'version',
         ): 'toolcli.command_utils.standard_subcommands.version_command',

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing
 
+
 if typing.TYPE_CHECKING:
     #
     # # generic types
@@ -67,10 +68,12 @@ if typing.TYPE_CHECKING:
         vegeta_kwargs: typing.Mapping[str, typing.Any]
 
     VegetaKwargs = typing.Mapping[str, typing.Union[str, None]]
+    MultiVegetaKwargs = typing.Sequence[VegetaKwargs]
+    VegetaKwargsShorthand = typing.Union[VegetaKwargs, MultiVegetaKwargs]
 
     LoadTest = typing.Sequence[VegetaAttack]
 
-    Mode = typing.Literal['stress', 'spike', 'soak']
+    LoadTestMode = typing.Literal['stress', 'spike', 'soak']
 
     #
     # # load tests outputs

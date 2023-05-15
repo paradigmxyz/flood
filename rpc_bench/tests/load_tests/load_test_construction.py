@@ -58,7 +58,9 @@ def construct_load_test(
 
     # partition calls into individual attacks
     if not repeat_calls:
-        attacks_calls: typing.MutableSequence[typing.Sequence[rpc_bench.Call]] = []
+        attacks_calls: typing.MutableSequence[
+            typing.Sequence[rpc_bench.Call]
+        ] = []
         calls_iter = iter(calls)
         for rate, duration in zip(rates, durations):
             n_attack_calls = rate * duration

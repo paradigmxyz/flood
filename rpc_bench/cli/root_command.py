@@ -13,6 +13,11 @@ import rpc_bench
 
 help_message = """Load test JSON RPC endpoints
 
+[bold][title]Test Specification[/bold][/title]
+- [metavar]TEST[/metavar] can be a template, use [metavar]rpc_bench ls[/metavar] to list test templates
+- Alternatively, [metavar]TEST[/metavar] can be a directory path of a previous test
+    - This will rerun this the previous test, possibly on new nodes
+
 [bold][title]Node Specification[/bold][/title]
 - Nodes are specified as a space-separated list
 - Basic node syntax is [metavar]url[/metavar] or [metavar]name=url[/metavar]
@@ -47,6 +52,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['-s', '--seed'],
                 'dest': 'random_seed',
+                'type': int,
                 'help': 'random seed to use, default is current timestamp',
             },
             {
@@ -56,6 +62,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ['-m', '--mode'],
+                'choices': ['stress', 'spike', 'soak'],
                 'help': 'stress, spike, soak, latency, or equality',
             },
             {
@@ -87,16 +94,24 @@ def root_command(
     test: str,
     nodes: typing.Sequence[str],
     output: str | None,
-    mode: str | None,
-    rates: typing.Sequence[str] | None,
-    duration: str | None,
+    mode: rpc_bench.LoadTestMode | None,
+    rates: typing.Sequence[int] | typing.Sequence[str] | None,
+    duration: str | int | None,
     random_seed: int | None,
-    dry: bool | None,
+    dry: bool,
     quiet: bool,
 ) -> None:
 
+    # TODO: perform str conversions later in pipeline
+    if duration is not None:
+        import tooltime
+
+        duration = tooltime.timelength_to_seconds(duration)
+    if rates is not None:
+        rates = [int(rate) for rate in rates]
+
     rpc_bench.run(
-        test=test,
+        test_name=test,
         mode=mode,
         nodes=nodes,
         random_seed=random_seed,
