@@ -75,6 +75,9 @@ if typing.TYPE_CHECKING:
 
     LoadTestMode = typing.Literal['stress', 'spike', 'soak']
 
+    LoadTestGenerator = typing.Callable[..., LoadTest]
+    MultiLoadTestGenerator = typing.Callable[..., typing.Mapping[str, LoadTest]]
+
     #
     # # load tests outputs
     #

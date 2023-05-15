@@ -51,6 +51,8 @@ def construct_load_test(
     assert len(durations) == len(rates)
 
     # pluralize singular vegeta kwargs
+    if vegeta_kwargs is None:
+        vegeta_kwargs = {}
     if isinstance(vegeta_kwargs, dict):
         vegeta_kwargs = [vegeta_kwargs] * len(rates)
     if not isinstance(vegeta_kwargs, list):

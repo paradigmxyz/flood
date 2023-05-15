@@ -132,8 +132,8 @@ def _run_load_test_locally(
             calls=attack['calls'],
             duration=attack['duration'],
             rate=attack['duration'],
-            vegeta_kwargs=attack['vegeta_attacks'],
-            verbose=verbose,
+            vegeta_kwargs=attack['vegeta_kwargs'],
+            verbose=verbose >= 2,
         )
         results.append(result)
         if verbose:

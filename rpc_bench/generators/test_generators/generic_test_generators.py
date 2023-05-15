@@ -10,41 +10,53 @@ import rpc_bench
 #
 
 
-def get_single_test_generators() -> typing.Sequence[str]:
-    return [
-        item for item in dir(rpc_bench) if item.startswith('generate_test_')
-    ]
+def get_single_test_generators() -> (
+    typing.Mapping[str, rpc_bench.LoadTestGenerator]
+):
+    return {
+        get_test_generator_display_name(item): item
+        for item in dir(rpc_bench)
+        if item.startswith('generate_test_')
+    }
 
 
-def get_multi_test_generators() -> typing.Sequence[str]:
-    return [
-        item for item in dir(rpc_bench) if item.startswith('generate_tests_')
-    ]
+def get_multi_test_generators() -> (
+    typing.Mapping[str, rpc_bench.MultiLoadTestGenerator]
+):
+    return {
+        get_test_generator_display_name(item): item
+        for item in dir(rpc_bench)
+        if item.startswith('generate_tests_')
+    }
 
 
-def get_test_generator(
-    test_name: str,
-) -> typing.Callable[..., rpc_bench.LoadTest]:
-    single_name = 'generate_test_' + test_name
-    if hasattr(rpc_bench, single_name):
-        return getattr(rpc_bench, single_name)  # type: ignore
+def get_test_generator(test_name: str) -> rpc_bench.LoadTestGenerator:
+    function_name = get_test_generator_function_name(test_name)
+    if hasattr(rpc_bench, function_name):
+        return getattr(rpc_bench, function_name)  # type: ignore
     else:
         raise Exception()
 
 
-def get_test_display_name(test: str) -> str:
+def get_test_generator_display_name(test: str) -> str:
     if not test.startswith('generate_test_'):
         raise Exception()
     test = test[len('generate_test_') :]
-
     head, tail = test.split('_', 1)
     test = head + '_' + snake_case_to_camel_case(tail)
-
     return test
 
 
-def get_display_name_test(name: str) -> str:
-    raise NotImplementedError()
+def get_test_generator_function_name(display_name: str) -> str:
+    function_name = 'generate_test_' + camel_case_to_snake_case(display_name)
+    return function_name
+
+
+def camel_case_to_snake_case(string: str) -> str:
+    # adapted from https://stackoverflow.com/a/1176023
+    import re
+
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
 
 
 def snake_case_to_camel_case(string: str) -> str:
