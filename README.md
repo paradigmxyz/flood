@@ -8,6 +8,22 @@ a load test is a series of vegeta attacks
 
 ## Installation
 
+#### Prerequisites
+
+Install [`vegeta`](https://github.com/tsenart/vegeta):
+- on mac: `brew update && brew install vegeta`
+- from source: `go install github.com/tsenart/vegeta@latest`
+
+Install latest [`ctc`](https://github.com/checkthechain/checkthechain):
+```
+git clone checkthechain/checkthechain
+cd checkthechain
+pip install -e ./
+```
+
+#### Installing `rpc_bench`
+
+
 ```
 git clone https://github.com/paradigmxyz/rpc_bench
 cd rpc_bench
