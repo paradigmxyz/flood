@@ -66,11 +66,18 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'stress, spike, soak, latency, or equality',
             },
             {
+                'name': ['--metrics'],
+                'nargs': '+',
+                'help': 'space-separated list of performance metrics to show',
+            },
+            {
                 'name': ['-r', '--rates'],
+                'nargs': '+',
                 'help': 'rates to use in load test (requests per second)',
             },
             {
                 'name': ['-d', '--duration'],
+                'type': int,
                 'help': 'amount of time to test each rate',
             },
             {
@@ -94,19 +101,20 @@ def root_command(
     test: str,
     nodes: typing.Sequence[str],
     output: str | None,
+    metrics: typing.Sequence[str],
     mode: rpc_bench.LoadTestMode | None,
     rates: typing.Sequence[int] | typing.Sequence[str] | None,
-    duration: str | int | None,
+    duration: int | None,
     random_seed: int | None,
     dry: bool,
     quiet: bool,
 ) -> None:
 
     # TODO: perform str conversions later in pipeline
-    if duration is not None:
-        import tooltime
+    # if duration is not None:
+    #     import tooltime
 
-        duration = tooltime.timelength_to_seconds(duration)
+    #     duration = tooltime.timelength_to_seconds(duration)
     if rates is not None:
         rates = [int(rate) for rate in rates]
 
@@ -114,6 +122,7 @@ def root_command(
         test_name=test,
         mode=mode,
         nodes=nodes,
+        metrics=metrics,
         random_seed=random_seed,
         verbose=(not quiet),
         rates=rates,

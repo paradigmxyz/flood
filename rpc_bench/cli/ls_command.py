@@ -15,5 +15,5 @@ def get_command_spec() -> toolcli.CommandSpec:
 def ls_command() -> None:
     print('Available tests:')
     for test in rpc_bench.get_single_test_generators():
-        print('-', rpc_bench.get_test_display_name(test))
+        print('-', test)
 

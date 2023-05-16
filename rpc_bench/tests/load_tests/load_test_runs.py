@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import rpc_bench
 from rpc_bench import user_io
 from rpc_bench import spec
 from . import load_test_construction
@@ -27,7 +28,12 @@ def run_load_tests(
     if nodes is not None:
         nodes = user_io.parse_nodes(nodes)
     tqdm = user_io.outputs._get_tqdm()
-    pbar = {'position': 0}
+    pbar = {
+        'leave': False,
+        'desc': 'nodes',
+        'position': 0,
+        'colour': rpc_bench.styles['content'],
+    }
 
     # case: single node and single test
     if node is not None and test is not None:
@@ -42,7 +48,7 @@ def run_load_tests(
         return results
 
     # case: multiple nodes and single tests
-    elif nodes is not None and tests is not None:
+    elif nodes is not None and test is not None:
         results = {}
         for name, nd in tqdm.tqdm(nodes.items(), **pbar):
             results[name] = run_load_test(node=nd, verbose=verbose, test=test)
@@ -82,7 +88,7 @@ def run_load_test(
     # parse user_io
     node = user_io.parse_node(node)
     if test is None:
-        if (rates is None or calls is None):
+        if rates is None or calls is None:
             raise Exception('specify rates and calls')
         test = load_test_construction.construct_load_test(
             rates=rates,
@@ -122,7 +128,13 @@ def _run_load_test_locally(
     if _pbar_kwargs is None:
         _pbar_kwargs = {}
     tqdm = user_io.outputs._get_tqdm()
-    tqdm_kwargs = dict(leave=False, desc='samples', **_pbar_kwargs)
+    tqdm_kwargs = dict(
+        leave=False,
+        desc='samples',
+        position=1,
+        colour=rpc_bench.styles['content'],
+        **_pbar_kwargs,
+    )
 
     # perform tests
     results = []
@@ -131,12 +143,12 @@ def _run_load_test_locally(
             url=node['url'],
             calls=attack['calls'],
             duration=attack['duration'],
-            rate=attack['duration'],
+            rate=attack['rate'],
             vegeta_kwargs=attack['vegeta_kwargs'],
             verbose=verbose >= 2,
         )
         results.append(result)
-        if verbose:
+        if verbose >= 2:
             print()
 
     # format output

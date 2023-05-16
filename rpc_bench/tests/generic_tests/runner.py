@@ -6,7 +6,7 @@ import rpc_bench
 
 
 def run(
-test_name: str,
+    test_name: str,
     *,
     nodes: rpc_bench.NodesShorthand,
     random_seed: rpc_bench.RandomSeed | None = None,
@@ -18,6 +18,7 @@ test_name: str,
     vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
     dry: bool,
     output: str | None = None,
+    metrics: typing.Sequence[str] | None = None,
 ) -> None:
     """generate and run load test(s) against node(s)"""
 
@@ -31,7 +32,6 @@ test_name: str,
             else:
                 os.makedirs(output)
 
-
     # generate tests
     if test_name in rpc_bench.get_single_test_generators():
         _run_single(
@@ -39,11 +39,13 @@ test_name: str,
             nodes=nodes,
             random_seed=random_seed,
             rates=rates,
+            duration=duration,
             durations=durations,
             vegeta_kwargs=vegeta_kwargs,
             dry=dry,
             output=output,
             verbose=verbose,
+            metrics=metrics,
         )
     elif test_name in rpc_bench.get_multi_test_generators():
         raise NotImplementedError()
@@ -63,10 +65,13 @@ def _run_single(
     vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
     dry: bool,
     output: str | None = None,
+    metrics: typing.Sequence[str] | None = None,
     verbose: bool,
 ) -> None:
     import os
     import json
+
+    import toolstr
 
     # create timing
     rates, durations = rpc_bench.generate_timings(
@@ -86,6 +91,35 @@ def _run_single(
         },
     )
 
+    if verbose:
+        toolstr.print_text_box(
+            toolstr.add_style(
+                'Running load test: ' + test_name, rpc_bench.styles['metavar']
+            ),
+            style=rpc_bench.styles['content'],
+        )
+        toolstr.print_bullet(
+            key='sample rates', value=rates, styles=rpc_bench.styles
+        )
+        if len(set(durations)) == 1:
+            toolstr.print_bullet(
+                key='sample duration',
+                value=durations[0],
+                styles=rpc_bench.styles,
+            )
+        else:
+            toolstr.print_bullet(
+                key='sample durations', value=durations, styles=rpc_bench.styles
+            )
+        if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
+            toolstr.print_bullet(
+                key='extra args', value=None, styles=rpc_bench.styles
+            )
+        toolstr.print_bullet(
+            key='output directory', value=output, styles=rpc_bench.styles
+        )
+        print()
+
     # save outputs to disk
     if output is not None:
         test_design_path = os.path.join(output, 'test.json')
@@ -99,17 +133,14 @@ def _run_single(
 
     # run tests
     if not dry:
-
         nodes = rpc_bench.parse_nodes(nodes)
 
         # run tests
-        results = {}
-        for node_name, node in nodes.items():
-            results[node_name] = rpc_bench.run_load_test(
-                node=node,
-                test=test,
-                verbose=verbose,
-            )
+        results = rpc_bench.run_load_tests(
+            nodes=nodes,
+            test=test,
+            verbose=verbose,
+        )
 
         # output results to file
         if output is not None:
@@ -122,4 +153,17 @@ def _run_single(
             }
             with open(result_path, 'w') as f:
                 json.dump(result_payload, f)
+            print('saved output metrics to:', result_path)
+            print()
+
+        print()
+        print('Load tests completed. Summarizing performance metrics...')
+        print()
+        print()
+        if metrics is None:
+            metrics = ['success', 'throughput', 'p90']
+        rpc_bench.print_metric_tables(
+            results=results,
+            metrics=metrics,
+        )
 

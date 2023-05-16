@@ -14,7 +14,7 @@ def get_single_test_generators() -> (
     typing.Mapping[str, rpc_bench.LoadTestGenerator]
 ):
     return {
-        get_test_generator_display_name(item): item
+        get_test_generator_display_name(item): item  # type: ignore
         for item in dir(rpc_bench)
         if item.startswith('generate_test_')
     }
@@ -24,7 +24,7 @@ def get_multi_test_generators() -> (
     typing.Mapping[str, rpc_bench.MultiLoadTestGenerator]
 ):
     return {
-        get_test_generator_display_name(item): item
+        get_test_generator_display_name(item): item  # type: ignore
         for item in dir(rpc_bench)
         if item.startswith('generate_tests_')
     }
@@ -38,7 +38,14 @@ def get_test_generator(test_name: str) -> rpc_bench.LoadTestGenerator:
         raise Exception()
 
 
-def get_test_generator_display_name(test: str) -> str:
+def get_test_generator_display_name(test: str | rpc_bench.LoadTestGenerator) -> str:
+    if not isinstance(test, str):
+        import types
+
+        if not isinstance(test, types.FunctionType):
+            raise Exception('should be str or function')
+        test = test.__name__
+
     if not test.startswith('generate_test_'):
         raise Exception()
     test = test[len('generate_test_') :]
