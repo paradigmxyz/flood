@@ -16,7 +16,7 @@ Install [`vegeta`](https://github.com/tsenart/vegeta):
 
 Install latest [`ctc`](https://github.com/checkthechain/checkthechain):
 ```
-git clone checkthechain/checkthechain
+git clone https://github.com/checkthechain/checkthechain
 cd checkthechain
 pip install -e ./
 ```
