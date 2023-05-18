@@ -102,13 +102,13 @@ def print_metric_tables(
 
         rows = [[rate] for rate in rates]
         for name, result in results.items():
-            for row, value in zip(rows, result[metric]):
+            for row, value in zip(rows, result[metric]):  # type: ignore
                 row.append(value)
         column_formats = {name: {'decimals': 3} for name in names}
         toolstr.print_table(
             rows,
             labels=labels,
-            column_formats=column_formats,
+            column_formats=column_formats,  # type: ignore
             label_style=rpc_bench.styles['metavar'],
             border=rpc_bench.styles['content'],
         )
