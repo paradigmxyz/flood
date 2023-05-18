@@ -87,3 +87,17 @@ def parse_node(node: str | spec.Node) -> spec.Node:
     else:
         raise Exception('invalid node format')
 
+
+def parse_test_data(test: spec.LoadTest):
+    rates = []
+    durations = []
+    vegeta_kwargs = []
+    for attack in test:
+        rates.append(attack['rate'])
+        durations.append(attack['duration'])
+        vegeta_kwargs.append(attack['vegeta_kwargs'])
+    return {
+        'rates': rates,
+        'durations': durations,
+        'vegeta_kwargs': vegeta_kwargs,
+    }

@@ -128,6 +128,6 @@ def root_command(
         rates=rates,
         duration=duration,
         dry=dry,
-        output=output,
+        output_dir=output or True,
     )
 

@@ -27,6 +27,7 @@ if typing.TYPE_CHECKING:
         typing.Mapping[str, str],
         typing.Mapping[str, Node],
     ]
+    Nodes = typing.Mapping[str, Node]
 
     class ProgressBar(typing.TypedDict):
         desc: str
