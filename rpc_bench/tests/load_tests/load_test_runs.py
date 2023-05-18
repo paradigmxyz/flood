@@ -15,7 +15,7 @@ def run_load_tests(
     nodes: spec.NodesShorthand | None = None,
     test: spec.LoadTest | None = None,
     tests: typing.Mapping[str, spec.LoadTest] | None = None,
-    verbose: bool = False,
+    verbose: bool | int = False,
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
     """run multiple load tests"""
     # parse user_io
@@ -80,7 +80,7 @@ def run_load_test(
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
-    verbose: bool = False,
+    verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test against a single node"""
@@ -119,7 +119,7 @@ def _run_load_test_locally(
     *,
     node: spec.Node,
     test: spec.LoadTest | None,
-    verbose: bool = False,
+    verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
@@ -160,7 +160,7 @@ def _run_load_test_remotely(
     *,
     node: spec.Node,
     test: spec.LoadTest | None,
-    verbose: bool = False,
+    verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""

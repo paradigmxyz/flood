@@ -74,6 +74,12 @@ if typing.TYPE_CHECKING:
 
     LoadTest = typing.Sequence[VegetaAttack]
 
+    class LoadTestColumnWise(typing.TypedDict):
+        rates: typing.Sequence[int]
+        durations: typing.Sequence[int]
+        calls: typing.Sequence[typing.Sequence[typing.Any]]
+        vegeta_kwargs: typing.Sequence[typing.Any]
+
     LoadTestMode = typing.Literal['stress', 'spike', 'soak']
 
     LoadTestGenerator = typing.Callable[..., LoadTest]

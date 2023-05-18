@@ -23,17 +23,20 @@ def run(
     mode: rpc_bench.LoadTestMode | None = None,
     vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
     dry: bool,
-    output_dir: str | int | None = None,
+    output_dir: str | bool | None = None,
     metrics: typing.Sequence[str] | None = None,
 ) -> None:
     """generate and run load test(s) against node(s)"""
     import json
     import os
 
-    if isinstance(output_dir, bool) and output_dir:
-        import tempfile
+    if isinstance(output_dir, bool):
+        if output_dir:
+            import tempfile
 
-        output_dir = tempfile.mkdtemp()
+            output_dir = tempfile.mkdtemp()
+        else:
+            output_dir = None
 
     # run test from path
     if os.path.exists(test_name) or '/' in test_name:
@@ -82,7 +85,7 @@ def run(
 
 def _run_single(
     *,
-    test_name: str | None = None,
+    test_name: str,
     test: rpc_bench.LoadTest | None = None,
     nodes: rpc_bench.NodesShorthand,
     random_seed: rpc_bench.RandomSeed | None = None,
@@ -157,6 +160,7 @@ def _run_single(
             nodes=nodes,
             results=results,
         )
+    # rpc_bench.summarize_load_tests(outputs=results)
 
     # print summary
     if verbose:
@@ -302,7 +306,7 @@ def _get_node_str(node: rpc_bench.Node) -> str:
 
 
 def _print_single_run_conclusion(
-    output_dir: str,
+    output_dir: str | None,
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     metrics: typing.Sequence[str] | None,
     verbose: bool | int,
