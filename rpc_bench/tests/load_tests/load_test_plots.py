@@ -17,7 +17,7 @@ def plot_load_test_results(
     toolplot.setup_plot_formatting()
 
     if output_dir is not None:
-        os.makedirs(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
 
     plt.figure()
     plot_load_test_success(outputs, test_name=test_name)

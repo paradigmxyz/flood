@@ -33,6 +33,7 @@ def run_load_tests(
         'desc': 'nodes',
         'position': 0,
         'colour': rpc_bench.styles['content'],
+        'disable': not verbose,
     }
 
     # case: single node and single test
@@ -133,6 +134,7 @@ def _run_load_test_locally(
         desc='samples',
         position=1,
         colour=rpc_bench.styles['content'],
+        disable=not verbose,
         **_pbar_kwargs,
     )
 
@@ -164,5 +166,68 @@ def _run_load_test_remotely(
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
-    raise NotImplementedError()
+
+    import json
+    import os
+    import subprocess
+    import uuid
+    import toolstr
+
+    # parse node specification
+    remote = node['remote']
+    if remote is None:
+        raise Exception('not a remote node')
+
+    # save call data, saving methods to preserve ordering in json
+    job_id = str(uuid.uuid4())
+    tempdir = '/tmp/rpc_bench__' + job_id
+    os.makedirs(tempdir)
+    rpc_bench.tests.generic_tests.runner._save_single_run_test(
+        test_name='',
+        test=test,
+        output_dir=tempdir,
+    )
+
+    # send call data to remote server
+    if verbose:
+        toolstr.print(
+            toolstr.add_style('- ', rpc_bench.styles['title'])
+            + toolstr.add_style(node['name'], rpc_bench.styles['metavar'])
+            + toolstr.add_style(':', rpc_bench.styles['title'])
+            + ' host'
+            + toolstr.add_style('=', rpc_bench.styles['title'])
+            + toolstr.add_style(remote, rpc_bench.styles['metavar'])
+            + ', url'
+            + toolstr.add_style('=', rpc_bench.styles['title'])
+            + toolstr.add_style(node['url'], rpc_bench.styles['metavar'])
+        )
+        print('    Sending tests to remote node')
+    # cmd = 'ssh {host} mkdir {tempdir}'.format(host=remote, tempdir=tempdir)
+    # subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
+    cmd = 'rsync -r ' + tempdir + ' ' + remote + ':' + os.path.dirname(tempdir)
+    subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
+
+    # initiate benchmarks
+    if verbose:
+        print('    Executing test on remote node')
+    cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m rpc_bench {test} {name}={url} --output {output}'".format(
+        host=remote,
+        name=node['name'],
+        url=node['url'],
+        test=tempdir,
+        output=tempdir,
+    )
+    subprocess.check_output(cmd.split(' '), stderr=subprocess.DEVNULL)
+
+    # retrieve benchmark results
+    if verbose:
+        print('    Retrieving results')
+    results_path = os.path.join(tempdir, 'results.json')
+    cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
+    subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
+
+    # return results
+    with open(results_path, 'r') as f:
+        results: spec.LoadTestOutput = json.load(f)
+        return results['results'][node['name']]
 

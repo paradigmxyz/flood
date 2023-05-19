@@ -194,11 +194,20 @@ def _run_single(
         return
 
     # run tests
-    results = rpc_bench.run_load_tests(
-        nodes=nodes,
-        test=test,
-        verbose=verbose,
-    )
+    try:
+        results = rpc_bench.run_load_tests(
+            nodes=nodes,
+            test=test,
+            verbose=verbose,
+        )
+    except Exception as e:
+        # import traceback
+        # print('THIS WAS THE ERROR:', e.args)
+        # print()
+        # print(traceback.format_exc())
+        # print()
+        # print("ERROR OVER")
+        raise e
 
     # output results to file
     if output_dir is not None:
@@ -226,6 +235,7 @@ def _run_single(
             results=results,
             metrics=metrics,
             verbose=verbose,
+            figures=figures,
         )
         with toolstr.write_stdout_to_file(summary_path, mode='a'):
             _print_single_run_conclusion(
@@ -233,6 +243,7 @@ def _run_single(
                 results=results,
                 metrics=metrics,
                 verbose=verbose,
+                figures=figures,
             )
 
 
@@ -253,7 +264,7 @@ def _save_single_run_test(
         if os.path.exists(output_dir):
             raise Exception('output must be a directory path')
         else:
-            os.makedirs(output_dir)
+            os.makedirs(output_dir, exist_ok=True)
 
     path = path_templates['single_run_test'].format(output_dir=output_dir)
     payload = {
@@ -381,6 +392,7 @@ def _print_single_run_conclusion(
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     metrics: typing.Sequence[str] | None,
     verbose: bool | int,
+    figures: bool,
 ) -> None:
     import os
     import toolstr
@@ -418,12 +430,13 @@ def _print_single_run_conclusion(
             colon_str='',
             styles=rpc_bench.styles,
         )
-        toolstr.print_bullet(
-            key=os.path.relpath(figures_path, output_dir),
-            value='',
-            colon_str='',
-            styles=rpc_bench.styles,
-        )
+        if figures:
+            toolstr.print_bullet(
+                key=os.path.relpath(figures_path, output_dir),
+                value='',
+                colon_str='',
+                styles=rpc_bench.styles,
+            )
 
     # decide metrics
     if metrics is None:
