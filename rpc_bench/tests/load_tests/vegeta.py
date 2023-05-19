@@ -138,6 +138,12 @@ def _create_vegeta_report(
         .strip()
     )
     report: spec.RawLoadTestOutputDatum = json.loads(report_output)
+
+    if 'min' in report['latencies']:
+        latency_min = report['latencies']['min'] / 1e9
+    else:
+        latency_min = None
+
     return {
         'target_rate': target_rate,
         'actual_rate': report['rate'] / 1e9,
@@ -146,7 +152,7 @@ def _create_vegeta_report(
         'requests': report['requests'],
         'throughput': report['throughput'],
         'success': float(report['success']),
-        'min': report['latencies']['min'] / 1e9,
+        'min': latency_min,
         'mean': report['latencies']['mean'] / 1e9,
         'p50': report['latencies']['50th'] / 1e9,
         'p90': report['latencies']['90th'] / 1e9,
