@@ -128,6 +128,9 @@ def _run_single(
     metrics: typing.Sequence[str] | None = None,
     verbose: bool | int,
 ) -> None:
+    import os
+    import toolstr
+
     # parse inputs
     nodes = rpc_bench.parse_nodes(nodes)
 
@@ -166,6 +169,19 @@ def _run_single(
             output_dir=output_dir,
             nodes=nodes,
         )
+
+        if output_dir is not None:
+            summary_path = os.path.join(output_dir, 'summary.txt')
+            with toolstr.write_stdout_to_file(summary_path):
+                _print_single_run_preamble(
+                    test_name=test_name,
+                    rerun_of=rerun_of,
+                    rates=rates,
+                    durations=durations,
+                    vegeta_kwargs=vegeta_kwargs,
+                    output_dir=output_dir,
+                    nodes=nodes,
+                )
 
     # save test to disk
     if output_dir is not None:
@@ -211,6 +227,13 @@ def _run_single(
             metrics=metrics,
             verbose=verbose,
         )
+        with toolstr.write_stdout_to_file(summary_path, mode='a'):
+            _print_single_run_conclusion(
+                output_dir=output_dir,
+                results=results,
+                metrics=metrics,
+                verbose=verbose,
+            )
 
 
 #
