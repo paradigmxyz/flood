@@ -5,28 +5,53 @@ import typing
 import rpc_bench
 
 
-def summarize_load_tests(
+def plot_load_test_results(
     outputs: typing.Mapping[str, rpc_bench.LoadTestOutput],
     test_name: str,
+    output_dir: str | None = None,
 ) -> None:
+    import os
     import matplotlib.pyplot as plt  # type: ignore
+    import toolplot
 
-    plot_success(outputs, test_name=test_name)
-    plt.show()
-    plot_throughput(outputs, test_name=test_name)
-    plt.show()
-    plot_latencies(outputs, test_name=test_name)
-    plt.show()
+    toolplot.setup_plot_formatting()
+
+    if output_dir is not None:
+        os.makedirs(output_dir)
+
+    plt.figure()
+    plot_load_test_success(outputs, test_name=test_name)
+    if output_dir is not None:
+        path = os.path.join(output_dir, 'success.png')
+        plt.savefig(path)
+    else:
+        plt.show()
+
+    plt.figure()
+    plot_load_test_throughput(outputs, test_name=test_name)
+    if output_dir is not None:
+        path = os.path.join(output_dir, 'throughput.png')
+        plt.savefig(path)
+    else:
+        plt.show()
+
+    plt.figure()
+    plot_load_test_latencies(outputs, test_name=test_name)
+    if output_dir is not None:
+        path = os.path.join(output_dir, 'latencies.png')
+        plt.savefig(path)
+    else:
+        plt.show()
 
 
-def plot_success(
+def plot_load_test_success(
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
     import matplotlib.pyplot as plt
 
-    plot_test_results(
+    plot_load_test_result_metrics(
         results=results,
         metrics=['success'],
         colors=colors,
@@ -38,12 +63,12 @@ def plot_success(
     plt.legend(loc='center right')
 
 
-def plot_throughput(
+def plot_load_test_throughput(
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
-    plot_test_results(
+    plot_load_test_result_metrics(
         results=results,
         metrics=['throughput'],
         colors=colors,
@@ -53,7 +78,7 @@ def plot_throughput(
     )
 
 
-def plot_latencies(
+def plot_load_test_latencies(
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     colors: typing.Mapping[
         str,
@@ -66,7 +91,7 @@ def plot_latencies(
     if colors is None:
         colors = dict(zip(results.keys(), rpc_bench.colors.values()))
 
-    plot_test_results(
+    plot_load_test_result_metrics(
         results=results,
         metrics=metrics,
         colors=colors,
@@ -77,7 +102,7 @@ def plot_latencies(
     )
 
 
-def plot_test_results(
+def plot_load_test_result_metrics(
     results: typing.Mapping[str, rpc_bench.LoadTestOutput],
     metrics: typing.Sequence[str],
     *,

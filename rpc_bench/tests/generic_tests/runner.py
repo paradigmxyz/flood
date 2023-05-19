@@ -8,6 +8,7 @@ import rpc_bench
 path_templates = {
     'single_run_test': '{output_dir}/test.json',
     'single_run_results': '{output_dir}/results.json',
+    'single_run_figures_dir': '{output_dir}/figures',
 }
 
 
@@ -24,6 +25,7 @@ def run(
     vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
     dry: bool,
     output_dir: str | bool | None = None,
+    figures: bool = True,
     metrics: typing.Sequence[str] | None = None,
 ) -> None:
     """generate and run load test(s) against node(s)"""
@@ -41,7 +43,9 @@ def run(
     # run test from path
     if os.path.exists(test_name) or '/' in test_name:
         if os.path.isdir(test_name):
-            test_path = path_templates['single_run_test'].format(output_dir=test_name)
+            test_path = path_templates['single_run_test'].format(
+                output_dir=test_name
+            )
         else:
             test_path = test_name
         try:
@@ -61,6 +65,7 @@ def run(
             output_dir=output_dir,
             verbose=verbose,
             metrics=metrics,
+            figures=figures,
         )
 
     if test_name in rpc_bench.get_single_test_generators():
@@ -76,6 +81,7 @@ def run(
             output_dir=output_dir,
             verbose=verbose,
             metrics=metrics,
+            figures=figures,
         )
     elif test_name in rpc_bench.get_multi_test_generators():
         raise NotImplementedError()
@@ -96,6 +102,7 @@ def _run_single(
     vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
     dry: bool,
     output_dir: str | None = None,
+    figures: bool,
     metrics: typing.Sequence[str] | None = None,
     verbose: bool | int,
 ) -> None:
@@ -139,7 +146,9 @@ def _run_single(
 
     # save test to disk
     if output_dir is not None:
-        _save_single_run_test(test_name=test_name, output_dir=output_dir, test=test)
+        _save_single_run_test(
+            test_name=test_name, output_dir=output_dir, test=test
+        )
 
     # skip dry run
     if dry:
@@ -160,7 +169,16 @@ def _run_single(
             nodes=nodes,
             results=results,
         )
-    # rpc_bench.summarize_load_tests(outputs=results)
+
+        if figures:
+            figures_dir = path_templates['single_run_figures_dir'].format(
+                output_dir=output_dir
+            )
+            rpc_bench.plot_load_test_results(
+                outputs=results,
+                test_name=test_name,
+                output_dir=figures_dir,
+            )
 
     # print summary
     if verbose:
@@ -311,22 +329,47 @@ def _print_single_run_conclusion(
     metrics: typing.Sequence[str] | None,
     verbose: bool | int,
 ) -> None:
+    import os
     import toolstr
 
     print('Load tests completed.')
 
     # print message about metrics file
     if output_dir is not None:
+        test_path = path_templates['single_run_test'].format(
+            output_dir=output_dir
+        )
         result_path = path_templates['single_run_results'].format(
+            output_dir=output_dir
+        )
+        figures_path = path_templates['single_run_figures_dir'].format(
             output_dir=output_dir
         )
         print()
         print()
         toolstr.print_bullet(
-            key='Saved output metrics to',
-            value=result_path,
+            key='Saving results',
+            value='',
             styles=rpc_bench.styles,
             bullet_str='',
+        )
+        toolstr.print_bullet(
+            key=os.path.relpath(test_path, output_dir),
+            value='',
+            colon_str='',
+            styles=rpc_bench.styles,
+        )
+        toolstr.print_bullet(
+            key=os.path.relpath(result_path, output_dir),
+            value='',
+            colon_str='',
+            styles=rpc_bench.styles,
+        )
+        toolstr.print_bullet(
+            key=os.path.relpath(figures_path, output_dir),
+            value='',
+            colon_str='',
+            styles=rpc_bench.styles,
         )
 
     # decide metrics

@@ -89,6 +89,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': ['-o', '--output'],
                 'help': 'directory to save results, default is tmp dir',
             },
+            {
+                'name': ['--no-figures'],
+                'help': 'skip generating summary figures in output_dir',
+                'dest': 'figures',
+                'action': 'store_false',
+            },
         ],
         'examples': [
             'eth_getBlockByNumber localhost:8545',
@@ -108,6 +114,7 @@ def root_command(
     random_seed: int | None,
     dry: bool,
     quiet: bool,
+    figures: bool,
 ) -> None:
 
     # TODO: perform str conversions later in pipeline
@@ -129,5 +136,6 @@ def root_command(
         duration=duration,
         dry=dry,
         output_dir=output or True,
+        figures=figures,
     )
 
