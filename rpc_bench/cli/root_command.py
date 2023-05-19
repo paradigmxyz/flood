@@ -46,7 +46,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': 'nodes',
-                'nargs': '+',
+                'nargs': '*',
                 'help': 'nodes to test, see syntax above',
             },
             {
@@ -87,6 +87,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ['-o', '--output'],
+                'dest': 'output_dir',
                 'help': 'directory to save results, default is tmp dir',
             },
             {
@@ -106,7 +107,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 def root_command(
     test: str,
     nodes: typing.Sequence[str],
-    output: str | None,
+    output_dir: str | None,
     metrics: typing.Sequence[str],
     mode: rpc_bench.LoadTestMode | None,
     rates: typing.Sequence[int] | typing.Sequence[str] | None,
@@ -122,6 +123,8 @@ def root_command(
     #     import tooltime
 
     #     duration = tooltime.timelength_to_seconds(duration)
+    if len(nodes) == 0:
+        nodes = None
     if rates is not None:
         rates = [int(rate) for rate in rates]
 
@@ -135,7 +138,7 @@ def root_command(
         rates=rates,
         duration=duration,
         dry=dry,
-        output_dir=output or True,
+        output_dir=output_dir or True,
         figures=figures,
     )
 

@@ -15,7 +15,7 @@ path_templates = {
 def run(
     test_name: str,
     *,
-    nodes: rpc_bench.NodesShorthand,
+    nodes: rpc_bench.NodesShorthand | None | None,
     random_seed: rpc_bench.RandomSeed | None = None,
     verbose: bool | int,
     rates: typing.Sequence[int] | None = None,
@@ -39,15 +39,18 @@ def run(
             output_dir = tempfile.mkdtemp()
         else:
             output_dir = None
+    if output_dir is not None:
+        output_dir = os.path.abspath(os.path.expanduser(output_dir))
 
     # run test from path
     if os.path.exists(test_name) or '/' in test_name:
-        if os.path.isdir(test_name):
+        path_spec = test_name
+        if os.path.isdir(path_spec):
             test_path = path_templates['single_run_test'].format(
-                output_dir=test_name
+                output_dir=path_spec
             )
         else:
-            test_path = test_name
+            test_path = path_spec
         try:
             with open(test_path, 'r') as f:
                 test_payload = json.load(f)
@@ -56,8 +59,23 @@ def run(
         except Exception:
             raise Exception('invalid test path: ' + str(test_path))
 
+        if nodes is None:
+            if os.path.isdir(path_spec):
+                result_path = path_templates['single_run_results'].format(
+                    output_dir=path_spec
+                )
+            else:
+                result_path = path_spec
+            try:
+                with open(result_path, 'r') as f:
+                    test_payload = json.load(f)
+                nodes = test_payload['nodes']
+            except Exception:
+                raise Exception('invalid test path: ' + str(result_path))
+
         return _run_single(
             test_name=test_name,
+            rerun_of=path_spec,
             test=test,
             nodes=nodes,
             random_seed=random_seed,
@@ -67,6 +85,9 @@ def run(
             metrics=metrics,
             figures=figures,
         )
+
+    if nodes is None:
+        raise Exception('must specify nodes')
 
     if test_name in rpc_bench.get_single_test_generators():
         _run_single(
@@ -92,6 +113,7 @@ def run(
 def _run_single(
     *,
     test_name: str,
+    rerun_of: str | None = None,
     test: rpc_bench.LoadTest | None = None,
     nodes: rpc_bench.NodesShorthand,
     random_seed: rpc_bench.RandomSeed | None = None,
@@ -137,6 +159,7 @@ def _run_single(
     if verbose:
         _print_single_run_preamble(
             test_name=test_name,
+            rerun_of=rerun_of,
             rates=rates,
             durations=durations,
             vegeta_kwargs=vegeta_kwargs,
@@ -252,11 +275,13 @@ def _save_single_run_results(
 
 
 def _print_single_run_preamble(
+    *,
     test_name: str,
     rates: typing.Sequence[int],
     durations: typing.Sequence[int],
     vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None,
     nodes: rpc_bench.Nodes,
+    rerun_of: str | None = None,
     output_dir: str | None,
 ) -> None:
     import toolstr
@@ -283,6 +308,11 @@ def _print_single_run_preamble(
     if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
         toolstr.print_bullet(
             key='extra args', value=None, styles=rpc_bench.styles
+        )
+
+    if rerun_of is not None:
+        toolstr.print_bullet(
+            key='rerun of', value=rerun_of, styles=rpc_bench.styles
         )
     toolstr.print_bullet(
         key='output directory', value=output_dir, styles=rpc_bench.styles
