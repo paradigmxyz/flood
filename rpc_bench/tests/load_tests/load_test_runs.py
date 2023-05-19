@@ -210,7 +210,7 @@ def _run_load_test_remotely(
     # initiate benchmarks
     if verbose:
         print('    Executing test on remote node')
-    cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m rpc_bench {test} {name}={url} --output {output}'".format(
+    cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m rpc_bench {test} {name}={url} --output {output} --no-figures'".format(
         host=remote,
         name=node['name'],
         url=node['url'],
