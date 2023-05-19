@@ -43,7 +43,7 @@ def test_parse_node(
     if name is not None:
         node_str = name + '=' + node_str
 
-    parsed = rpc_bench.latency_tests.latency_test_runs._parse_node(node_str)
+    parsed = rpc_bench.parse_node(node_str)
 
     if name is not None:
         assert parsed['name'] == name
