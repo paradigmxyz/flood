@@ -3,13 +3,7 @@ from __future__ import annotations
 import typing
 
 import rpc_bench
-
-
-path_templates = {
-    'single_run_test': '{output_dir}/test.json',
-    'single_run_results': '{output_dir}/results.json',
-    'single_run_figures_dir': '{output_dir}/figures',
-}
+from rpc_bench.user_io import file_io
 
 
 def run(
@@ -46,9 +40,7 @@ def run(
     if os.path.exists(test_name) or '/' in test_name:
         path_spec = test_name
         if os.path.isdir(path_spec):
-            test_path = path_templates['single_run_test'].format(
-                output_dir=path_spec
-            )
+            test_path = rpc_bench.get_single_run_test_path(output_dir=path_spec)
         else:
             test_path = path_spec
         try:
@@ -61,8 +53,8 @@ def run(
 
         if nodes is None:
             if os.path.isdir(path_spec):
-                result_path = path_templates['single_run_results'].format(
-                    output_dir=path_spec
+                result_path = rpc_bench.get_single_run_results_path(
+                    output_dir=path_spec,
                 )
             else:
                 result_path = path_spec
@@ -185,7 +177,7 @@ def _run_single(
 
     # save test to disk
     if output_dir is not None:
-        _save_single_run_test(
+        file_io._save_single_run_test(
             test_name=test_name, output_dir=output_dir, test=test
         )
 
@@ -211,7 +203,7 @@ def _run_single(
 
     # output results to file
     if output_dir is not None:
-        _save_single_run_results(
+        file_io._save_single_run_results(
             output_dir=output_dir,
             test=test,
             nodes=nodes,
@@ -219,7 +211,7 @@ def _run_single(
         )
 
         if figures:
-            figures_dir = path_templates['single_run_figures_dir'].format(
+            figures_dir = file_io.get_single_run_figures_path(
                 output_dir=output_dir
             )
             rpc_bench.plot_load_test_results(
@@ -245,62 +237,6 @@ def _run_single(
                 verbose=verbose,
                 figures=figures,
             )
-
-
-#
-# # saving files
-#
-
-
-def _save_single_run_test(
-    test_name: str,
-    output_dir: str,
-    test: rpc_bench.LoadTest,
-) -> None:
-    import os
-    import json
-
-    if not os.path.isdir(output_dir):
-        if os.path.exists(output_dir):
-            raise Exception('output must be a directory path')
-        else:
-            os.makedirs(output_dir, exist_ok=True)
-
-    path = path_templates['single_run_test'].format(output_dir=output_dir)
-    payload = {
-        'version': rpc_bench.__version__,
-        'type': 'single_test',
-        'test_name': test_name,
-        'test': test,
-    }
-    with open(path, 'w') as f:
-        json.dump(payload, f)
-
-
-def _save_single_run_results(
-    output_dir: str,
-    test: rpc_bench.LoadTest,
-    nodes: rpc_bench.Nodes,
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
-) -> None:
-    import os
-    import json
-
-    if not os.path.isdir(output_dir):
-        if os.path.exists(output_dir):
-            raise Exception('output must be a directory path')
-        else:
-            os.makedirs(output_dir)
-
-    path = path_templates['single_run_results'].format(output_dir=output_dir)
-    payload = {
-        'type': 'single_test',
-        'test': test,
-        'nodes': nodes,
-        'results': results,
-    }
-    with open(path, 'w') as f:
-        json.dump(payload, f)
 
 
 #
@@ -401,15 +337,17 @@ def _print_single_run_conclusion(
 
     # print message about metrics file
     if output_dir is not None:
-        test_path = path_templates['single_run_test'].format(
+
+        test_path = file_io.get_single_run_test_path(
             output_dir=output_dir
         )
-        result_path = path_templates['single_run_results'].format(
+        result_path = file_io.get_single_run_results_path(
             output_dir=output_dir
         )
-        figures_path = path_templates['single_run_figures_dir'].format(
+        figures_path = file_io.get_single_run_figures_path(
             output_dir=output_dir
         )
+
         print()
         print()
         toolstr.print_bullet(

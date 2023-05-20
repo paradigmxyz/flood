@@ -117,7 +117,7 @@ if typing.TYPE_CHECKING:
         requests: int
         throughput: float
         success: float
-        min: float
+        min: float | None
         mean: float
         p50: float
         p90: float
@@ -139,7 +139,7 @@ if typing.TYPE_CHECKING:
         requests: typing.Sequence[int]
         throughput: typing.Sequence[float]
         success: typing.Sequence[float]
-        min: typing.Sequence[float]
+        min: typing.Sequence[float | None]
         mean: typing.Sequence[float]
         p50: typing.Sequence[float]
         p90: typing.Sequence[float]
@@ -152,4 +152,19 @@ if typing.TYPE_CHECKING:
         last_request_timestamp: typing.Sequence[str]
         last_response_timestamp: typing.Sequence[str]
         final_wait_time: typing.Sequence[float]
+
+    RunType = typing.Literal['single_run']
+
+    class SingleRunTestPayload(typing.TypedDict):
+        version: str
+        type: RunType
+        name: str
+        test: LoadTest
+
+    class SingleRunResultsPayload(typing.TypedDict):
+        version: str
+        type: RunType
+        test: LoadTest
+        nodes: Nodes
+        results: typing.Mapping[str, LoadTestOutput]
 

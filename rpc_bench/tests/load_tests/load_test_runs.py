@@ -161,7 +161,7 @@ def _run_load_test_locally(
 def _run_load_test_remotely(
     *,
     node: spec.Node,
-    test: spec.LoadTest | None,
+    test: spec.LoadTest,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> spec.LoadTestOutput:
@@ -182,7 +182,7 @@ def _run_load_test_remotely(
     job_id = str(uuid.uuid4())
     tempdir = '/tmp/rpc_bench__' + job_id
     os.makedirs(tempdir)
-    rpc_bench.tests.generic_tests.runner._save_single_run_test(
+    rpc_bench.user_io.file_io._save_single_run_test(
         test_name='',
         test=test,
         output_dir=tempdir,
@@ -190,26 +190,42 @@ def _run_load_test_remotely(
 
     # send call data to remote server
     if verbose:
-        toolstr.print(
-            toolstr.add_style('- ', rpc_bench.styles['title'])
-            + toolstr.add_style(node['name'], rpc_bench.styles['metavar'])
-            + toolstr.add_style(':', rpc_bench.styles['title'])
-            + ' host'
-            + toolstr.add_style('=', rpc_bench.styles['title'])
-            + toolstr.add_style(remote, rpc_bench.styles['metavar'])
-            + ', url'
-            + toolstr.add_style('=', rpc_bench.styles['title'])
-            + toolstr.add_style(node['url'], rpc_bench.styles['metavar'])
+        import datetime
+
+        dt = datetime.datetime.now()
+        dt = dt.replace(
+            second=dt.second + int(dt.microsecond >= 500_000), microsecond=0
         )
-        print('    Sending tests to remote node')
-    # cmd = 'ssh {host} mkdir {tempdir}'.format(host=remote, tempdir=tempdir)
-    # subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
+        timestamp = (
+            toolstr.add_style('\[', rpc_bench.styles['content'])
+            + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
+            + toolstr.add_style(']', rpc_bench.styles['content'])
+        )
+        node_name = (
+            toolstr.add_style('\[', rpc_bench.styles['content'])
+            + toolstr.add_style('node', rpc_bench.styles['metavar'])
+            + toolstr.add_style('=', rpc_bench.styles['content'])
+            + node['name']
+            + toolstr.add_style(']', rpc_bench.styles['content'])
+        )
+        toolstr.print(
+            timestamp + ' ' + node_name + ' Sending tests to remote node'
+        )
     cmd = 'rsync -r ' + tempdir + ' ' + remote + ':' + os.path.dirname(tempdir)
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # initiate benchmarks
     if verbose:
-        print('    Executing test on remote node')
+        dt = datetime.datetime.now()
+        dt = dt.replace(
+            second=dt.second + int(dt.microsecond >= 500_000), microsecond=0
+        )
+        timestamp = (
+            toolstr.add_style('\[', rpc_bench.styles['content'])
+            + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
+            + toolstr.add_style(']', rpc_bench.styles['content'])
+        )
+        toolstr.print(timestamp + ' ' + node_name + ' Executing test on remote node')
     cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m rpc_bench {test} {name}={url} --output {output} --no-figures'".format(
         host=remote,
         name=node['name'],
@@ -221,13 +237,22 @@ def _run_load_test_remotely(
 
     # retrieve benchmark results
     if verbose:
-        print('    Retrieving results')
+        dt = datetime.datetime.now()
+        dt = dt.replace(
+            second=dt.second + int(dt.microsecond >= 500_000), microsecond=0
+        )
+        timestamp = (
+            toolstr.add_style('\[', rpc_bench.styles['content'])
+            + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
+            + toolstr.add_style(']', rpc_bench.styles['content'])
+        )
+        toolstr.print(timestamp + ' ' + node_name + ' Retrieving results')
     results_path = os.path.join(tempdir, 'results.json')
     cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # return results
     with open(results_path, 'r') as f:
-        results: spec.LoadTestOutput = json.load(f)
+        results: spec.SingleRunResultsPayload = json.load(f)
         return results['results'][node['name']]
 

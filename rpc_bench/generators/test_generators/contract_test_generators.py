@@ -24,7 +24,7 @@ def generate_test_eth_get_code(
     )
 
 
-def generate_test_eth_get_storage_at_by_url(
+def generate_test_eth_get_storage_at(
     rates: typing.Sequence[int],
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,

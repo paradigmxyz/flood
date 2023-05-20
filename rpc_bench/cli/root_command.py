@@ -106,7 +106,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def root_command(
     test: str,
-    nodes: typing.Sequence[str],
+    nodes: typing.Sequence[str] | None,
     output_dir: str | None,
     metrics: typing.Sequence[str],
     mode: rpc_bench.LoadTestMode | None,
@@ -123,7 +123,7 @@ def root_command(
     #     import tooltime
 
     #     duration = tooltime.timelength_to_seconds(duration)
-    if len(nodes) == 0:
+    if nodes is not None and len(nodes) == 0:
         nodes = None
     if rates is not None:
         rates = [int(rate) for rate in rates]
