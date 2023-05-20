@@ -1,9 +1,23 @@
 
 # RPC Bench
 
-tool for benchmarking RPC calls to a node
+A tool for benchmarking and load testing EVM nodes
 
-a load test is a series of vegeta attacks
+`rpc_bench` can measure many different types of workloads
+- it separately measure performance of every JSON-RPC method type
+- it perform stress tests, spike tests, and soak tests
+
+`rpc_bench` measures a variety of performance metrics including:
+1. throughput
+2. latency (mean, P50, P90, P95, P99, max)
+3. error rate
+
+`rpc_bench` makes it easy to compare the performance of:
+- different node clients (e.g. geth vs erigon vs reth)
+- different hardware configurations (e.g. local vs cloud vs low memory vs RAID-0)
+- different RPC providers (e.g. Alchemy vs Quicknode vs Infura)
+
+`rpc_bench` can generate tables, figures, and reports to make its results interpretable (example report [here])
 
 
 ## Installation
