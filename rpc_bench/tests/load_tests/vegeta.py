@@ -146,7 +146,7 @@ def _create_vegeta_report(
 
     return {
         'target_rate': target_rate,
-        'actual_rate': report['rate'] / 1e9,
+        'actual_rate': report['rate'],
         'target_duration': target_duration,
         'actual_duration': report['duration'] / 1e9,
         'requests': report['requests'],

@@ -78,13 +78,38 @@ def _save_single_run_results(
         json.dump(payload, f)
 
 
-def load_single_test_results(
+def load_single_run_test_payload(
     output_dir: str,
-) -> typing.Mapping[str, rpc_bench.LoadTestOutput]:
+) -> rpc_bench.SingleRunTestPayload:
+    import json
+
+    path = get_single_run_test_path(output_dir=output_dir)
+    with open(path) as f:
+        test: rpc_bench.SingleRunTestPayload = json.load(f)
+    return test
+
+
+def load_single_run_test(
+    output_dir: str,
+) -> rpc_bench.LoadTest:
+    payload = load_single_run_test_payload(output_dir=output_dir)
+    return payload['test']
+
+
+def load_single_run_results_payload(
+    output_dir: str,
+) -> rpc_bench.SingleRunResultsPayload:
     import json
 
     path = get_single_run_results_path(output_dir=output_dir)
     with open(path) as f:
-        results: typing.Mapping[str, rpc_bench.LoadTestOutput] = json.load(f)
+        results: rpc_bench.SingleRunResultsPayload = json.load(f)
     return results
+
+
+def load_single_run_results(
+    output_dir: str,
+) -> typing.Mapping[str, rpc_bench.LoadTestOutput]:
+    payload = load_single_run_results_payload(output_dir=output_dir)
+    return payload['results']
 
