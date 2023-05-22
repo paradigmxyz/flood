@@ -9,6 +9,7 @@ def plot_load_test_results(
     outputs: typing.Mapping[str, rpc_bench.LoadTestOutput],
     test_name: str,
     output_dir: str | None = None,
+    latency_yscale_log: bool = False,
 ) -> None:
     import os
     import matplotlib.pyplot as plt  # type: ignore
@@ -36,7 +37,9 @@ def plot_load_test_results(
         plt.show()
 
     plt.figure()
-    plot_load_test_latencies(outputs, test_name=test_name)
+    plot_load_test_latencies(
+        outputs, test_name=test_name, yscale_log=latency_yscale_log
+    )
     if output_dir is not None:
         path = os.path.join(output_dir, 'latencies.png')
         plt.savefig(path)
@@ -87,18 +90,25 @@ def plot_load_test_latencies(
     | None = None,
     metrics: typing.Sequence[str] = ['p99', 'p90', 'p50'],
     test_name: str | None = None,
+    yscale_log: bool = False,
 ) -> None:
     if colors is None:
         colors = dict(zip(results.keys(), rpc_bench.colors.values()))
+
+    if yscale_log:
+        ymin = None
+    else:
+        ymin = 0
 
     plot_load_test_result_metrics(
         results=results,
         metrics=metrics,
         colors=colors,
         test_name=test_name,
-        ymin=0,
+        ymin=ymin,
         title='Latency vs Request Rate\n(lower is better)',
         ylabel='latency (seconds)',
+        yscale_log=yscale_log,
     )
 
 
@@ -116,6 +126,7 @@ def plot_load_test_result_metrics(
     ylabel: str | None = None,
     ylim: typing.Sequence[float] | None = None,
     ymin: float | int | None = None,
+    yscale_log: bool = False,
 ) -> None:
     import matplotlib.pyplot as plt
     import toolplot
@@ -158,6 +169,8 @@ def plot_load_test_result_metrics(
             )
 
     # set labels
+    if yscale_log:
+        plt.yscale('log')
     if ylim is not None:
         plt.ylim(*ylim)
     if ymin is not None:
