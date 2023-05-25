@@ -47,7 +47,7 @@ def run(
             with open(test_path, 'r') as f:
                 test_payload = json.load(f)
             test = test_payload['test']
-            test_name = test_payload['test_name']
+            test_name = test_payload['name']
         except Exception:
             raise Exception('invalid test path: ' + str(test_path))
 
@@ -193,12 +193,12 @@ def _run_single(
             verbose=verbose,
         )
     except Exception as e:
-        # import traceback
-        # print('THIS WAS THE ERROR:', e.args)
-        # print()
-        # print(traceback.format_exc())
-        # print()
-        # print("ERROR OVER")
+        import traceback
+        print('THIS WAS THE ERROR:', e.args)
+        print()
+        print(traceback.format_exc())
+        print()
+        print("ERROR OVER")
         raise e
 
     # output results to file
