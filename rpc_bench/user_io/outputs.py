@@ -119,7 +119,6 @@ def print_metric_tables(
     names = list(results.keys())
     rates = results[names[0]]['target_rate']
     for metric in metrics:
-
         # create labels
         if metric == 'success':
             suffix = ''
@@ -132,6 +131,8 @@ def print_metric_tables(
                 raise NotImplementedError('comparison of >2 tests')
             comparison_label = names[0] + ' / ' + names[1]
             labels.append(comparison_label)
+        else:
+            comparison_label = None
 
         # build rows
         rows: list[list[typing.Any]] = [[rate] for rate in rates]
@@ -155,7 +156,11 @@ def print_metric_tables(
         column_formats = {
             column: {'decimals': use_decimals} for column in unitted_names
         }
-        column_formats[comparison_label] = {'decimals': 1, 'percentage': True}
+        if comparison_label is not None:
+            column_formats[comparison_label] = {
+                'decimals': 1,
+                'percentage': True,
+            }
 
         # print header
         toolstr.print_text_box(
