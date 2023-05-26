@@ -24,7 +24,7 @@ if typing.TYPE_CHECKING:
 
     class NotebookChunkTemplate(typing.TypedDict):
         type: typing.Literal['chunk']
-        f: typing.Callable[..., typing.Sequence[NotebookCellTemplate]]
+        f: typing.Callable[..., typing.Sequence[nbformat.notebooknode.NotebookNode]]
         inputs: typing.Sequence[str]
 
     NotebookCellPrecursor = typing.Union[

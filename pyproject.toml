@@ -34,6 +34,7 @@ dependencies = [
     'requests >=2.20.0, <3',
     'tqdm >=4.65.0, <5',
     'numpy >=1.19.0, <1.25',
+    'nbformat >= 5.8.0',
 # 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
 ]
 
