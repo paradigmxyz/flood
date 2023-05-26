@@ -20,7 +20,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': 'test_dirs',
                 'nargs': '+',
-                'help': 'paths to previous tests',
+                'help': 'space-seperated paths to previous tests',
             },
             {
                 'name': ['-o', '--output'],
@@ -32,6 +32,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'metrics to graph in report',
             },
         ],
+        'examples': ['tests/test1 tests/test2 tests/test3'],
     }
 
 

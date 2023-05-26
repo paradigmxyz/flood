@@ -46,14 +46,24 @@ pip install -e ./
 
 ## Usage
 
+#### run test
 ```
 rpc_bench eth_getBlockByNumber NODE1_NAME=NODE1_URL NODE2_NAME=NODE2_URL --rates 10 100 1000 --duration 30
 ```
 
+#### orchestrate tests on remote nodes
+```
+rpc_bench eth_getBlockByNumber NODE1_NAME=NODE1_URL:localhost:8545 NODE2_NAME=NODE2_URL:localhost:8545
+```
+
+#### create report
+```
+rpc_bench report tests/test1_output tests/test2_output
+````
 
 ## Code Layout
 - `rpc_bench/cli`: command line interface
 - `rpc_bench/generators`: utilities for generating sequences of rpc calls with parameterized distributions
-- `rpc_bench/tests`: implementations of load tests
+- `rpc_bench/tests`: implementations of tests
 - `rpc_bench/user_io`: utiltiies for parsing user input
 
