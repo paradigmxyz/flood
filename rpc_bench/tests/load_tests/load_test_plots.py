@@ -78,6 +78,7 @@ def plot_load_test_throughput(
         test_name=test_name,
         title='Throughput vs Request Rate\n(higher is better)',
         ylabel='throughput\n(responses per second)',
+        ymin=0,
     )
 
 
