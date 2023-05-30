@@ -181,3 +181,47 @@ def print_metric_tables(
         if metric != metrics[-1]:
             print()
 
+#
+# # generic restylings of toolstr functions
+#
+
+def print_text_box(text: str) -> None:
+    import toolstr
+
+    toolstr.print_text_box(
+        text,
+        text_style=rpc_bench.styles.get('metavar'),
+        style=rpc_bench.styles.get('content'),
+    )
+
+
+def print_header(text: str) -> None:
+    import toolstr
+
+    toolstr.print_header(
+        text,
+        text_style=rpc_bench.styles.get('metavar'),
+        style=rpc_bench.styles.get('content'),
+    )
+
+
+def print_bullet(*args: typing.Any, **kwargs: typing.Any) -> None:
+    import toolstr
+
+    toolstr.print_bullet(
+        *args,
+        **kwargs,
+        styles=rpc_bench.styles,
+    )
+
+
+def print_table(*args: typing.Any, **kwargs: typing.Any) -> None:
+    import toolstr
+
+    toolstr.print_table(
+        *args,
+        **kwargs,
+        label_style=rpc_bench.styles.get('metavar'),
+        border=rpc_bench.styles.get('content'),
+    )
+

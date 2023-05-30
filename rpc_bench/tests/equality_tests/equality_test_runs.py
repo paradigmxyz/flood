@@ -24,9 +24,14 @@ def run_equality_test(
     if len(nodes) != 2:
         raise Exception('should use two nodes in equality test')
 
+    # get tests
+    if test_name != 'all':
+        raise NotImplementedError('must use test_name="all" for equality test')
+    equality_tests = equality_test_sets.get_all_equality_tests()
+
     # print preamble
-    toolstr.print_text_box('Running equality test')
-    toolstr.print_bullet(key='nodes', value='', styles=rpc_bench.styles)
+    rpc_bench.print_text_box('Running equality test')
+    rpc_bench.print_bullet(key='nodes', value='')
     for n, node in enumerate(nodes.values()):
         toolstr.print(
             toolstr.add_style(str(n + 1), rpc_bench.styles['metavar'])
@@ -35,11 +40,9 @@ def run_equality_test(
             indent=4,
             style=rpc_bench.styles['description'],
         )
-
-    # get tests
-    if test_name != 'all':
-        raise NotImplementedError('must use test_name="all" for equality test')
-    equality_tests = equality_test_sets.get_all_equality_tests()
+    rpc_bench.print_bullet(key='methods', value='')
+    for test in equality_tests:
+        rpc_bench.print_bullet(key=test[0], value='', colon_str='', indent=4)
 
     successful = []
     headers = {'Content-Type': 'application/json', 'User-Agent': 'rpc_bench'}
@@ -72,23 +75,23 @@ def run_equality_test(
             successful.append(test_name)
 
     print()
-    toolstr.print_text_box('Equality Test Summary')
+    rpc_bench.print_text_box('Equality Test Summary')
     print()
-    toolstr.print_header('No differences detected')
+    rpc_bench.print_header('No differences detected (n = ' + str(len(successful)) + ')')
     if len(successful) == 0:
         print('[none]')
     else:
         for name in sorted(successful):
-            print('-', name)
+            rpc_bench.print_bullet(key=name, value='', colon_str='')
     print()
 
-    toolstr.print_header('Differences Detected')
     failed = [test[0] for test in equality_tests if test[0] not in successful]
+    rpc_bench.print_header('Differences detected (n = ' + str(len(failed)) + ')')
     if len(failed) == 0:
         print('[none]')
     else:
         for name in sorted(failed):
-            print('-', name)
+            rpc_bench.print_bullet(key=name, value='', colon_str='')
 
 
 def json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
@@ -109,24 +112,26 @@ def _summarize_result(
 
     if not json_equal(results[0], results[1]):
         print()
-        toolstr.print_text_box('Discrepancies in ' + test_name)
+        rpc_bench.print_text_box('Discrepancies in ' + test_name)
         print()
-        print('args:')
+        rpc_bench.print_header('args')
         if len(args) > 0:
             for arg in args:
-                toolstr.print_bullet(key=arg, value='', colon_str='')
+                rpc_bench.print_bullet(key=arg, value='', colon_str='')
         if len(kwargs) > 0:
             for key, value in kwargs.items():
-                toolstr.print_bullet(key=key, value=value)
+                rpc_bench.print_bullet(key=key, value=value)
         print()
-        print('CALL OBJECT:')
+        rpc_bench.print_header('call')
         print(call)
 
         if any(result is None for result in results):
             print()
         for node, result in zip(nodes.values(), results):
             if result is None:
-                print(node['name'], ' failed')
+                toolstr.print(
+                    node['name'] + ' failed', style=rpc_bench.styles['title']
+                )
 
         if results[0] is None or results[1] is None:
             return False
@@ -160,7 +165,7 @@ def _print_result_diff(
             only_in_0 = keys0 - keys1
             only_in_1 = keys1 - keys0
             print()
-            toolstr.print_header('different fields in results')
+            rpc_bench.print_header('different fields in results')
             if len(only_in_0) > 0:
                 print(
                     '- present only in',
@@ -181,8 +186,8 @@ def _print_result_diff(
                 rows.append(row)
         if len(rows) > 0:
             print()
-            toolstr.print_header('differences in values')
-            toolstr.print_table(
+            rpc_bench.print_header('differences in values')
+            rpc_bench.print_table(
                 rows,
                 labels=['field', nodes[0]['name'], nodes[1]['name']],
                 compact=3,
@@ -193,15 +198,17 @@ def _print_result_diff(
     elif isinstance(result0, list):
         if len(result1) != len(result0):
             print()
-            toolstr.print_header('different number of results')
+            rpc_bench.print_header('different number of results')
             for node, result in zip(nodes, results):
-                print('-', node['name'] + ':', len(result), 'results')
+                rpc_bench.print_bullet(
+                    key=node['name'], value=str(len(result)) + ' results'
+                )
         else:
             raise NotImplementedError()
 
     else:
         if result1 != result0:
-            toolstr.print_header('differences in values')
+            rpc_bench.print_header('differences in values')
             for node, result in zip(nodes, results):
-                toolstr.print_bullet(key=node['name'], value=result)
+                rpc_bench.print_bullet(key=node['name'], value=result)
 
