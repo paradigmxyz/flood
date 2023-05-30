@@ -69,11 +69,14 @@ def parse_node(node: str | spec.Node) -> spec.Node:
 
         # add missing prefix
         if not any(url.startswith(prefix) for prefix in prefixes):
-            if (
-                url.startswith('localhost')
-                or url.startswith('0.0.0.0')
-                or url.startswith('127.0.0.1')
-            ):
+            # check if is ip
+            pieces = url.split(':')[0].split('.')
+            is_ip = len(pieces) == 4 and all(
+                piece.isdecimal() for piece in pieces
+            )
+
+            # add prefix
+            if url.startswith('localhost') or is_ip:
                 url = 'http://' + url
             else:
                 url = 'https://' + url
