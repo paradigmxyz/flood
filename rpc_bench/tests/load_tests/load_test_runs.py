@@ -193,9 +193,10 @@ def _run_load_test_remotely(
         import datetime
 
         dt = datetime.datetime.now()
-        dt = dt.replace(
-            second=dt.second + int(dt.microsecond >= 500_000), microsecond=0
-        )
+        if dt.microsecond >= 500_000:
+            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+        else:
+            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
         timestamp = (
             toolstr.add_style('\[', rpc_bench.styles['content'])
             + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
@@ -217,9 +218,10 @@ def _run_load_test_remotely(
     # initiate benchmarks
     if verbose:
         dt = datetime.datetime.now()
-        dt = dt.replace(
-            second=dt.second + int(dt.microsecond >= 500_000), microsecond=0
-        )
+        if dt.microsecond >= 500_000:
+            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+        else:
+            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
         timestamp = (
             toolstr.add_style('\[', rpc_bench.styles['content'])
             + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
@@ -238,9 +240,10 @@ def _run_load_test_remotely(
     # retrieve benchmark results
     if verbose:
         dt = datetime.datetime.now()
-        dt = dt.replace(
-            second=dt.second + int(dt.microsecond >= 500_000), microsecond=0
-        )
+        if dt.microsecond >= 500_000:
+            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+        else:
+            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
         timestamp = (
             toolstr.add_style('\[', rpc_bench.styles['content'])
             + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
