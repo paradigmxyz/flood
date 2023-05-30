@@ -3,14 +3,35 @@ from __future__ import annotations
 import typing
 
 import rpc_bench
+from rpc_bench import block_generators
 
 
-def get_all_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
-    return list(get_vanilla_equality_tests()) + list(get_trace_equality_tests())
+def get_all_equality_tests(
+        start_block: int = 10_000_000,
+        end_block: int = 16_000_000,
+        range_size: int = 100,
+        random_seed: rpc_bench.RandomSeed | None = None,
+) -> typing.Sequence[rpc_bench.EqualityTest]:
+    return list(get_vanilla_equality_tests(start_block=start_block, end_block=end_block, range_size=range_size,
+                                           random_seed=random_seed)) + list(
+        get_trace_equality_tests(start_block=start_block, end_block=end_block, random_seed=random_seed))
 
 
-def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
+def get_vanilla_equality_tests(
+        start_block: int = 10_000_000,
+        end_block: int = 16_000_000,
+        range_size: int = 100,
+        random_seed: rpc_bench.RandomSeed | None = None,
+) -> typing.Sequence[rpc_bench.EqualityTest]:
     import ctc.rpc
+
+    start_block, end_block = block_generators.generate_block_ranges(
+        n=1,
+        range_size=range_size,
+        start_block=start_block,
+        end_block=end_block,
+        random_seed=random_seed,
+    )[0]
 
     return [
         (
@@ -25,8 +46,8 @@ def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             [],
             {
                 'address': '0x6b175474e89094c44da98b954eedeac495271d0f',
-                'start_block': 14_000_000,
-                'end_block': 14_000_100,
+                'start_block': start_block,
+                'end_block': end_block,
             },
         ),
         (
@@ -41,7 +62,7 @@ def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             ['0xeb27d00030033c29307daa483171d22eb0c93342'],
             # ['0xe540c45c504b348ad4d6eb9344e6cfa07c959be6'],
             {
-                'block_number': 16_000_000,
+                'block_number': start_block,
             },
         ),
         (
@@ -49,7 +70,7 @@ def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             ctc.rpc.construct_eth_get_transaction_count,
             ['0xeb27d00030033c29307daa483171d22eb0c93342'],
             {
-                'block_number': 16_000_000,
+                'block_number': start_block,
             },
         ),
         (
@@ -59,7 +80,7 @@ def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             {
                 'address': '0x4d9079bb4165aeb4084c526a32695dcfd2f77381',
                 'position': '0x0000000000000000000000000000000000000000000000000000000000000002',
-                'block_number': 16_100_000,
+                'block_number': start_block,
             },
         ),
         (
@@ -71,7 +92,7 @@ def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
         (
             'eth_getBlockByNumber',
             ctc.rpc.construct_eth_get_block_by_number,
-            [16_000_000],
+            [start_block],
             {},
         ),
         (
@@ -128,14 +149,25 @@ def get_vanilla_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
                 'function_parameters': [
                     '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'
                 ],
-                'block_number': 16_000_000,
+                'block_number': start_block,
             },
         ),
     ]
 
 
-def get_trace_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
+def get_trace_equality_tests(
+        start_block: int = 10_000_000,
+        end_block: int = 16_000_000,
+        random_seed: rpc_bench.RandomSeed | None = None,
+) -> typing.Sequence[rpc_bench.EqualityTest]:
     import ctc.rpc
+
+    block_number = block_generators.generate_block_numbers(
+        n=1,
+        start_block=start_block,
+        end_block=end_block,
+        random_seed=random_seed,
+    )[0]
 
     function_abi = {
         'constant': True,
@@ -152,7 +184,7 @@ def get_trace_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             'trace_block',
             ctc.rpc.construct_trace_block,
             [],
-            {'block_number': 16_000_000},
+            {'block_number': block_number},
         ),
         (
             'trace_call',
@@ -165,7 +197,7 @@ def get_trace_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
                 'function_parameters': [
                     '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'
                 ],
-                'block_number': 16_000_000,
+                'block_number': block_number,
             },
         ),
         (
@@ -214,7 +246,7 @@ def get_trace_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             ctc.rpc.construct_trace_replay_block_transactions,
             [],
             {
-                'block_number': 16_000_000,
+                'block_number': block_number,
                 'trace_type': ['trace'],
             },
         ),
@@ -235,4 +267,3 @@ def get_trace_equality_tests() -> typing.Sequence[rpc_bench.EqualityTest]:
             {},
         ),
     ]
-
