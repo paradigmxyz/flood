@@ -59,6 +59,17 @@ if typing.TYPE_CHECKING:
         latencies: NodesMethodLatencies
 
     #
+    # # equality test
+    #
+
+    EqualityTest = tuple[
+        str,
+        typing.Callable[..., typing.Any],
+        typing.Sequence[typing.Any],
+        typing.Mapping[str, typing.Any],
+    ]
+
+    #
     # # load test types
     #
 

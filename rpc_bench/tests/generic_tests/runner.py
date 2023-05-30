@@ -9,9 +9,9 @@ from rpc_bench.user_io import file_io
 def run(
     test_name: str,
     *,
-    nodes: rpc_bench.NodesShorthand | None | None,
+    nodes: rpc_bench.NodesShorthand | None,
     random_seed: rpc_bench.RandomSeed | None = None,
-    verbose: bool | int,
+    verbose: bool | int = True,
     rates: typing.Sequence[int] | None = None,
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,

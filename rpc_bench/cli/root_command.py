@@ -61,14 +61,14 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
             {
-                'name': ['-m', '--mode'],
-                'choices': ['stress', 'spike', 'soak'],
-                'help': 'stress, spike, soak, latency, or equality',
+                'name': ['-e', '--equality'],
+                'help': 'run equality test instead of load test',
+                'action': 'store_true',
             },
             {
-                'name': ['--metrics'],
-                'nargs': '+',
-                'help': 'space-separated list of performance metrics to show',
+                'name': ['-m', '--mode'],
+                'choices': ['stress', 'spike', 'soak'],
+                'help': 'load test type: stress, spike, or soak',
             },
             {
                 'name': ['-r', '--rates'],
@@ -81,14 +81,19 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'amount of time to test each rate',
             },
             {
+                'name': ['-o', '--output'],
+                'dest': 'output_dir',
+                'help': 'directory to save results, default is tmp dir',
+            },
+            {
                 'name': ['--dry'],
                 'help': 'only construct tests, do not run them',
                 'action': 'store_true',
             },
             {
-                'name': ['-o', '--output'],
-                'dest': 'output_dir',
-                'help': 'directory to save results, default is tmp dir',
+                'name': ['--metrics'],
+                'nargs': '+',
+                'help': 'space-separated list of performance metrics to show',
             },
             {
                 'name': ['--no-figures'],
@@ -100,6 +105,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': [
             'eth_getBlockByNumber localhost:8545',
             'eth_getLogs localhost:8545 localhost:8546 localhost:8547',
+            'all client1=0.0.0.0:8545 client2=0.0.0.0:8546 --equality',
         ],
     }
 
@@ -116,29 +122,49 @@ def root_command(
     dry: bool,
     quiet: bool,
     figures: bool,
+    equality: bool,
 ) -> None:
-
-    # TODO: perform str conversions later in pipeline
-    # if duration is not None:
-    #     import tooltime
-
-    #     duration = tooltime.timelength_to_seconds(duration)
+    verbose = not quiet
     if nodes is not None and len(nodes) == 0:
         nodes = None
-    if rates is not None:
-        rates = [int(rate) for rate in rates]
 
-    rpc_bench.run(
-        test_name=test,
-        mode=mode,
-        nodes=nodes,
-        metrics=metrics,
-        random_seed=random_seed,
-        verbose=(not quiet),
-        rates=rates,
-        duration=duration,
-        dry=dry,
-        output_dir=output_dir or True,
-        figures=figures,
-    )
+    if equality:
+        if output_dir is not None:
+            raise Exception('output_dir not used in equality test')
+        if metrics is not None:
+            raise Exception('metrics not used in equality test')
+        if mode is not None:
+            raise Exception('metrics not used in equality test')
+        if rates is not None:
+            raise Exception('rates not used in equality test')
+        if duration is not None:
+            raise Exception('duration not used in equality test')
+        if dry:
+            raise Exception('dry not used in equality test')
+        if not figures:
+            raise Exception('figures not used in equality test')
+        rpc_bench.run_equality_test(
+            test_name=test,
+            nodes=nodes,
+            random_seed=random_seed,
+            verbose=verbose,
+        )
+
+    else:
+
+        if rates is not None:
+            rates = [int(rate) for rate in rates]
+        rpc_bench.run(
+            test_name=test,
+            mode=mode,
+            nodes=nodes,
+            metrics=metrics,
+            random_seed=random_seed,
+            verbose=verbose,
+            rates=rates,
+            duration=duration,
+            dry=dry,
+            output_dir=output_dir or True,
+            figures=figures,
+        )
 
