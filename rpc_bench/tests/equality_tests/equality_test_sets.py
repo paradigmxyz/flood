@@ -7,21 +7,32 @@ from rpc_bench import block_generators
 
 
 def get_all_equality_tests(
-        start_block: int = 10_000_000,
-        end_block: int = 16_000_000,
-        range_size: int = 100,
-        random_seed: rpc_bench.RandomSeed | None = None,
+    start_block: int = 10_000_000,
+    end_block: int = 16_000_000,
+    range_size: int = 100,
+    random_seed: rpc_bench.RandomSeed | None = None,
 ) -> typing.Sequence[rpc_bench.EqualityTest]:
-    return list(get_vanilla_equality_tests(start_block=start_block, end_block=end_block, range_size=range_size,
-                                           random_seed=random_seed)) + list(
-        get_trace_equality_tests(start_block=start_block, end_block=end_block, random_seed=random_seed))
+    return list(
+        get_vanilla_equality_tests(
+            start_block=start_block,
+            end_block=end_block,
+            range_size=range_size,
+            random_seed=random_seed,
+        )
+    ) + list(
+        get_trace_equality_tests(
+            start_block=start_block,
+            end_block=end_block,
+            random_seed=random_seed,
+        )
+    )
 
 
 def get_vanilla_equality_tests(
-        start_block: int = 10_000_000,
-        end_block: int = 16_000_000,
-        range_size: int = 100,
-        random_seed: rpc_bench.RandomSeed | None = None,
+    start_block: int = 10_000_000,
+    end_block: int = 16_000_000,
+    range_size: int = 100,
+    random_seed: rpc_bench.RandomSeed | None = None,
 ) -> typing.Sequence[rpc_bench.EqualityTest]:
     import ctc.rpc
 
@@ -156,9 +167,9 @@ def get_vanilla_equality_tests(
 
 
 def get_trace_equality_tests(
-        start_block: int = 10_000_000,
-        end_block: int = 16_000_000,
-        random_seed: rpc_bench.RandomSeed | None = None,
+    start_block: int = 10_000_000,
+    end_block: int = 16_000_000,
+    random_seed: rpc_bench.RandomSeed | None = None,
 ) -> typing.Sequence[rpc_bench.EqualityTest]:
     import ctc.rpc
 
@@ -267,3 +278,4 @@ def get_trace_equality_tests(
             {},
         ),
     ]
+
