@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
-from rpc_bench import spec
+import flood
+from flood import spec
 
 if typing.TYPE_CHECKING:
     import types
@@ -76,31 +76,27 @@ def outputs_to_dataframe(
     )
 
 
-def print_load_test_summary(test: rpc_bench.LoadTest) -> None:
+def print_load_test_summary(test: flood.LoadTest) -> None:
     import toolstr
 
-    parsed = rpc_bench.parse_test_data(test)
+    parsed = flood.parse_test_data(test)
     rates = parsed['rates']
     durations = parsed['durations']
     vegeta_kwargs = parsed['vegeta_kwargs']
 
-    toolstr.print_bullet(
-        key='sample rates', value=rates, styles=rpc_bench.styles
-    )
+    toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
     if len(set(durations)) == 1:
         toolstr.print_bullet(
             key='sample duration',
             value=durations[0],
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
     else:
         toolstr.print_bullet(
-            key='sample durations', value=durations, styles=rpc_bench.styles
+            key='sample durations', value=durations, styles=flood.styles
         )
     if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
-        toolstr.print_bullet(
-            key='extra args', value=None, styles=rpc_bench.styles
-        )
+        toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
 
 
 def print_metric_tables(
@@ -164,10 +160,8 @@ def print_metric_tables(
 
         # print header
         toolstr.print_text_box(
-            toolstr.add_style(
-                metric + ' vs load', rpc_bench.styles.get('metavar')
-            ),
-            style=rpc_bench.styles.get('content'),
+            toolstr.add_style(metric + ' vs load', flood.styles.get('metavar')),
+            style=flood.styles.get('content'),
         )
 
         # print table
@@ -175,23 +169,25 @@ def print_metric_tables(
             rows,
             labels=labels,
             column_formats=column_formats,  # type: ignore
-            label_style=rpc_bench.styles.get('metavar'),
-            border=rpc_bench.styles.get('content'),
+            label_style=flood.styles.get('metavar'),
+            border=flood.styles.get('content'),
         )
         if metric != metrics[-1]:
             print()
 
+
 #
 # # generic restylings of toolstr functions
 #
+
 
 def print_text_box(text: str) -> None:
     import toolstr
 
     toolstr.print_text_box(
         text,
-        text_style=rpc_bench.styles.get('metavar'),
-        style=rpc_bench.styles.get('content'),
+        text_style=flood.styles.get('metavar'),
+        style=flood.styles.get('content'),
     )
 
 
@@ -200,8 +196,8 @@ def print_header(text: str) -> None:
 
     toolstr.print_header(
         text,
-        text_style=rpc_bench.styles.get('metavar'),
-        style=rpc_bench.styles.get('content'),
+        text_style=flood.styles.get('metavar'),
+        style=flood.styles.get('content'),
     )
 
 
@@ -211,7 +207,7 @@ def print_bullet(*args: typing.Any, **kwargs: typing.Any) -> None:
     toolstr.print_bullet(
         *args,
         **kwargs,
-        styles=rpc_bench.styles,
+        styles=flood.styles,
     )
 
 
@@ -221,7 +217,7 @@ def print_table(*args: typing.Any, **kwargs: typing.Any) -> None:
     toolstr.print_table(
         *args,
         **kwargs,
-        label_style=rpc_bench.styles.get('metavar'),
-        border=rpc_bench.styles.get('content'),
+        label_style=flood.styles.get('metavar'),
+        border=flood.styles.get('content'),
     )
 

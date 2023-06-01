@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
+import flood
 
 
 def estimate_call_count(
@@ -34,11 +34,11 @@ def construct_load_test(
     rates: typing.Sequence[int],
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: rpc_bench.VegetaKwargs
-    | typing.Sequence[rpc_bench.VegetaKwargs]
+    vegeta_kwargs: flood.VegetaKwargs
+    | typing.Sequence[flood.VegetaKwargs]
     | None = None,
     repeat_calls: bool = False,
-) -> rpc_bench.LoadTest:
+) -> flood.LoadTest:
     # validate inputs
     if len(rates) == 0:
         raise Exception('must specify at least one rate')
@@ -60,9 +60,7 @@ def construct_load_test(
 
     # partition calls into individual attacks
     if not repeat_calls:
-        attacks_calls: typing.MutableSequence[
-            typing.Sequence[rpc_bench.Call]
-        ] = []
+        attacks_calls: typing.MutableSequence[typing.Sequence[flood.Call]] = []
         calls_iter = iter(calls)
         for rate, duration in zip(rates, durations):
             n_attack_calls = rate * duration
@@ -75,11 +73,11 @@ def construct_load_test(
     assert len(attacks_calls) == len(rates)
 
     # create load tests
-    load_test: list[rpc_bench.VegetaAttack] = []
+    load_test: list[flood.VegetaAttack] = []
     for rate, duration, a_calls, attack_kwargs in zip(
         rates, durations, attacks_calls, vegeta_kwargs
     ):
-        attack: rpc_bench.VegetaAttack = {
+        attack: flood.VegetaAttack = {
             'rate': rate,
             'duration': duration,
             'calls': a_calls,

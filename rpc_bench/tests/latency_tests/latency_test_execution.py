@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
-from rpc_bench import spec
+import flood
+from flood import spec
 from . import latency_test_outputs
 
 
@@ -52,7 +52,7 @@ def _execute_local_calls(
     # specify headers
     headers = {
         'Content-Type': 'application/json',
-        'User-Agent': 'rpc_bench',
+        'User-Agent': 'flood',
     }
 
     # perform calls
@@ -92,9 +92,9 @@ def _execute_remote_calls(
         print()
         toolstr.print_header(
             toolstr.add_style(
-                'Performing Remote Benchmarks...', rpc_bench.styles['metavar']
+                'Performing Remote Benchmarks...', flood.styles['metavar']
             ),
-            style=rpc_bench.styles['content'],
+            style=flood.styles['content'],
         )
 
     latencies: typing.MutableMapping[
@@ -133,7 +133,7 @@ def _execute_node_remote_calls(
 
     # save call data, saving methods to preserve ordering in json
     job_id = str(uuid.uuid4())
-    tempdir = '/tmp/rpc_bench__' + job_id
+    tempdir = '/tmp/flood__' + job_id
     os.makedirs(tempdir)
     calls_path = os.path.join(tempdir, 'calls.json')
     calls_data = {'methods': list(calls.keys()), 'calls': calls}
@@ -143,15 +143,15 @@ def _execute_node_remote_calls(
     # send call data to remote server
     if verbose:
         toolstr.print(
-            toolstr.add_style('- ', rpc_bench.styles['title'])
-            + toolstr.add_style(node['name'], rpc_bench.styles['metavar'])
-            + toolstr.add_style(':', rpc_bench.styles['title'])
+            toolstr.add_style('- ', flood.styles['title'])
+            + toolstr.add_style(node['name'], flood.styles['metavar'])
+            + toolstr.add_style(':', flood.styles['title'])
             + ' host'
-            + toolstr.add_style('=', rpc_bench.styles['title'])
-            + toolstr.add_style(remote, rpc_bench.styles['metavar'])
+            + toolstr.add_style('=', flood.styles['title'])
+            + toolstr.add_style(remote, flood.styles['metavar'])
             + ', url'
-            + toolstr.add_style('=', rpc_bench.styles['title'])
-            + toolstr.add_style(node['url'], rpc_bench.styles['metavar'])
+            + toolstr.add_style('=', flood.styles['title'])
+            + toolstr.add_style(node['url'], flood.styles['metavar'])
         )
         print('    Sending call schedule')
     cmd = 'ssh {host} mkdir {tempdir}'.format(host=remote, tempdir=tempdir)
@@ -163,7 +163,7 @@ def _execute_node_remote_calls(
     if verbose:
         print('    Executing remote calls')
     results_path = os.path.join(tempdir, 'results.json')
-    cmd = 'ssh {host} python3 -m rpc_bench {url} --calls {calls_path} --output {output}'.format(
+    cmd = 'ssh {host} python3 -m flood {url} --calls {calls_path} --output {output}'.format(
         host=remote,
         url=node['url'],
         calls_path=calls_path,

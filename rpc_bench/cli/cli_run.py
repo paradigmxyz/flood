@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import toolcli
 
-import rpc_bench
+import flood
 
 
 def run_cli(raw_command: str | None = None) -> None:
     command_index: toolcli.CommandIndex = {
-        (): 'rpc_bench.cli.root_command',
-        ('ls',): 'rpc_bench.cli.ls_command',
-        ('report',): 'rpc_bench.cli.report_command',
+        (): 'flood.cli.root_command',
+        ('ls',): 'flood.cli.ls_command',
+        ('report',): 'flood.cli.report_command',
         (
             'version',
         ): 'toolcli.command_utils.standard_subcommands.version_command',
@@ -17,14 +17,14 @@ def run_cli(raw_command: str | None = None) -> None:
     }
 
     config: toolcli.CLIConfig = {
-        'base_command': 'rpc_bench',
-        'description': rpc_bench.__doc__,
-        'version': rpc_bench.__version__,
+        'base_command': 'flood',
+        'description': flood.__doc__,
+        'version': flood.__version__,
         'default_command_sequence': (),
         'root_help_arguments': True,
         # 'root_help_subcommands': False,
         'include_debug_arg': True,
-        'style_theme': rpc_bench.styles,
+        'style_theme': flood.styles,
     }
 
     toolcli.run_cli(

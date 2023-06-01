@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from rpc_bench import spec
-import rpc_bench
+from flood import spec
+import flood
 
 
 def generate_test_eth_get_block_by_number(
@@ -12,12 +12,12 @@ def generate_test_eth_get_block_by_number(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> rpc_bench.LoadTest:
-    n_calls = rpc_bench.estimate_call_count(
+) -> flood.LoadTest:
+    n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = rpc_bench.generate_calls_eth_get_block_by_number(n_calls=n_calls)
-    return rpc_bench.construct_load_test(
+    calls = flood.generate_calls_eth_get_block_by_number(n_calls=n_calls)
+    return flood.construct_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -31,12 +31,12 @@ def generate_test_eth_get_block_by_hash(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> rpc_bench.LoadTest:
-    n_calls = rpc_bench.estimate_call_count(
+) -> flood.LoadTest:
+    n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = rpc_bench.generate_calls_eth_get_block_by_hash(n_calls=n_calls)
-    return rpc_bench.construct_load_test(
+    calls = flood.generate_calls_eth_get_block_by_hash(n_calls=n_calls)
+    return flood.construct_load_test(
         calls=calls,
         rates=rates,
         duration=duration,

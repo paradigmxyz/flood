@@ -4,7 +4,7 @@ requires = ["flit_core >=3.2, <4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "rpc_bench"
+name = "flood"
 readme = "README.md"
 requires-python = ">=3.7"
 dynamic = ["version", "description"]
@@ -49,16 +49,16 @@ test = [
 ]
 
 [project.scripts]
-rpc_bench = "rpc_bench.cli.cli_run:run_cli"
+flood = "flood.cli.cli_run:run_cli"
 
 [tool.flit.module]
-name = "rpc_bench"
+name = "flood"
 
 [tool.mypy]
 python_version = "3.9"
 strict = true
 implicit_reexport = true
-files = ["rpc_bench"]
+files = ["flood"]
 
 [tool.pytest.ini_options]
 testpaths = [

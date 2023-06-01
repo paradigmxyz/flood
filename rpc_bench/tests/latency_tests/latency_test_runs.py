@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 import typing
 
-from rpc_bench import user_io
-from rpc_bench import spec
+from flood import user_io
+from flood import spec
 from . import call_creation
 from . import latency_test_execution
 from . import latency_test_outputs

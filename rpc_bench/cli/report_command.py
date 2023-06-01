@@ -4,7 +4,7 @@ import typing
 
 import toolcli
 
-import rpc_bench
+import flood
 
 
 help_message = """create report of previous test results
@@ -47,7 +47,7 @@ def report_command(
 
         output = os.getcwd()
 
-    rpc_bench.create_load_test_report(
+    flood.create_load_test_report(
         test_paths=test_dirs,
         output_dir=output,
         metrics=metrics,

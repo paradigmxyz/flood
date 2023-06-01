@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
-from rpc_bench.user_io import file_io
+import flood
+from flood.user_io import file_io
 
 
 def run(
     test_name: str,
     *,
-    nodes: rpc_bench.NodesShorthand | None,
-    random_seed: rpc_bench.RandomSeed | None = None,
+    nodes: flood.NodesShorthand | None,
+    random_seed: flood.RandomSeed | None = None,
     verbose: bool | int = True,
     rates: typing.Sequence[int] | None = None,
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
-    mode: rpc_bench.LoadTestMode | None = None,
-    vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
+    mode: flood.LoadTestMode | None = None,
+    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
     dry: bool,
     output_dir: str | bool | None = None,
     figures: bool = True,
@@ -40,7 +40,7 @@ def run(
     if os.path.exists(test_name) or '/' in test_name:
         path_spec = test_name
         if os.path.isdir(path_spec):
-            test_path = rpc_bench.get_single_run_test_path(output_dir=path_spec)
+            test_path = flood.get_single_run_test_path(output_dir=path_spec)
         else:
             test_path = path_spec
         try:
@@ -53,7 +53,7 @@ def run(
 
         if nodes is None:
             if os.path.isdir(path_spec):
-                result_path = rpc_bench.get_single_run_results_path(
+                result_path = flood.get_single_run_results_path(
                     output_dir=path_spec,
                 )
             else:
@@ -81,7 +81,7 @@ def run(
     if nodes is None:
         raise Exception('must specify nodes')
 
-    if test_name in rpc_bench.get_single_test_generators():
+    if test_name in flood.get_single_test_generators():
         _run_single(
             test_name=test_name,
             nodes=nodes,
@@ -96,7 +96,7 @@ def run(
             metrics=metrics,
             figures=figures,
         )
-    elif test_name in rpc_bench.get_multi_test_generators():
+    elif test_name in flood.get_multi_test_generators():
         raise NotImplementedError()
     else:
         raise Exception('invalid test name')
@@ -106,14 +106,14 @@ def _run_single(
     *,
     test_name: str,
     rerun_of: str | None = None,
-    test: rpc_bench.LoadTest | None = None,
-    nodes: rpc_bench.NodesShorthand,
-    random_seed: rpc_bench.RandomSeed | None = None,
+    test: flood.LoadTest | None = None,
+    nodes: flood.NodesShorthand,
+    random_seed: flood.RandomSeed | None = None,
     rates: typing.Sequence[int] | None = None,
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
-    mode: rpc_bench.LoadTestMode | None = None,
-    vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None = None,
+    mode: flood.LoadTestMode | None = None,
+    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
     dry: bool,
     output_dir: str | None = None,
     figures: bool,
@@ -124,24 +124,24 @@ def _run_single(
     import toolstr
 
     # parse inputs
-    nodes = rpc_bench.parse_nodes(nodes)
+    nodes = flood.parse_nodes(nodes)
 
     # create test
     if test is not None:
-        test_data = rpc_bench.parse_test_data(test=test)
+        test_data = flood.parse_test_data(test=test)
         rates = test_data['rates']
         durations = test_data['durations']
         vegeta_kwargs = test_data['vegeta_kwargs']
     else:
         if test_name is None:
             raise Exception('must specify test or test_name')
-        rates, durations = rpc_bench.generate_timings(
+        rates, durations = flood.generate_timings(
             rates=rates,
             duration=duration,
             durations=durations,
             mode=mode,
         )
-        test = rpc_bench.generate_test(
+        test = flood.generate_test(
             test_name=test_name,
             constants={
                 'rates': rates,
@@ -187,13 +187,14 @@ def _run_single(
 
     # run tests
     try:
-        results = rpc_bench.run_load_tests(
+        results = flood.run_load_tests(
             nodes=nodes,
             test=test,
             verbose=verbose,
         )
     except Exception as e:
         import traceback
+
         print('THIS WAS THE ERROR:', e.args)
         print()
         print(traceback.format_exc())
@@ -214,7 +215,7 @@ def _run_single(
             figures_dir = file_io.get_single_run_figures_path(
                 output_dir=output_dir
             )
-            rpc_bench.plot_load_test_results(
+            flood.plot_load_test_results(
                 outputs=results,
                 test_name=test_name,
                 output_dir=figures_dir,
@@ -249,43 +250,37 @@ def _print_single_run_preamble(
     test_name: str,
     rates: typing.Sequence[int],
     durations: typing.Sequence[int],
-    vegeta_kwargs: rpc_bench.VegetaKwargsShorthand | None,
-    nodes: rpc_bench.Nodes,
+    vegeta_kwargs: flood.VegetaKwargsShorthand | None,
+    nodes: flood.Nodes,
     rerun_of: str | None = None,
     output_dir: str | None,
 ) -> None:
     import toolstr
 
     toolstr.print_text_box(
-        toolstr.add_style(
-            'Load test: ' + test_name, rpc_bench.styles['metavar']
-        ),
-        style=rpc_bench.styles['content'],
+        toolstr.add_style('Load test: ' + test_name, flood.styles['metavar']),
+        style=flood.styles['content'],
     )
-    toolstr.print_bullet(
-        key='sample rates', value=rates, styles=rpc_bench.styles
-    )
+    toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
     if len(set(durations)) == 1:
         toolstr.print_bullet(
             key='sample duration',
             value=durations[0],
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
     else:
         toolstr.print_bullet(
-            key='sample durations', value=durations, styles=rpc_bench.styles
+            key='sample durations', value=durations, styles=flood.styles
         )
     if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
-        toolstr.print_bullet(
-            key='extra args', value=None, styles=rpc_bench.styles
-        )
+        toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
 
     if rerun_of is not None:
         toolstr.print_bullet(
-            key='rerun of', value=rerun_of, styles=rpc_bench.styles
+            key='rerun of', value=rerun_of, styles=flood.styles
         )
     toolstr.print_bullet(
-        key='output directory', value=output_dir, styles=rpc_bench.styles
+        key='output directory', value=output_dir, styles=flood.styles
     )
 
     if len(nodes) == 1:
@@ -293,29 +288,29 @@ def _print_single_run_preamble(
         toolstr.print_bullet(
             key='node',
             value=_get_node_str(node),
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
     else:
-        toolstr.print_bullet(key='nodes', value='', styles=rpc_bench.styles)
+        toolstr.print_bullet(key='nodes', value='', styles=flood.styles)
         for n, node in enumerate(nodes.values()):
             toolstr.print(
-                toolstr.add_style(str(n + 1), rpc_bench.styles['metavar'])
+                toolstr.add_style(str(n + 1), flood.styles['metavar'])
                 + '. '
                 + _get_node_str(node),
                 indent=4,
-                style=rpc_bench.styles['description'],
+                style=flood.styles['description'],
             )
 
     print()
     print()
     toolstr.print_header(
         'Running load tests...',
-        style=rpc_bench.styles['content'],
-        text_style=rpc_bench.styles['metavar'],
+        style=flood.styles['content'],
+        text_style=flood.styles['metavar'],
     )
 
 
-def _get_node_str(node: rpc_bench.Node) -> str:
+def _get_node_str(node: flood.Node) -> str:
     node_str = '"' + node['name'] + '", url=' + node['url']
     remote = node['remote']
     if remote is not None:
@@ -325,7 +320,7 @@ def _get_node_str(node: rpc_bench.Node) -> str:
 
 def _print_single_run_conclusion(
     output_dir: str | None,
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput],
     metrics: typing.Sequence[str] | None,
     verbose: bool | int,
     figures: bool,
@@ -337,13 +332,8 @@ def _print_single_run_conclusion(
 
     # print message about metrics file
     if output_dir is not None:
-
-        test_path = file_io.get_single_run_test_path(
-            output_dir=output_dir
-        )
-        result_path = file_io.get_single_run_results_path(
-            output_dir=output_dir
-        )
+        test_path = file_io.get_single_run_test_path(output_dir=output_dir)
+        result_path = file_io.get_single_run_results_path(output_dir=output_dir)
         figures_path = file_io.get_single_run_figures_path(
             output_dir=output_dir
         )
@@ -353,27 +343,27 @@ def _print_single_run_conclusion(
         toolstr.print_bullet(
             key='Saving results',
             value='',
-            styles=rpc_bench.styles,
+            styles=flood.styles,
             bullet_str='',
         )
         toolstr.print_bullet(
             key=os.path.relpath(test_path, output_dir),
             value='',
             colon_str='',
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
         toolstr.print_bullet(
             key=os.path.relpath(result_path, output_dir),
             value='',
             colon_str='',
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
         if figures:
             toolstr.print_bullet(
                 key=os.path.relpath(figures_path, output_dir),
                 value='',
                 colon_str='',
-                styles=rpc_bench.styles,
+                styles=flood.styles,
             )
 
     # decide metrics
@@ -388,7 +378,7 @@ def _print_single_run_conclusion(
         toolstr.print_bullet(
             key='metrics shown below',
             value=', '.join(metrics),
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
         example_result = list(results.values())[0]
         additional = [
@@ -397,12 +387,12 @@ def _print_single_run_conclusion(
         toolstr.print_bullet(
             key='additional metrics available',
             value=', '.join(additional),
-            styles=rpc_bench.styles,
+            styles=flood.styles,
         )
 
     # print metric values
     print()
-    rpc_bench.print_metric_tables(
+    flood.print_metric_tables(
         results=results,
         metrics=metrics,
     )

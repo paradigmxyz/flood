@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-import rpc_bench
+import flood
 
 
 names = [None, 'test_node', 'backup_node']
@@ -43,7 +43,7 @@ def test_parse_node(
     if name is not None:
         node_str = name + '=' + node_str
 
-    parsed = rpc_bench.parse_node(node_str)
+    parsed = flood.parse_node(node_str)
 
     if name is not None:
         assert parsed['name'] == name

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from rpc_bench import spec
+from flood import spec
 
 
 def generate_block_numbers(

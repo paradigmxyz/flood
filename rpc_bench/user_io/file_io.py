@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
+import flood
 
 
 _path_templates = {
@@ -29,7 +29,7 @@ def get_single_run_figures_path(output_dir: str) -> str:
 def _save_single_run_test(
     test_name: str,
     output_dir: str,
-    test: rpc_bench.LoadTest,
+    test: flood.LoadTest,
 ) -> None:
     import os
     import json
@@ -42,7 +42,7 @@ def _save_single_run_test(
 
     path = _path_templates['single_run_test'].format(output_dir=output_dir)
     payload = {
-        'version': rpc_bench.__version__,
+        'version': flood.__version__,
         'type': 'single_test',
         'name': test_name,
         'test': test,
@@ -53,9 +53,9 @@ def _save_single_run_test(
 
 def _save_single_run_results(
     output_dir: str,
-    test: rpc_bench.LoadTest,
-    nodes: rpc_bench.Nodes,
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    test: flood.LoadTest,
+    nodes: flood.Nodes,
+    results: typing.Mapping[str, flood.LoadTestOutput],
 ) -> None:
     import os
     import json
@@ -68,7 +68,7 @@ def _save_single_run_results(
 
     path = _path_templates['single_run_results'].format(output_dir=output_dir)
     payload = {
-        'version': rpc_bench.__version__,
+        'version': flood.__version__,
         'type': 'single_test',
         'test': test,
         'nodes': nodes,
@@ -80,36 +80,36 @@ def _save_single_run_results(
 
 def load_single_run_test_payload(
     output_dir: str,
-) -> rpc_bench.SingleRunTestPayload:
+) -> flood.SingleRunTestPayload:
     import json
 
     path = get_single_run_test_path(output_dir=output_dir)
     with open(path) as f:
-        test: rpc_bench.SingleRunTestPayload = json.load(f)
+        test: flood.SingleRunTestPayload = json.load(f)
     return test
 
 
 def load_single_run_test(
     output_dir: str,
-) -> rpc_bench.LoadTest:
+) -> flood.LoadTest:
     payload = load_single_run_test_payload(output_dir=output_dir)
     return payload['test']
 
 
 def load_single_run_results_payload(
     output_dir: str,
-) -> rpc_bench.SingleRunResultsPayload:
+) -> flood.SingleRunResultsPayload:
     import json
 
     path = get_single_run_results_path(output_dir=output_dir)
     with open(path) as f:
-        results: rpc_bench.SingleRunResultsPayload = json.load(f)
+        results: flood.SingleRunResultsPayload = json.load(f)
     return results
 
 
 def load_single_run_results(
     output_dir: str,
-) -> typing.Mapping[str, rpc_bench.LoadTestOutput]:
+) -> typing.Mapping[str, flood.LoadTestOutput]:
     payload = load_single_run_results_payload(output_dir=output_dir)
     return payload['results']
 

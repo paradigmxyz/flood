@@ -2,22 +2,22 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
+import flood
 from . import equality_test_sets
 
 
 def run_equality_test(
     test_name: str,
-    nodes: rpc_bench.NodesShorthand,
+    nodes: flood.NodesShorthand,
     *,
     verbose: bool | int = True,
-    random_seed: rpc_bench.RandomSeed | None = None,
+    random_seed: flood.RandomSeed | None = None,
 ) -> None:
     import json
     import requests
     import toolstr
 
-    nodes = rpc_bench.parse_nodes(nodes)
+    nodes = flood.parse_nodes(nodes)
     for node in nodes.values():
         if node['remote'] is not None:
             raise Exception('remote not supported for equality test')
@@ -30,22 +30,22 @@ def run_equality_test(
     equality_tests = equality_test_sets.get_all_equality_tests()
 
     # print preamble
-    rpc_bench.print_text_box('Running equality test')
-    rpc_bench.print_bullet(key='nodes', value='')
+    flood.print_text_box('Running equality test')
+    flood.print_bullet(key='nodes', value='')
     for n, node in enumerate(nodes.values()):
         toolstr.print(
-            toolstr.add_style(str(n + 1), rpc_bench.styles['metavar'])
+            toolstr.add_style(str(n + 1), flood.styles['metavar'])
             + '. '
             + str(node),
             indent=4,
-            style=rpc_bench.styles['description'],
+            style=flood.styles['description'],
         )
-    rpc_bench.print_bullet(key='methods', value='')
+    flood.print_bullet(key='methods', value='')
     for test in equality_tests:
-        rpc_bench.print_bullet(key=test[0], value='', colon_str='', indent=4)
+        flood.print_bullet(key=test[0], value='', colon_str='', indent=4)
 
     successful = []
-    headers = {'Content-Type': 'application/json', 'User-Agent': 'rpc_bench'}
+    headers = {'Content-Type': 'application/json', 'User-Agent': 'flood'}
     for test in equality_tests:
         # create call
         test_name, constructor, args, kwargs = test
@@ -75,23 +75,25 @@ def run_equality_test(
             successful.append(test_name)
 
     print()
-    rpc_bench.print_text_box('Equality Test Summary')
+    flood.print_text_box('Equality Test Summary')
     print()
-    rpc_bench.print_header('No differences detected (n = ' + str(len(successful)) + ')')
+    flood.print_header(
+        'No differences detected (n = ' + str(len(successful)) + ')'
+    )
     if len(successful) == 0:
         print('[none]')
     else:
         for name in sorted(successful):
-            rpc_bench.print_bullet(key=name, value='', colon_str='')
+            flood.print_bullet(key=name, value='', colon_str='')
     print()
 
     failed = [test[0] for test in equality_tests if test[0] not in successful]
-    rpc_bench.print_header('Differences detected (n = ' + str(len(failed)) + ')')
+    flood.print_header('Differences detected (n = ' + str(len(failed)) + ')')
     if len(failed) == 0:
         print('[none]')
     else:
         for name in sorted(failed):
-            rpc_bench.print_bullet(key=name, value='', colon_str='')
+            flood.print_bullet(key=name, value='', colon_str='')
 
 
 def json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
@@ -102,8 +104,8 @@ def json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
 
 def _summarize_result(
     results: typing.Sequence[typing.Any],
-    nodes: rpc_bench.Nodes,
-    test: rpc_bench.EqualityTest,
+    nodes: flood.Nodes,
+    test: flood.EqualityTest,
     call: typing.Mapping[str, typing.Any],
 ) -> bool:
     import toolstr
@@ -112,17 +114,17 @@ def _summarize_result(
 
     if not json_equal(results[0], results[1]):
         print()
-        rpc_bench.print_text_box('Discrepancies in ' + test_name)
+        flood.print_text_box('Discrepancies in ' + test_name)
         print()
-        rpc_bench.print_header('args')
+        flood.print_header('args')
         if len(args) > 0:
             for arg in args:
-                rpc_bench.print_bullet(key=arg, value='', colon_str='')
+                flood.print_bullet(key=arg, value='', colon_str='')
         if len(kwargs) > 0:
             for key, value in kwargs.items():
-                rpc_bench.print_bullet(key=key, value=value)
+                flood.print_bullet(key=key, value=value)
         print()
-        rpc_bench.print_header('call')
+        flood.print_header('call')
         print(call)
 
         if any(result is None for result in results):
@@ -130,7 +132,7 @@ def _summarize_result(
         for node, result in zip(nodes.values(), results):
             if result is None:
                 toolstr.print(
-                    node['name'] + ' failed', style=rpc_bench.styles['title']
+                    node['name'] + ' failed', style=flood.styles['title']
                 )
 
         if results[0] is None or results[1] is None:
@@ -146,7 +148,7 @@ def _summarize_result(
 
 def _print_result_diff(
     results: typing.Sequence[typing.Any],
-    nodes: typing.Sequence[rpc_bench.Node],
+    nodes: typing.Sequence[flood.Node],
 ) -> None:
     import toolstr
 
@@ -165,7 +167,7 @@ def _print_result_diff(
             only_in_0 = keys0 - keys1
             only_in_1 = keys1 - keys0
             print()
-            rpc_bench.print_header('different fields in results')
+            flood.print_header('different fields in results')
             if len(only_in_0) > 0:
                 print(
                     '- present only in',
@@ -186,8 +188,8 @@ def _print_result_diff(
                 rows.append(row)
         if len(rows) > 0:
             print()
-            rpc_bench.print_header('differences in values')
-            rpc_bench.print_table(
+            flood.print_header('differences in values')
+            flood.print_table(
                 rows,
                 labels=['field', nodes[0]['name'], nodes[1]['name']],
                 compact=3,
@@ -198,9 +200,9 @@ def _print_result_diff(
     elif isinstance(result0, list):
         if len(result1) != len(result0):
             print()
-            rpc_bench.print_header('different number of results')
+            flood.print_header('different number of results')
             for node, result in zip(nodes, results):
-                rpc_bench.print_bullet(
+                flood.print_bullet(
                     key=node['name'], value=str(len(result)) + ' results'
                 )
         else:
@@ -208,7 +210,7 @@ def _print_result_diff(
 
     else:
         if result1 != result0:
-            rpc_bench.print_header('differences in values')
+            flood.print_header('differences in values')
             for node, result in zip(nodes, results):
-                rpc_bench.print_bullet(key=node['name'], value=result)
+                flood.print_bullet(key=node['name'], value=result)
 

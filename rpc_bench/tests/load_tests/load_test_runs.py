@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
-from rpc_bench import user_io
-from rpc_bench import spec
+import flood
+from flood import user_io
+from flood import spec
 from . import load_test_construction
 from . import vegeta
 
@@ -32,7 +32,7 @@ def run_load_tests(
         'leave': False,
         'desc': 'nodes',
         'position': 0,
-        'colour': rpc_bench.styles['content'],
+        'colour': flood.styles['content'],
         'disable': not verbose,
     }
 
@@ -133,7 +133,7 @@ def _run_load_test_locally(
         leave=False,
         desc='samples',
         position=1,
-        colour=rpc_bench.styles['content'],
+        colour=flood.styles['content'],
         disable=not verbose,
         **_pbar_kwargs,
     )
@@ -180,9 +180,9 @@ def _run_load_test_remotely(
 
     # save call data, saving methods to preserve ordering in json
     job_id = str(uuid.uuid4())
-    tempdir = '/tmp/rpc_bench__' + job_id
+    tempdir = '/tmp/flood__' + job_id
     os.makedirs(tempdir)
-    rpc_bench.user_io.file_io._save_single_run_test(
+    flood.user_io.file_io._save_single_run_test(
         test_name='',
         test=test,
         output_dir=tempdir,
@@ -194,20 +194,22 @@ def _run_load_test_remotely(
 
         dt = datetime.datetime.now()
         if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+            dt = dt + datetime.timedelta(
+                microseconds=1_000_000 - dt.microsecond
+            )
         else:
             dt = dt - datetime.timedelta(microseconds=dt.microsecond)
         timestamp = (
-            toolstr.add_style('\[', rpc_bench.styles['content'])
-            + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
-            + toolstr.add_style(']', rpc_bench.styles['content'])
+            toolstr.add_style('\[', flood.styles['content'])
+            + toolstr.add_style(str(dt), flood.styles['metavar'])
+            + toolstr.add_style(']', flood.styles['content'])
         )
         node_name = (
-            toolstr.add_style('\[', rpc_bench.styles['content'])
-            + toolstr.add_style('node', rpc_bench.styles['metavar'])
-            + toolstr.add_style('=', rpc_bench.styles['content'])
+            toolstr.add_style('\[', flood.styles['content'])
+            + toolstr.add_style('node', flood.styles['metavar'])
+            + toolstr.add_style('=', flood.styles['content'])
             + node['name']
-            + toolstr.add_style(']', rpc_bench.styles['content'])
+            + toolstr.add_style(']', flood.styles['content'])
         )
         toolstr.print(
             timestamp + ' ' + node_name + ' Sending tests to remote node'
@@ -219,16 +221,20 @@ def _run_load_test_remotely(
     if verbose:
         dt = datetime.datetime.now()
         if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+            dt = dt + datetime.timedelta(
+                microseconds=1_000_000 - dt.microsecond
+            )
         else:
             dt = dt - datetime.timedelta(microseconds=dt.microsecond)
         timestamp = (
-            toolstr.add_style('\[', rpc_bench.styles['content'])
-            + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
-            + toolstr.add_style(']', rpc_bench.styles['content'])
+            toolstr.add_style('\[', flood.styles['content'])
+            + toolstr.add_style(str(dt), flood.styles['metavar'])
+            + toolstr.add_style(']', flood.styles['content'])
         )
-        toolstr.print(timestamp + ' ' + node_name + ' Executing test on remote node')
-    cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m rpc_bench {test} {name}={url} --output {output} --no-figures'".format(
+        toolstr.print(
+            timestamp + ' ' + node_name + ' Executing test on remote node'
+        )
+    cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures'".format(
         host=remote,
         name=node['name'],
         url=node['url'],
@@ -241,13 +247,15 @@ def _run_load_test_remotely(
     if verbose:
         dt = datetime.datetime.now()
         if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+            dt = dt + datetime.timedelta(
+                microseconds=1_000_000 - dt.microsecond
+            )
         else:
             dt = dt - datetime.timedelta(microseconds=dt.microsecond)
         timestamp = (
-            toolstr.add_style('\[', rpc_bench.styles['content'])
-            + toolstr.add_style(str(dt), rpc_bench.styles['metavar'])
-            + toolstr.add_style(']', rpc_bench.styles['content'])
+            toolstr.add_style('\[', flood.styles['content'])
+            + toolstr.add_style(str(dt), flood.styles['metavar'])
+            + toolstr.add_style(']', flood.styles['content'])
         )
         toolstr.print(timestamp + ' ' + node_name + ' Retrieving results')
     results_path = os.path.join(tempdir, 'results.json')

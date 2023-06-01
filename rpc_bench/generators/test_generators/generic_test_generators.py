@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
+import flood
 
 
 #
@@ -11,34 +11,34 @@ import rpc_bench
 
 
 def get_single_test_generators() -> (
-    typing.Mapping[str, rpc_bench.LoadTestGenerator]
+    typing.Mapping[str, flood.LoadTestGenerator]
 ):
     return {
         get_test_generator_display_name(item): item  # type: ignore
-        for item in dir(rpc_bench)
+        for item in dir(flood)
         if item.startswith('generate_test_')
     }
 
 
 def get_multi_test_generators() -> (
-    typing.Mapping[str, rpc_bench.MultiLoadTestGenerator]
+    typing.Mapping[str, flood.MultiLoadTestGenerator]
 ):
     return {
         get_test_generator_display_name(item): item  # type: ignore
-        for item in dir(rpc_bench)
+        for item in dir(flood)
         if item.startswith('generate_tests_')
     }
 
 
-def get_test_generator(test_name: str) -> rpc_bench.LoadTestGenerator:
+def get_test_generator(test_name: str) -> flood.LoadTestGenerator:
     function_name = get_test_generator_function_name(test_name)
-    if hasattr(rpc_bench, function_name):
-        return getattr(rpc_bench, function_name)  # type: ignore
+    if hasattr(flood, function_name):
+        return getattr(flood, function_name)  # type: ignore
     else:
         raise Exception()
 
 
-def get_test_generator_display_name(test: str | rpc_bench.LoadTestGenerator) -> str:
+def get_test_generator_display_name(test: str | flood.LoadTestGenerator) -> str:
     if not isinstance(test, str):
         import types
 
@@ -79,7 +79,7 @@ def snake_case_to_camel_case(string: str) -> str:
 def generate_test(
     test_name: str,
     constants: typing.Mapping[str, typing.Any],
-) -> rpc_bench.LoadTest:
+) -> flood.LoadTest:
     test_generator = get_test_generator(test_name)
     test = test_generator(**constants)
     return test
@@ -92,7 +92,7 @@ def generate_test(
 #         str, typing.Mapping[str, typing.Sequence[typing.Any]]
 #     ]
 #     | None = None,
-# ) -> typing.Mapping[str, rpc_bench.LoadTest]:
+# ) -> typing.Mapping[str, flood.LoadTest]:
 #     """variables is in format {variable_name: {test_name: variable_value}}"""
 #     import itertools
 

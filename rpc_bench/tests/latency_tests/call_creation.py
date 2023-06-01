@@ -3,7 +3,7 @@ from __future__ import annotations
 import ctc.rpc
 import typing
 
-from rpc_bench import spec
+from flood import spec
 
 
 def _get_all_methods() -> typing.Sequence[str]:

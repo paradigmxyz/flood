@@ -9,12 +9,12 @@ import typing
 
 import toolcli
 
-import rpc_bench
+import flood
 
 help_message = """Load test JSON RPC endpoints
 
 [bold][title]Test Specification[/bold][/title]
-- [metavar]TEST[/metavar] can be a template, use [metavar]rpc_bench ls[/metavar] to list test templates
+- [metavar]TEST[/metavar] can be a template, use [metavar]flood ls[/metavar] to list test templates
 - Alternatively, [metavar]TEST[/metavar] can be a directory path of a previous test
     - This will rerun this the previous test, possibly on new nodes
 
@@ -24,13 +24,13 @@ help_message = """Load test JSON RPC endpoints
 - The [metavar]name[/metavar] of each node is used for benchmark summary report
 
 [bold][title]Remote Usage[/bold][/title]
-- [metavar]rpc_bench[/metavar] can be invoked on remote machines
+- [metavar]flood[/metavar] can be invoked on remote machines
 - Use node syntax [metavar]user@remote:node_url[/metavar] or [metavar]name=user@remote:node_url[/metavar]
 - Can omit the [metavar]user@[/metavar] prefix if ssh config has username specified
-- [metavar]rpc_bench[/metavar] must already be installed on each remote machine
+- [metavar]flood[/metavar] must already be installed on each remote machine
 
 [bold][title]Parameter Randomization[/bold][/title]
-- [metavar]rpc_bench[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
+- [metavar]flood[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
 - For each call, parameters are randomized to minimize caching effects
 - Specify random seed [metavar]-s <seed>[/metavar] for repeatable set of randomized calls"""
 
@@ -42,7 +42,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {
                 'name': 'test',
-                'help': 'test to run (use [metavar]rpc_bench ls[/metavar] for list)',
+                'help': 'test to run (use [metavar]flood ls[/metavar] for list)',
             },
             {
                 'name': 'nodes',
@@ -115,7 +115,7 @@ def root_command(
     nodes: typing.Sequence[str] | None,
     output_dir: str | None,
     metrics: typing.Sequence[str],
-    mode: rpc_bench.LoadTestMode | None,
+    mode: flood.LoadTestMode | None,
     rates: typing.Sequence[int] | typing.Sequence[str] | None,
     duration: int | None,
     random_seed: int | None,
@@ -143,7 +143,7 @@ def root_command(
             raise Exception('dry not used in equality test')
         if not figures:
             raise Exception('figures not used in equality test')
-        rpc_bench.run_equality_test(
+        flood.run_equality_test(
             test_name=test,
             nodes=nodes,
             random_seed=random_seed,
@@ -151,10 +151,9 @@ def root_command(
         )
 
     else:
-
         if rates is not None:
             rates = [int(rate) for rate in rates]
-        rpc_bench.run(
+        flood.run(
             test_name=test,
             mode=mode,
             nodes=nodes,

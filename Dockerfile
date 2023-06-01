@@ -2,14 +2,14 @@
 FROM python:3.11.3
 
 # create user
-ENV USERNAME="rpc_bench"
+ENV USERNAME="flood"
 RUN adduser $USERNAME
 USER $USERNAME
 
-# install rpc_bench
+# install flood
 RUN mkdir /home/$USERNAME/repos
-COPY ./ /home/$USERNAME/repos/rpc_bench/
-WORKDIR /home/$USERNAME/repos/rpc_bench
+COPY ./ /home/$USERNAME/repos/flood/
+WORKDIR /home/$USERNAME/repos/flood
 RUN pip install ./
 
 # install ctc
@@ -26,7 +26,7 @@ RUN tar xzf vegeta_12.8.4_linux_amd64.tar.gz
 WORKDIR /home/$USERNAME/bin/
 RUN ln -s /home/$USERNAME/bin/vegeta_files/vegeta /home/$USERNAME/bin/vegeta
 
-# run rpc_bench
+# run flood
 WORKDIR /home/$USERNAME
-ENTRYPOINT ["python", "-m", "rpc_bench"]
+ENTRYPOINT ["python", "-m", "flood"]
 

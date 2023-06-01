@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from rpc_bench import spec
+from flood import spec
 
 
 def get_ctc_alias_url(url: str) -> str | None:

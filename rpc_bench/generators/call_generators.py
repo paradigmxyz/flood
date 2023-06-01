@@ -3,7 +3,7 @@ from __future__ import annotations
 import ctc.rpc
 import typing
 
-from rpc_bench import spec
+from flood import spec
 from . import address_generators
 from . import block_generators
 from . import slot_generators

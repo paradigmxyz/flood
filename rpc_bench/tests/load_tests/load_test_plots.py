@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
+import flood
 
 
 def plot_load_test_results(
-    outputs: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    outputs: typing.Mapping[str, flood.LoadTestOutput],
     test_name: str,
     output_dir: str | None = None,
     latency_yscale_log: bool = False,
@@ -48,7 +48,7 @@ def plot_load_test_results(
 
 
 def plot_load_test_success(
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
@@ -67,7 +67,7 @@ def plot_load_test_success(
 
 
 def plot_load_test_throughput(
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
@@ -83,7 +83,7 @@ def plot_load_test_throughput(
 
 
 def plot_load_test_latencies(
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput],
     colors: typing.Mapping[
         str,
         str | typing.Sequence[str] | typing.Mapping[str, str],
@@ -94,7 +94,7 @@ def plot_load_test_latencies(
     yscale_log: bool = False,
 ) -> None:
     if colors is None:
-        colors = dict(zip(results.keys(), rpc_bench.colors.values()))
+        colors = dict(zip(results.keys(), flood.colors.values()))
 
     if yscale_log:
         ymin = None
@@ -114,7 +114,7 @@ def plot_load_test_latencies(
 
 
 def plot_load_test_result_metrics(
-    results: typing.Mapping[str, rpc_bench.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput],
     metrics: typing.Sequence[str],
     *,
     colors: typing.Mapping[
@@ -135,7 +135,7 @@ def plot_load_test_result_metrics(
     if colors is None:
         colors = {
             key: color
-            for key, color in zip(results.keys(), rpc_bench.color_defaults)
+            for key, color in zip(results.keys(), flood.color_defaults)
         }
 
     for name, result in results.items():

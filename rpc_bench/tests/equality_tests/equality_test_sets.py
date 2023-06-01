@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
-from rpc_bench import block_generators
+import flood
+from flood import block_generators
 
 
 def get_all_equality_tests(
     start_block: int = 10_000_000,
     end_block: int = 16_000_000,
     range_size: int = 100,
-    random_seed: rpc_bench.RandomSeed | None = None,
-) -> typing.Sequence[rpc_bench.EqualityTest]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.EqualityTest]:
     return list(
         get_vanilla_equality_tests(
             start_block=start_block,
@@ -32,8 +32,8 @@ def get_vanilla_equality_tests(
     start_block: int = 10_000_000,
     end_block: int = 16_000_000,
     range_size: int = 100,
-    random_seed: rpc_bench.RandomSeed | None = None,
-) -> typing.Sequence[rpc_bench.EqualityTest]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.EqualityTest]:
     import ctc.rpc
 
     start_block, end_block = block_generators.generate_block_ranges(
@@ -169,8 +169,8 @@ def get_vanilla_equality_tests(
 def get_trace_equality_tests(
     start_block: int = 10_000_000,
     end_block: int = 16_000_000,
-    random_seed: rpc_bench.RandomSeed | None = None,
-) -> typing.Sequence[rpc_bench.EqualityTest]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.EqualityTest]:
     import ctc.rpc
 
     block_number = block_generators.generate_block_numbers(

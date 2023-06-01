@@ -10,18 +10,18 @@ __version__ = '0.1.0'
 
 
 def _clean_package_imports() -> None:
-    """remove deep nested modules from rpc_bench namespace"""
+    """remove deep nested modules from flood namespace"""
 
     import sys
 
-    rpc_bench = sys.modules['rpc_bench']
-    moduletype = type(rpc_bench)
-    delattr(rpc_bench, 'annotations')
-    for key, value in tuple(vars(rpc_bench).items()):
+    flood = sys.modules['flood']
+    moduletype = type(flood)
+    delattr(flood, 'annotations')
+    for key, value in tuple(vars(flood).items()):
         if isinstance(value, moduletype):
             name = value.__name__
-            if not name.startswith('rpc_bench') or name.count('.') > 1:
-                delattr(rpc_bench, key)
+            if not name.startswith('flood') or name.count('.') > 1:
+                delattr(flood, key)
 
 
 _clean_package_imports()

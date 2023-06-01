@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-import rpc_bench
+import flood
 
 
 default_stress_test_rates = [1, 4, 16, 64, 256, 512]
@@ -25,7 +25,7 @@ def generate_timings(
     rates: typing.Sequence[int] | None = None,
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
-    mode: rpc_bench.LoadTestMode | None = None,
+    mode: flood.LoadTestMode | None = None,
 ) -> tuple[typing.Sequence[int], typing.Sequence[int]]:
     """create rates and durations for test"""
 

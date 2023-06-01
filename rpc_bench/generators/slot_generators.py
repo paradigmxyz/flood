@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-_slot_sample_path = '/tmp/rpc_bench/slot_samples.parquet'
+_slot_sample_path = '/tmp/flood/slot_samples.parquet'
 
 
 def generate_slots(n: int) -> typing.Sequence[tuple[str, str]]:
