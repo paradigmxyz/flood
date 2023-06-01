@@ -1,13 +1,9 @@
 
-# flood
+# 🌊🌊 flood 🌊🌊
 
-A tool for benchmarking and load testing EVM nodes
+`flood` is a tool for benchmarking and load testing EVM nodes
 
-`flood` can measure many different types of workloads
-- it separately measure performance of every JSON-RPC method type
-- it perform stress tests, spike tests, and soak tests
-
-`flood` measures a variety of performance metrics including:
+For each RPC method, `flood` measures the effect of load on metrics such as:
 1. throughput
 2. latency (mean, P50, P90, P95, P99, max)
 3. error rate
@@ -17,7 +13,7 @@ A tool for benchmarking and load testing EVM nodes
 - different hardware configurations (e.g. local vs cloud vs low memory vs RAID-0)
 - different RPC providers (e.g. Alchemy vs Quicknode vs Infura)
 
-`flood` can generate tables, figures, and reports to make its results interpretable (example report [here])
+`flood` can generate tables, figures, and reports for easy sharing of results (example report [here])
 
 
 ## Installation
@@ -66,4 +62,3 @@ flood report tests/test1_output tests/test2_output
 - `flood/generators`: utilities for generating sequences of rpc calls with parameterized distributions
 - `flood/tests`: implementations of tests
 - `flood/user_io`: utiltiies for parsing user input
-
