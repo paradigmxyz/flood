@@ -30,11 +30,23 @@ def create_samples_dataset(
         sizes = raw_data_spec.default_sizes
     else:
         raise Exception('invalid sizes format: ' + str(type(sizes)))
+    if datatypes is None:
+        datatypes = raw_data_spec.default_datatypes
     max_size = max(sizes.values())
 
-    # create samples
+    # print summary
     if verbose:
-        print('creating samples...')
+        print('creating dataset of raw EVM samples')
+        print('- version:', version)
+        print('- datatypes:', datatypes)
+        print('- network:', network)
+        print('- sizes:', sizes)
+        if output_dir is not None:
+            print('- saving to:', output_dir)
+        print()
+        print('collecting samples...')
+
+    # collect samples
     samples = create_raw_samples(
         n=max_size,
         network='ethereum',
