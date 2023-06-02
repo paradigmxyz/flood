@@ -36,7 +36,7 @@ dependencies = [
     'numpy >=1.19.0, <1.25',
     'nbformat >= 5.8.0',
     'toolplot >= 0.3.4',
-    'matplotlib >= 3.7.1'
+    'matplotlib >= 3.7.1',
     'paradigm-data-portal >= 0.2.2',
 # 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
 ]

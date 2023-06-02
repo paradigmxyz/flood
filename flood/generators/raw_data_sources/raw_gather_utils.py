@@ -12,19 +12,34 @@ def create_samples_dataset(
     *,
     output_dir: str,
     network: str,
-    version: str,
-    sizes: typing.Mapping[str, int] | None = None,
+    version: str | None = None,
+    sizes: typing.Mapping[str, int] | typing.Sequence[str] | None = None,
+    datatypes: typing.Sequence[str] | None = None,
     verbose: bool = True,
 ) -> None:
     # parse inputs
-    if sizes is None:
+    if version is None:
+        version = 'v1_0_0'
+    if isinstance(sizes, list):
+        sizes = {
+            k: v for k, v in raw_data_spec.default_sizes.items() if k in sizes
+        }
+    elif isinstance(sizes, dict):
+        pass
+    elif sizes is None:
         sizes = raw_data_spec.default_sizes
+    else:
+        raise Exception('invalid sizes format: ' + str(type(sizes)))
     max_size = max(sizes.values())
 
     # create samples
     if verbose:
         print('creating samples...')
-    samples = create_raw_samples(n=max_size, network="ethereum")
+    samples = create_raw_samples(
+        n=max_size,
+        network='ethereum',
+        datatypes=datatypes,
+    )
 
     # write sample files
     if verbose:
@@ -42,90 +57,97 @@ def create_samples_dataset(
 
 
 def create_raw_samples(
-    n: int, network: str
+    n: int,
+    network: str,
+    datatypes: typing.Sequence[str] | None = None,
 ) -> typing.Mapping[str, pl.DataFrame]:
     import glob
     import pdp
     from pdp.datasets import contracts
     import polars as pl
 
+    if datatypes is None:
+        datatypes = raw_data_spec.default_datatypes
+
+    samples = {}
+
     # contracts
-    contracts_df = contracts.query_contracts(
-        columns=["contract_address", "block_number", "deployer"],
-        network=network,
-    ).sort("block_number")
-    contracts_sample = contracts_df[
-        ["contract_address", "block_number"]
-    ].sample(n=n)
+    if 'contracts' in datatypes:
+        contracts_df = contracts.query_contracts(
+            columns=['contract_address', 'block_number', 'deployer'],
+            network=network,
+        ).sort('block_number')
+        samples['contracts'] = contracts_df[
+            ['contract_address', 'block_number']
+        ].sample(n=n)
 
     # slots
-    slot_glob = pdp.get_dataset_glob(
-        network=network,
-        datatype="slots",
-    )
-    pieces = []
-    for file in glob.glob(slot_glob):
-        piece = (
-            pl.scan_parquet(file)
-            .select("contract_address", "slot", "first_updated_block")
-            .collect()
-            .sample(int(n / 10))
+    if 'slots' in datatypes:
+        slot_glob = pdp.get_dataset_glob(
+            network=network,
+            datatype='slots',
         )
-        pieces.append(piece)
-    slots_sample = pl.concat(pieces).sample(n)
-    slots_sample = slots_sample.rename(
-        {
-            "first_updated_block": "block_number",
-        }
-    )
+        pieces = []
+        for file in glob.glob(slot_glob):
+            piece = (
+                pl.scan_parquet(file)
+                .select('contract_address', 'slot', 'first_updated_block')
+                .collect()
+                .sample(int(n / 10))
+            )
+            pieces.append(piece)
+        samples['slots'] = (
+            pl.concat(pieces)
+            .rename({'first_updated_block': 'block_number'})
+            .sample(n)
+        )
 
-    # slots
-    native_transfers_glob = pdp.get_dataset_glob(
-        network=network,
-        datatype="native_transfers",
-    )
-    pieces = []
-    for file in glob.glob(native_transfers_glob):
-        piece = (
-            pl.scan_parquet(file)
-            .select("transaction_hash", "block_number")
-            .collect()
+    # transactions
+    if 'transactions' in datatypes:
+        native_transfers_glob = pdp.get_dataset_glob(
+            network=network,
+            datatype='native_transfers',
         )
-        if len(piece) > n / 50:
-            piece = piece.sample(int(n / 50))
-        pieces.append(piece)
-    transactions_sample = pl.concat(pieces)
+        pieces = []
+        for file in glob.glob(native_transfers_glob):
+            piece = (
+                pl.scan_parquet(file)
+                .select('transaction_hash', 'block_number')
+                .collect()
+            )
+            if len(piece) > n / 50:
+                piece = piece.sample(int(n / 50))
+            pieces.append(piece)
+        samples['transactions'] = pl.concat(pieces).sample(n)
 
     # eoas
-    native_transfers_glob = pdp.get_dataset_glob(
-        network=network,
-        datatype="native_transfers",
-    )
-    pieces = []
-    for file in glob.glob(native_transfers_glob):
-        piece = (
-            pl.scan_parquet(file)
-            .select("from_address", "block_number")
-            .unique('from_address', keep='first')
-            .collect()
+    if 'eoas' in datatypes:
+        native_transfers_glob = pdp.get_dataset_glob(
+            network=network,
+            datatype='native_transfers',
         )
-        if len(piece) > n / 50:
-            piece = piece.sample(int(n / 50))
-        pieces.append(piece)
-    eoas_df = (
-        pl.concat(pieces)
-        .filter(~pl.col("from_address").is_in(contracts_df["contract_address"]))
-        .unique("from_address")
-        .rename({"from_address": "eoa"})
-    )
-    eoas_sample = eoas_df.sample(n)
+        pieces = []
+        for file in glob.glob(native_transfers_glob):
+            piece = (
+                pl.scan_parquet(file)
+                .select('from_address', 'block_number')
+                .unique('from_address', keep='first')
+                .collect()
+            )
+            if len(piece) > n / 50:
+                piece = piece.sample(int(n / 50))
+            pieces.append(piece)
+        eoas_df = (
+            pl.concat(pieces)
+            .filter(
+                ~pl.col('from_address').is_in(contracts_df['contract_address'])
+            )
+            .unique('from_address')
+            .rename({'from_address': 'eoa'})
+        )
+        samples['eoas'] = eoas_df.sample(n)
 
-    return {
-        "contracts": contracts_sample,
-        "eoas": eoas_sample,
-        "slots": slots_sample,
-        "transaction": transactions_sample,
-    }
+    return samples
 
 
 def write_raw_samples(
@@ -159,7 +181,7 @@ def write_raw_samples(
             elif len(sample_data) > size:
                 sized_data = sample_data[:size]
             else:
-                raise Exception("desired size is too big for sample data")
+                raise Exception('desired size is too big for sample data')
 
             # write file
             sized_data.write_parquet(output_path)

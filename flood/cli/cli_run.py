@@ -8,12 +8,15 @@ import flood
 def run_cli(raw_command: str | None = None) -> None:
     command_index: toolcli.CommandIndex = {
         (): 'flood.cli.root_command',
+        ('help',): 'toolcli.command_utils.standard_subcommands.help_command',
         ('ls',): 'flood.cli.ls_command',
         ('report',): 'flood.cli.report_command',
+        ('samples', 'collect'): 'flood.cli.samples_collect_command',
+        ('samples', 'download'): 'flood.cli.samples_download_command',
+        ('samples', 'ls'): 'flood.cli.samples_ls_command',
         (
             'version',
         ): 'toolcli.command_utils.standard_subcommands.version_command',
-        ('help',): 'toolcli.command_utils.standard_subcommands.help_command',
     }
 
     config: toolcli.CLIConfig = {
