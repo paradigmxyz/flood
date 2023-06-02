@@ -1,7 +1,7 @@
 
 # 🌊🌊 flood 🌊🌊
 
-`flood` is a tool for benchmarking and load testing EVM nodes
+`flood` is a load testing tool for benchmarking EVM nodes over RPC
 
 For each RPC method, `flood` measures the effect of load on metrics such as:
 1. throughput
