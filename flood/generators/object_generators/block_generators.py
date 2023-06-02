@@ -26,12 +26,13 @@ def generate_block_numbers(
     # generate blocks
     all_blocks = np.arange(start_block, end_block + 1)
     chosen = gen.choice(all_blocks, size=n, replace=replace)
+    chosen = chosen.tolist()
 
     # sort
     if sort:
-        return sorted(chosen)
-    else:
-        return list(chosen)
+        chosen = sorted(chosen)
+
+    return chosen
 
 
 def generate_block_hashes(
