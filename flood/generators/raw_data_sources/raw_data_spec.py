@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 
+samples_version = 'v1_0_0'
+
 url_root_template = (
     'https://datasets.paradigm.xyz/evm_samples/{network}_samples__{version}/'
 )
