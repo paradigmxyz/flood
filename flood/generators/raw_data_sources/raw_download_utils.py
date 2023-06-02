@@ -8,10 +8,11 @@ from . import raw_data_spec
 def download_samples(
     *,
     network: str,
-    size: str,
+    sizes: str | typing.Sequence[str],
     datatypes: typing.Sequence[str] | str | None = None,
     version: str | None = None,
     output_dir: str | None = None,
+    only_missing: bool = False,
     verbose: bool = True,
 ) -> None:
     import os
@@ -26,23 +27,35 @@ def download_samples(
         datatypes = raw_data_spec.default_datatypes
     if isinstance(datatypes, str):
         datatypes = [datatypes]
+    if isinstance(sizes, str):
+        sizes = [sizes]
+    elif isinstance(sizes, list):
+        pass
+    elif isinstance(sizes, dict):
+        sizes = list(sizes.keys())
+    else:
+        raise Exception()
     url_root = raw_data_spec.url_root_template.format(
         network=network, version=version
     )
 
     # download each datatype
     for datatype in datatypes:
-        filename = raw_data_spec.file_template.format(
-            datatype=datatype,
-            network=network,
-            size=size,
-            version=version,
-        )
-        output_path = os.path.join(output_dir, filename)
-        url = url_root + filename
+        for size in sizes:
+            filename = raw_data_spec.file_template.format(
+                datatype=datatype,
+                network=network,
+                size=size,
+                version=version,
+            )
+            output_path = os.path.join(output_dir, filename)
+            url = url_root + filename
 
-        print('downloading', filename)
-        pdp.download_file(url=url, output_path=output_path)
+            if only_missing and os.path.isfile(output_path):
+                continue
+
+            print('downloading', filename)
+            pdp.download_file(url=url, output_path=output_path)
 
 
 def get_flood_samples_dir() -> str:

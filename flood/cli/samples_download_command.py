@@ -17,8 +17,9 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'network, default ethereum',
             },
             {
-                'name': ('-s', '--size'),
-                'help': 'sample size, one of {XS, S, M, L, XL}, default L',
+                'name': ('-s', '--sizes'),
+                'help': 'sample sizes, one of {XS, S, M, L, XL, all}, default L',
+                'nargs': '+',
             },
             {
                 'name': ('-o', '--output-dir'),
@@ -28,27 +29,36 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': ('-d', '--datatypes'),
                 'help': 'datatypes to sample, default all',
             },
+            {
+                'name': ('-m', '--missing'),
+                'help': 'only download missing files',
+                'action': 'store_true',
+            },
         ],
     }
 
 
 def download_samples_command(
     network: str | None,
-    size: str | None,
+    sizes: typing.Sequence[str] | None,
     output_dir: str | None,
     datatypes: typing.Sequence[str] | None,
+    missing: bool,
 ) -> None:
     if network is None:
         network = 'ethereum'
-    if size is None:
-        size = 'L'
+    if sizes is None:
+        sizes = ['L']
+    if sizes == 'all':
+        sizes = list(flood.default_sizes.keys())
     if output_dir is None:
         output_dir = flood.get_flood_samples_dir()
 
     flood.download_samples(
         network=network,
-        size=size,
+        sizes=sizes,
         datatypes=datatypes,
         output_dir=output_dir,
+        only_missing=missing,
     )
 
