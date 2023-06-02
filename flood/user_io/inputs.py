@@ -17,6 +17,16 @@ def get_ctc_alias_url(url: str) -> str | None:
         return None
 
 
+def get_nodes_network(nodes: typing.Mapping[str, spec.Node]) -> str:
+    raise NotImplementedError()
+
+#     request = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
+
+#     networks = []
+#     for node in nodes.values():
+#         chain_id = ctc.rpc.sync_eth_chain_id(context=provider)
+
+
 def parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
     """parse given nodes according to input specification"""
     new_nodes: typing.MutableMapping[str, spec.Node] = {}

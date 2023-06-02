@@ -66,6 +66,8 @@ def load_raw_samples(
         version=version,
         samples_dir=samples_dir,
     )
+    if path is None:
+        raise Exception('no raw samples found to load')
     return pl.read_parquet(path)
 
 
@@ -89,6 +91,8 @@ def load_samples(
         version=version,
         samples_dir=samples_dir,
     )
+    if path is None:
+        raise Exception('no raw samples found to load')
 
     # download data if need be
     pass
@@ -101,11 +105,18 @@ def load_samples(
     }[datatype]
 
     df = pl.scan_parquet(path).select(columns).collect()
+    if n > len(df):
+        import math
+
+        n_copies = math.ceil(n / len(df))
+        df = pl.concat(n_copies * [df])
     if n < len(df):
         df = df.sample(n)
 
     for column in df.select(pl.col(pl.Binary)).columns:
-        df = df.select(('0x' + pl.col(column).bin.encode('hex')).alias(column))
+        df = df.with_columns(
+            ('0x' + pl.col(column).bin.encode('hex')).alias(column)
+        )
 
     if len(columns) == 1:
         return df[columns[0]].to_list()

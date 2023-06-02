@@ -125,6 +125,8 @@ def _run_single(
 
     # parse inputs
     nodes = flood.parse_nodes(nodes)
+    # network = flood.get_nodes_network(nodes)
+    network = 'ethereum'
 
     # create test
     if test is not None:
@@ -147,6 +149,7 @@ def _run_single(
                 'rates': rates,
                 'durations': durations,
                 'vegeta_kwargs': vegeta_kwargs,
+                'network': network,
             },
         )
 

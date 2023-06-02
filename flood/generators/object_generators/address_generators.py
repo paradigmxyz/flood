@@ -5,10 +5,18 @@ import typing
 import flood
 
 
-def generate_contract_addresses(n: int, network: str) -> typing.Sequence[str]:
+def generate_contract_addresses(
+    n: int,
+    network: str,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[str]:
     return flood.load_samples(network=network, datatype='contracts', n=n)
 
 
-def generate_eoas(n: int, network: str) -> typing.Sequence[str]:
+def generate_eoas(
+    n: int,
+    network: str,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[str]:
     return flood.load_samples(network=network, datatype='eoas', n=n)
 

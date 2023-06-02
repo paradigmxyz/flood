@@ -13,6 +13,7 @@ def generate_block_numbers(
     replace: bool = False,
     sort: bool = False,
     random_seed: spec.RandomSeed | None = None,
+    network: str | None = None,
 ) -> typing.Sequence[int]:
     import numpy as np
 
@@ -35,6 +36,7 @@ def generate_block_numbers(
 
 def generate_block_hashes(
     n: int,
+    network: str | None = None,
 ) -> typing.Sequence[str]:
     raise NotImplementedError()
 
@@ -50,6 +52,7 @@ def generate_block_ranges(
     n_attempts: int = 1_000_000,
     random_seed: spec.RandomSeed | None = None,
     method: str = 'strides',
+    network: str | None = None,
 ) -> typing.Sequence[tuple[int, int]]:
     if method == 'strides':
         return _generate_block_ranges_strides(

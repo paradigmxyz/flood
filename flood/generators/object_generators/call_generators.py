@@ -18,6 +18,7 @@ from . import transaction_generators
 def generate_calls_eth_get_block_by_number(
     n_calls: int | None = None,
     *,
+    network: str | None = None,
     block_numbers: typing.Sequence[int] | None = None,
 ) -> typing.Sequence[spec.Call]:
     if block_numbers is None:
@@ -28,6 +29,7 @@ def generate_calls_eth_get_block_by_number(
             random_seed=0,
             start_block=0,
             end_block=16_000_000,
+            network=network,
         )
     return [
         ctc.rpc.construct_eth_get_block_by_number(block_number=block_number)
@@ -38,6 +40,7 @@ def generate_calls_eth_get_block_by_number(
 def generate_calls_eth_get_block_by_hash(
     n_calls: int | None = None,
     *,
+    network: str | None = None,
     block_hashes: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[spec.Call]:
     if block_hashes is None:
@@ -45,6 +48,7 @@ def generate_calls_eth_get_block_by_hash(
             raise Exception('must specify more parameters')
         block_hashes = block_generators.generate_block_hashes(
             n=n_calls,
+            network=network,
         )
     return [
         ctc.rpc.construct_eth_get_block_by_hash(block_hash=block_hash)
@@ -60,6 +64,7 @@ def generate_calls_eth_get_block_by_hash(
 def generate_calls_eth_get_eth_balance(
     n_calls: int | None = None,
     *,
+    network: str,
     addresses: typing.Sequence[str] | None = None,
     block_numbers: typing.Sequence[int] | None = None,
 ) -> typing.Sequence[spec.Call]:
@@ -71,11 +76,14 @@ def generate_calls_eth_get_eth_balance(
             end_block=16_000_000,
             n=n_calls,
             random_seed=0,
+            network=network,
         )
     if addresses is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
-        addresses = address_generators.generate_contract_addresses(n_calls)
+        addresses = address_generators.generate_contract_addresses(
+            n_calls, network=network
+        )
 
     return [
         ctc.rpc.construct_eth_get_balance(
@@ -88,6 +96,7 @@ def generate_calls_eth_get_eth_balance(
 def generate_calls_eth_get_transaction_count(
     n_calls: int | None = None,
     *,
+    network: str,
     addresses: typing.Sequence[str] | None = None,
     block_numbers: typing.Sequence[int] | None = None,
 ) -> typing.Sequence[spec.Call]:
@@ -99,11 +108,12 @@ def generate_calls_eth_get_transaction_count(
             end_block=16_000_000,
             n=n_calls,
             random_seed=0,
+            network=network,
         )
     if addresses is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
-        addresses = address_generators.generate_eoas(n_calls)
+        addresses = address_generators.generate_eoas(n_calls, network=network)
 
     return [
         ctc.rpc.construct_eth_get_transaction_count(
@@ -121,13 +131,15 @@ def generate_calls_eth_get_transaction_count(
 def generate_calls_eth_get_transaction_by_hash(
     n_calls: int | None = None,
     *,
+    network: str,
     transaction_hashes: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[spec.Call]:
     if transaction_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
-            n_calls
+            n_calls,
+            network=network,
         )
     return [
         ctc.rpc.construct_eth_get_transaction_by_hash(
@@ -140,13 +152,15 @@ def generate_calls_eth_get_transaction_by_hash(
 def generate_calls_eth_get_transaction_receipt(
     n_calls: int | None = None,
     *,
+    network: str,
     transaction_hashes: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[spec.Call]:
     if transaction_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
-            n_calls
+            n_calls,
+            network=network,
         )
     return [
         ctc.rpc.construct_eth_get_transaction_receipt(
@@ -178,6 +192,7 @@ def generate_calls_eth_get_logs(
     contract_address: str | None = None,
     topics: typing.Sequence[str | None] | None = None,
     block_ranges: typing.Sequence[tuple[int, int]] | None = None,
+    network: str | None = None,
 ) -> typing.Sequence[spec.Call]:
     if contract_address is None:
         contract_address = contracts['USDC']
@@ -190,6 +205,7 @@ def generate_calls_eth_get_logs(
             n=n_calls,
             range_size=100,
             random_seed=0,
+            network=network,
         )
     if topics is None:
         topics = [event_hashes['Transfer']]
@@ -212,6 +228,7 @@ def generate_calls_eth_get_logs(
 def generate_calls_eth_get_code(
     n_calls: int | None = None,
     *,
+    network: str,
     addresses: typing.Sequence[str] | None = None,
     block_numbers: typing.Sequence[int | typing.Literal['latest']]
     | None = None,
@@ -224,11 +241,15 @@ def generate_calls_eth_get_code(
             end_block=16_000_000,
             n=n_calls,
             random_seed=0,
+            network=network,
         )
     if addresses is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
-        addresses = address_generators.generate_contract_addresses(n_calls)
+        addresses = address_generators.generate_contract_addresses(
+            n_calls,
+            network=network,
+        )
     return [
         ctc.rpc.construct_eth_get_code(
             address=address, block_number=block_number
@@ -240,6 +261,7 @@ def generate_calls_eth_get_code(
 def generate_calls_eth_get_storage_at(
     n_calls: int | None = None,
     *,
+    network: str,
     slots: typing.Sequence[tuple[str, str]] | None = None,
     block_numbers: typing.Sequence[int | typing.Literal['latest']]
     | None = None,
@@ -252,11 +274,12 @@ def generate_calls_eth_get_storage_at(
             end_block=16_000_000,
             n=n_calls,
             random_seed=0,
+            network=network,
         )
     if slots is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
-        slots = slot_generators.generate_slots(n_calls)
+        slots = slot_generators.generate_slots(n_calls, network=network)
     return [
         ctc.rpc.construct_eth_get_storage_at(
             address=address, position=slot, block_number=block_number
@@ -277,4 +300,101 @@ def generate_calls_eth_get_storage_at(
 #         )
 #         for address, block_number in zip(addresses, block_numbers)
 #     ]
+
+
+#
+# # traces
+#
+
+
+def generate_calls_trace_block(
+    n_calls: int | None = None,
+    *,
+    block_numbers: typing.Sequence[int] | None = None,
+    network: str | None = None,
+) -> typing.Sequence[spec.Call]:
+    if block_numbers is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        block_numbers = block_generators.generate_block_numbers(
+            n=n_calls,
+            random_seed=0,
+            start_block=0,
+            end_block=16_000_000,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_block(block_number=block_number)
+        for block_number in block_numbers
+    ]
+
+
+def generate_calls_trace_transaction(
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
+    network: str | None = None,
+) -> typing.Sequence[spec.Call]:
+    if transaction_hashes is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        if network is None:
+            raise Exception('must specify network')
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n=n_calls,
+            random_seed=0,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_transaction(transaction_hash=transaction_hash)
+        for transaction_hash in transaction_hashes
+    ]
+
+
+def generate_calls_trace_replay_block_transactions(
+    n_calls: int | None = None,
+    *,
+    block_numbers: typing.Sequence[int] | None = None,
+    network: str | None = None,
+) -> typing.Sequence[spec.Call]:
+    if block_numbers is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        block_numbers = block_generators.generate_block_numbers(
+            n=n_calls,
+            random_seed=0,
+            start_block=0,
+            end_block=16_000_000,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_replay_block_transactions(
+            block_number=block_number, trace_type=['trace'],
+        )
+        for block_number in block_numbers
+    ]
+
+
+def generate_calls_trace_replay_transaction(
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
+    network: str | None = None,
+) -> typing.Sequence[spec.Call]:
+    if transaction_hashes is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        if network is None:
+            raise Exception('must specify network')
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n=n_calls,
+            random_seed=0,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_replay_transaction(
+            transaction_hash=transaction_hash, trace_type=['trace'],
+        )
+        for transaction_hash in transaction_hashes
+    ]
 
