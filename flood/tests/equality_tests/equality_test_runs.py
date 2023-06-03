@@ -53,7 +53,9 @@ def run_equality_test(
 
         # dispatch call
         results = []
+        responses = []
         for node in nodes.values():
+            response = None
             try:
                 response = requests.post(
                     url=node['url'], data=json.dumps(call), headers=headers
@@ -65,11 +67,16 @@ def run_equality_test(
                     result = None
             except Exception:
                 result = None
+            responses.append(response)
             results.append(result)
 
         # print summary
         success = _summarize_result(
-            results=results, nodes=nodes, test=test, call=call
+            responses=responses,
+            results=results,
+            nodes=nodes,
+            test=test,
+            call=call,
         )
         if success:
             successful.append(test_name)
@@ -103,6 +110,7 @@ def json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
 
 
 def _summarize_result(
+    responses: typing.Sequence[typing.Any],
     results: typing.Sequence[typing.Any],
     nodes: flood.Nodes,
     test: flood.EqualityTest,
@@ -129,11 +137,15 @@ def _summarize_result(
 
         if any(result is None for result in results):
             print()
-        for node, result in zip(nodes.values(), results):
+        for node, result, response in zip(nodes.values(), results, responses):
             if result is None:
                 toolstr.print(
                     node['name'] + ' failed', style=flood.styles['title']
                 )
+                if response.status_code == 200:
+                    print('response:', response.json())
+                else:
+                    print('response: status code ', response.status_code)
 
         if results[0] is None or results[1] is None:
             return False
@@ -206,7 +218,28 @@ def _print_result_diff(
                     key=node['name'], value=str(len(result)) + ' results'
                 )
         else:
-            raise NotImplementedError()
+            import json
+
+            print('differences:')
+            n_printed = 0
+            for i, (item0, item1) in enumerate(zip(result0, result1)):
+                if not json_equal(item0, item1):
+
+                    if n_printed >= 10:
+                        print('...')
+                        break
+
+                    item0_str = json.dumps(item0)
+                    if len(item0_str) > 20:
+                        item0_str = item0_str[:17] + '...'
+                    item1_str = json.dumps(item1)
+                    if len(item1_str) > 20:
+                        item1_str = item1_str[:17] + '...'
+                    print('- item at index', i)
+                    print('    -', nodes[0]['name'] + ':', item0_str)
+                    print('    -', nodes[1]['name'] + ':', item1_str)
+
+                    n_printed += 1
 
     else:
         if result1 != result0:
