@@ -50,12 +50,15 @@ def test_parse_node(
     else:
         assert parsed['name'] == unnamed_node_str
 
+    pieces = node_url.split(':')[0].split('.')
+    is_ip = len(pieces) == 4 and all(
+        piece.isdecimal() for piece in pieces
+    )
+
     if url_prefix != '':
         assert parsed['url'] == node_url
     elif (
-        node_url.startswith('localhost')
-        or node_url.startswith('0.0.0.0')
-        or node_url.startswith('127.0.0.1')
+        node_url.startswith('localhost') or is_ip
     ):
         assert parsed['url'] == 'http://' + node_url
     else:
