@@ -23,7 +23,7 @@ def generate_test_eth_get_balance(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -48,7 +48,7 @@ def generate_test_eth_get_transaction_count(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,

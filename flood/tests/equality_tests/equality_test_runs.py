@@ -129,7 +129,7 @@ def run_equality_test(
     toolstr.print('summary saved to: ' + file_path, style=flood.styles['comment'])
 
 
-def json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
+def _json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
     import json
 
     return json.dumps(lhs, sort_keys=True) == json.dumps(rhs, sort_keys=True)
@@ -146,7 +146,7 @@ def _summarize_result(
 
     test_name, constructor, args, kwargs = test
 
-    if not json_equal(results[0], results[1]):
+    if not _json_equal(results[0], results[1]):
         print()
         flood.print_text_box('Discrepancies in ' + test_name)
         print()
@@ -221,7 +221,7 @@ def _print_result_diff(
 
         rows = []
         for key in keys0 & keys1:
-            if not json_equal(result0[key], result1[key]):
+            if not _json_equal(result0[key], result1[key]):
                 row = [key, result0[key], result1[key]]
                 rows.append(row)
         if len(rows) > 0:
@@ -249,7 +249,7 @@ def _print_result_diff(
             print('differences:')
             n_printed = 0
             for i, (item0, item1) in enumerate(zip(result0, result1)):
-                if not json_equal(item0, item1):
+                if not _json_equal(item0, item1):
 
                     if n_printed >= 10:
                         print('...')

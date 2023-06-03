@@ -5,7 +5,7 @@ import typing
 from . import raw_data_spec
 
 
-def download_samples(
+def download_raw_data(
     *,
     network: str,
     sizes: str | typing.Sequence[str],
@@ -35,14 +35,14 @@ def download_samples(
         sizes = list(sizes.keys())
     else:
         raise Exception()
-    url_root = raw_data_spec.url_root_template.format(
+    url_root = raw_data_spec.raw_data_url_template.format(
         network=network, version=version
     )
 
     # download each datatype
     for datatype in datatypes:
         for size in sizes:
-            filename = raw_data_spec.file_template.format(
+            filename = raw_data_spec.raw_data_file_template.format(
                 datatype=datatype,
                 network=network,
                 size=size,

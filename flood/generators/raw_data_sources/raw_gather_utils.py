@@ -47,7 +47,7 @@ def create_samples_dataset(
         print('collecting samples...')
 
     # collect samples
-    samples = create_raw_samples(
+    samples = _create_raw_samples(
         n=max_size,
         network='ethereum',
         datatypes=datatypes,
@@ -56,7 +56,7 @@ def create_samples_dataset(
     # write sample files
     if verbose:
         print('writing samples to disk...')
-    write_raw_samples(
+    _write_raw_samples(
         samples=samples,
         output_dir=output_dir,
         sizes=sizes,
@@ -68,7 +68,7 @@ def create_samples_dataset(
         print('sample dataset completed')
 
 
-def create_raw_samples(
+def _create_raw_samples(
     n: int,
     network: str,
     datatypes: typing.Sequence[str] | None = None,
@@ -162,7 +162,7 @@ def create_raw_samples(
     return samples
 
 
-def write_raw_samples(
+def _write_raw_samples(
     samples: typing.Mapping[str, pl.DataFrame],
     *,
     output_dir: str,
@@ -172,7 +172,9 @@ def write_raw_samples(
 ) -> None:
     import os
 
-    path_template = os.path.join(output_dir, raw_data_spec.file_template)
+    path_template = os.path.join(
+        output_dir, raw_data_spec.raw_data_file_template
+    )
     if sizes is None:
         sizes = raw_data_spec.default_sizes
 

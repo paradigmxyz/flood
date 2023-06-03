@@ -23,7 +23,7 @@ def generate_test_trace_block(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -48,7 +48,7 @@ def generate_test_trace_transaction(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -73,7 +73,7 @@ def generate_test_trace_replay_block_transactions(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -98,7 +98,7 @@ def generate_test_trace_replay_transaction(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,

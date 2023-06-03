@@ -54,7 +54,7 @@ def download_samples_command(
     if output_dir is None:
         output_dir = flood.get_flood_samples_dir()
 
-    flood.download_samples(
+    flood.download_raw_data(
         network=network,
         sizes=sizes,
         datatypes=datatypes,

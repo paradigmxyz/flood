@@ -50,23 +50,23 @@ def get_test_generator_display_name(test: str | flood.LoadTestGenerator) -> str:
         raise Exception()
     test = test[len('generate_test_') :]
     head, tail = test.split('_', 1)
-    test = head + '_' + snake_case_to_camel_case(tail)
+    test = head + '_' + _snake_case_to_camel_case(tail)
     return test
 
 
 def get_test_generator_function_name(display_name: str) -> str:
-    function_name = 'generate_test_' + camel_case_to_snake_case(display_name)
+    function_name = 'generate_test_' + _camel_case_to_snake_case(display_name)
     return function_name
 
 
-def camel_case_to_snake_case(string: str) -> str:
+def _camel_case_to_snake_case(string: str) -> str:
     # adapted from https://stackoverflow.com/a/1176023
     import re
 
     return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
 
 
-def snake_case_to_camel_case(string: str) -> str:
+def _snake_case_to_camel_case(string: str) -> str:
     pieces = string.split('_')
     return pieces[0] + ''.join(piece.title() for piece in pieces[1:])
 

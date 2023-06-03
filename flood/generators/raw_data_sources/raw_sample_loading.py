@@ -15,7 +15,7 @@ def get_raw_samples_path(
     datatype: str,
     *,
     size: str | None = None,
-    version: str = raw_data_spec.samples_version,
+    version: str = raw_data_spec.raw_data_version,
     samples_dir: str | None = None,
 ) -> str | None:
     import os
@@ -29,7 +29,7 @@ def get_raw_samples_path(
     if size == 'largest_available':
         import glob
 
-        path_glob = flood.file_template.format(
+        path_glob = raw_data_spec.raw_data_file_template.format(
             network=network,
             datatype=datatype,
             size='*',
@@ -43,7 +43,7 @@ def get_raw_samples_path(
             return None
 
     else:
-        filename = flood.file_template.format(
+        filename = raw_data_spec.raw_data_file_template.format(
             network=network,
             datatype=datatype,
             size=size,
@@ -57,7 +57,7 @@ def load_raw_samples(
     datatype: str,
     *,
     size: str | None = None,
-    version: str = raw_data_spec.samples_version,
+    version: str = raw_data_spec.raw_data_version,
     samples_dir: str | None = None,
     download_missing: str | None = 'L',
 ) -> pl.DataFrame:
@@ -72,7 +72,7 @@ def load_raw_samples(
         if download_missing is not None:
             if size is None:
                 size = 'L'
-            raw_download_utils.download_samples(
+            raw_download_utils.download_raw_data(
                 network=network,
                 datatypes=[datatype],
                 version=version,
@@ -99,7 +99,7 @@ def load_samples(
     n: int,
     *,
     size: str | None = None,
-    version: str = raw_data_spec.samples_version,
+    version: str = raw_data_spec.raw_data_version,
     samples_dir: str | None = None,
     binary_convert: bool = True,
     download_missing: bool = True,
@@ -120,7 +120,7 @@ def load_samples(
         if download_missing:
             if size is None:
                 size = 'L'
-            raw_download_utils.download_samples(
+            raw_download_utils.download_raw_data(
                 network=network,
                 datatypes=[datatype],
                 version=version,

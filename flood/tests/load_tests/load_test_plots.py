@@ -99,7 +99,7 @@ def plot_load_test_latencies(
     import matplotlib.pyplot as plt
 
     if colors is None:
-        colors = dict(zip(results.keys(), flood.colors.values()))
+        colors = dict(zip(results.keys(), flood.plot_colors.values()))
 
     if yscale_log:
         ymin = None

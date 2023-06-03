@@ -22,7 +22,7 @@ styles: toolcli.StyleTheme = {
 }
 
 
-colors = {
+plot_colors = {
     'orange_shades': [
         'darkgoldenrod',
         'darkorange',
@@ -61,19 +61,6 @@ def _get_tqdm() -> types.ModuleType:
     import tqdm  # type: ignore
 
     return tqdm
-
-
-def outputs_to_dataframe(
-    outputs: typing.Mapping[str, spec.LoadTestOutput]
-) -> pl.DataFrame:
-    import polars as pl
-
-    return pl.concat(
-        [
-            pl.DataFrame(data).with_columns(pl.lit(name).alias('test'))
-            for name, data in outputs.items()
-        ]
-    )
 
 
 def print_load_test_summary(test: flood.LoadTest) -> None:

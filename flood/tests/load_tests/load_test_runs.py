@@ -157,7 +157,7 @@ def run_load_test(
     if test is None:
         if rates is None or calls is None:
             raise Exception('specify rates and calls')
-        test = load_test_construction.construct_load_test(
+        test = load_test_construction.create_load_test(
             rates=rates,
             calls=calls,
             duration=duration,

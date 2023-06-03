@@ -41,7 +41,7 @@ def samples_ls_command() -> None:
         missing = []
         for size in flood.default_sizes:
             for datatype in flood.default_datatypes:
-                filename = flood.file_template.format(
+                filename = flood.raw_data_file_template.format(
                     network=network,
                     size=size,
                     datatype=datatype,

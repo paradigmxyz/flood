@@ -29,7 +29,7 @@ def estimate_call_count(
     return n_calls
 
 
-def construct_load_test(
+def create_load_test(
     calls: typing.Sequence[typing.Any],
     rates: typing.Sequence[int],
     duration: int | None = None,

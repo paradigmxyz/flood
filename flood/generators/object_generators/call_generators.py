@@ -200,13 +200,13 @@ def generate_calls_eth_get_transaction_receipt(
 # # logs
 #
 
-contracts = {
+_default_contracts = {
     'USDC': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     'DAI': '0x6b175474e89094c44da98b954eedeac495271d0f',
     'LUSD': '0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
 }
 
-event_hashes = {
+_default_event_hashes = {
     'Transfer': '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
     'Approval': '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
 }
@@ -224,7 +224,7 @@ def generate_calls_eth_get_logs(
     import ctc.rpc
 
     if contract_address is None:
-        contract_address = contracts['USDC']
+        contract_address = _default_contracts['USDC']
     if block_ranges is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -237,7 +237,7 @@ def generate_calls_eth_get_logs(
             network=network,
         )
     if topics is None:
-        topics = [event_hashes['Transfer']]
+        topics = [_default_event_hashes['Transfer']]
     return [
         ctc.rpc.construct_eth_get_logs(
             address=contract_address,

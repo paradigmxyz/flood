@@ -22,7 +22,7 @@ def generate_test_eth_get_transaction_by_hash(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -47,7 +47,7 @@ def generate_test_eth_get_transaction_receipt(
         network=network,
         random_seed=random_seed,
     )
-    return flood.construct_load_test(
+    return flood.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
