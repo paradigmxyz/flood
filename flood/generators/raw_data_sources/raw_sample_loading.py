@@ -140,7 +140,7 @@ def load_samples(
 
     columns = {
         'contracts': ['contract_address'],
-        'eoa': ['eoas'],
+        'eoas': ['eoa'],
         'transactions': ['transaction_hash'],
         'slots': ['contract_address', 'slot'],
     }[datatype]
