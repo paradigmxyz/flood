@@ -71,6 +71,8 @@ def plot_load_test_throughput(
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
+    import matplotlib.pyplot as plt
+
     plot_load_test_result_metrics(
         results=results,
         metrics=['throughput'],
@@ -80,6 +82,7 @@ def plot_load_test_throughput(
         ylabel='throughput\n(responses per second)',
         ymin=0,
     )
+    plt.legend(loc='upper left')
 
 
 def plot_load_test_latencies(
@@ -93,6 +96,8 @@ def plot_load_test_latencies(
     test_name: str | None = None,
     yscale_log: bool = False,
 ) -> None:
+    import matplotlib.pyplot as plt
+
     if colors is None:
         colors = dict(zip(results.keys(), flood.colors.values()))
 
@@ -111,6 +116,7 @@ def plot_load_test_latencies(
         ylabel='latency (seconds)',
         yscale_log=yscale_log,
     )
+    plt.legend(loc='upper left')
 
 
 def plot_load_test_result_metrics(
