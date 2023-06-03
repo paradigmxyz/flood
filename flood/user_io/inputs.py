@@ -20,6 +20,7 @@ def get_ctc_alias_url(url: str) -> str | None:
 def get_nodes_network(nodes: typing.Mapping[str, spec.Node]) -> str:
     raise NotImplementedError()
 
+
 #     request = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
 
 #     networks = []
@@ -91,14 +92,44 @@ def parse_node(node: str | spec.Node) -> spec.Node:
             else:
                 url = 'https://' + url
 
+        client_version = get_node_client_version(url=url, remote=remote)
+
         return {
             'name': name,
             'url': url,
             'remote': remote,
+            'client_version': client_version,
         }
 
     else:
         raise Exception('invalid node format')
+
+
+def get_node_client_version(url: str, remote: str | None = None) -> str | None:
+    try:
+        if remote is None:
+            import ctc.rpc
+
+            info: str = ctc.rpc.sync_web3_client_version(
+                context={'provider': url}
+            )
+            return info
+        else:
+            import json
+            import subprocess
+
+            cmd = [
+                """ssh""",
+                remote,
+                """curl -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\": \"2.0\", \"method\": \"web3_clientVersion\", \"params\": [], \"id\": 1}' """
+                + url,
+            ]
+            output = subprocess.check_output(cmd, stderr=subprocess.DEVNULL)
+            response = json.loads(output)
+            info = response['result']
+            return info
+    except Exception:
+        return None
 
 
 def parse_test_data(test: spec.LoadTest) -> spec.LoadTestColumnWise:

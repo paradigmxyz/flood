@@ -18,6 +18,7 @@ if typing.TYPE_CHECKING:
         name: str
         url: str
         remote: str | None
+        client_version: str | None
 
     NodeShorthand = typing.Union[str, Node]
 

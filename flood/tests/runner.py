@@ -315,9 +315,7 @@ def _print_single_run_preamble(
     )
     dt = datetime.datetime.now()
     if dt.microsecond >= 500_000:
-        dt = dt + datetime.timedelta(
-            microseconds=1_000_000 - dt.microsecond
-        )
+        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
     else:
         dt = dt - datetime.timedelta(microseconds=dt.microsecond)
     timestamp = (
@@ -325,9 +323,7 @@ def _print_single_run_preamble(
         + toolstr.add_style(str(dt), flood.styles['metavar'])
         + toolstr.add_style(']', flood.styles['content'])
     )
-    toolstr.print(
-        timestamp + ' Starting'
-    )
+    toolstr.print(timestamp + ' Starting')
 
 
 def _get_node_str(node: flood.Node) -> str:
@@ -335,6 +331,8 @@ def _get_node_str(node: flood.Node) -> str:
     remote = node['remote']
     if remote is not None:
         node_str += ' remote=' + remote
+    if node['client_version'] is not None:
+        node_str = node_str + ' version=' + node['client_version']
     return node_str
 
 
@@ -351,9 +349,7 @@ def _print_single_run_conclusion(
 
     dt = datetime.datetime.now()
     if dt.microsecond >= 500_000:
-        dt = dt + datetime.timedelta(
-            microseconds=1_000_000 - dt.microsecond
-        )
+        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
     else:
         dt = dt - datetime.timedelta(microseconds=dt.microsecond)
     timestamp = (
@@ -361,9 +357,7 @@ def _print_single_run_conclusion(
         + toolstr.add_style(str(dt), flood.styles['metavar'])
         + toolstr.add_style(']', flood.styles['content'])
     )
-    toolstr.print(
-        timestamp + ' Load tests completed.'
-    )
+    toolstr.print(timestamp + ' Load tests completed.')
 
     # print message about metrics file
     if output_dir is not None:
