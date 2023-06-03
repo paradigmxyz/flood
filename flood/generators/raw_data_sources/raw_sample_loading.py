@@ -4,6 +4,7 @@ import typing
 
 import flood
 from . import raw_data_spec
+from . import raw_download_utils
 
 if typing.TYPE_CHECKING:
     import polars as pl
@@ -58,6 +59,7 @@ def load_raw_samples(
     size: str | None = None,
     version: str = raw_data_spec.samples_version,
     samples_dir: str | None = None,
+    download_missing: str | None = 'L',
 ) -> pl.DataFrame:
     path = get_raw_samples_path(
         datatype=datatype,
@@ -67,7 +69,27 @@ def load_raw_samples(
         samples_dir=samples_dir,
     )
     if path is None:
-        raise Exception('no raw samples found to load')
+        if download_missing is not None:
+            if size is None:
+                size = 'L'
+            raw_download_utils.download_samples(
+                network=network,
+                datatypes=[datatype],
+                version=version,
+                output_dir=samples_dir,
+                sizes=[download_missing],
+            )
+            path = get_raw_samples_path(
+                datatype=datatype,
+                network=network,
+                size=size,
+                version=version,
+                samples_dir=samples_dir,
+            )
+            if path is None:
+                raise Exception('could not download necessary data')
+        else:
+            raise Exception('no raw samples found to load')
     return pl.read_parquet(path)
 
 
@@ -80,6 +102,7 @@ def load_samples(
     version: str = raw_data_spec.samples_version,
     samples_dir: str | None = None,
     binary_convert: bool = True,
+    download_missing: bool = True,
 ) -> typing.Sequence[typing.Any]:
     import polars as pl
 
@@ -92,10 +115,28 @@ def load_samples(
         samples_dir=samples_dir,
     )
     if path is None:
-        raise Exception('no raw samples found to load')
-
-    # download data if need be
-    pass
+        # download data if need be
+        if download_missing:
+            if size is None:
+                size = 'L'
+            raw_download_utils.download_samples(
+                network=network,
+                datatypes=[datatype],
+                version=version,
+                output_dir=samples_dir,
+                sizes=[size],
+            )
+            path = get_raw_samples_path(
+                datatype=datatype,
+                network=network,
+                size=size,
+                version=version,
+                samples_dir=samples_dir,
+            )
+            if path is None:
+                raise Exception('could not download necessary data')
+        else:
+            raise Exception('no raw samples found to load')
 
     columns = {
         'contracts': ['contract_address'],
