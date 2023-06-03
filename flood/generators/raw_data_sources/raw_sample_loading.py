@@ -103,6 +103,7 @@ def load_samples(
     samples_dir: str | None = None,
     binary_convert: bool = True,
     download_missing: bool = True,
+    random_seed: flood.RandomSeed | None = None,
 ) -> typing.Sequence[typing.Any]:
     import polars as pl
 
@@ -152,7 +153,9 @@ def load_samples(
         n_copies = math.ceil(n / len(df))
         df = pl.concat(n_copies * [df])
     if n < len(df):
-        df = df.sample(n)
+        rng = flood.get_rng(random_seed=random_seed)
+        seed = rng.integers(1_000_000_000, size=1)[0]
+        df = df.sample(n, shuffle=True, seed=seed)
 
     for column in df.select(pl.col(pl.Binary)).columns:
         df = df.with_columns(

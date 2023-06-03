@@ -17,7 +17,11 @@ def generate_test_eth_get_logs(
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generate_calls_eth_get_logs(n_calls, network=network)
+    calls = flood.generate_calls_eth_get_logs(
+        n_calls,
+        network=network,
+        random_seed=random_seed,
+    )
     return flood.construct_load_test(
         calls=calls,
         rates=rates,

@@ -10,5 +10,10 @@ def generate_transaction_hashes(
     network: str,
     random_seed: flood.RandomSeed | None = None,
 ) -> typing.Sequence[str]:
-    return flood.load_samples(network=network, datatype='transactions', n=n)
+    return flood.load_samples(
+        network=network,
+        datatype='transactions',
+        n=n,
+        random_seed=random_seed,
+    )
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from flood import spec
+from .. import rng_utils
 
 
 def generate_block_numbers(
@@ -18,14 +19,11 @@ def generate_block_numbers(
     import numpy as np
 
     # seed a generator
-    if random_seed is None:
-        random_seed = 0
-    if isinstance(random_seed, int):
-        gen = np.random.Generator(np.random.PCG64(random_seed))
+    rng = rng_utils.get_rng(random_seed=random_seed)
 
     # generate blocks
     all_blocks = np.arange(start_block, end_block + 1)
-    chosen_array = gen.choice(all_blocks, size=n, replace=replace)
+    chosen_array = rng.choice(all_blocks, size=n, replace=replace)
     chosen: list[int] = chosen_array.tolist()
 
     # sort
@@ -38,6 +36,7 @@ def generate_block_numbers(
 def generate_block_hashes(
     n: int,
     network: str | None = None,
+    random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[str]:
     raise NotImplementedError()
 
@@ -94,18 +93,16 @@ def _generate_block_ranges_strides(
 ) -> typing.Sequence[tuple[int, int]]:
     import numpy as np
 
-    if random_seed is None:
-        random_seed = 0
-    if isinstance(random_seed, int):
-        gen = np.random.Generator(np.random.PCG64(random_seed))
+    # seed a generator
+    rng = rng_utils.get_rng(random_seed=random_seed)
 
     block_ranges: list[tuple[int, int]] = []
     while len(block_ranges) < n:
         random_phases = list(range(range_size))
-        gen.shuffle(random_phases)
+        rng.shuffle(random_phases)
         for random_phase in random_phases:
             strides = np.arange(start_block + random_phase, end_block, range_size)
-            gen.shuffle(strides)
+            rng.shuffle(strides)
             n_missing = n - len(block_ranges)
             if n_missing > 0:
                 for stride in strides[:n_missing]:
@@ -127,13 +124,8 @@ def _generate_block_ranges_individual(
     n_attempts: int = 1_000_000,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[tuple[int, int]]:
-    import numpy as np
-
     # seed a generator
-    if random_seed is None:
-        random_seed = 0
-    if isinstance(random_seed, int):
-        gen = np.random.Generator(np.random.PCG64(random_seed))
+    rng = rng_utils.get_rng(random_seed=random_seed)
 
     # create starting sample
     start_blocks = generate_block_numbers(
@@ -161,7 +153,7 @@ def _generate_block_ranges_individual(
         try:
             start = next(candidates)
         except StopIteration:
-            start = gen.integers(start_block, end_block)
+            start = rng.integers(start_block, end_block)
         end = start + range_size
         candidate = (start, end)
 
@@ -186,6 +178,6 @@ def _generate_block_ranges_individual(
         return sorted(ranges)
     else:
         ranges_list = list(ranges)
-        gen.shuffle(ranges_list)
+        rng.shuffle(ranges_list)
         return ranges_list
 

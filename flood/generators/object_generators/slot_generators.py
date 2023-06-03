@@ -9,5 +9,10 @@ def generate_slots(
     network: str,
     random_seed: flood.RandomSeed | None = None,
 ) -> typing.Sequence[tuple[str, str]]:
-    return flood.load_samples(network=network, datatype='slots', n=n)
+    return flood.load_samples(
+        network=network,
+        datatype='slots',
+        n=n,
+        random_seed=random_seed,
+    )
 

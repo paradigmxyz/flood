@@ -150,6 +150,7 @@ def _run_single(
                 'durations': durations,
                 'vegeta_kwargs': vegeta_kwargs,
                 'network': network,
+                'random_seed': random_seed,
             },
         )
 

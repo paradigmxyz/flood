@@ -20,6 +20,7 @@ def generate_test_eth_get_transaction_by_hash(
     calls = flood.generate_calls_eth_get_transaction_by_hash(
         n_calls=n_calls,
         network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,
@@ -44,6 +45,7 @@ def generate_test_eth_get_transaction_receipt(
     calls = flood.generate_calls_eth_get_transaction_receipt(
         n_calls=n_calls,
         network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,

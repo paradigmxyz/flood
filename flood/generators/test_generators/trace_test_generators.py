@@ -18,7 +18,11 @@ def generate_test_trace_block(
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generate_calls_trace_block(n_calls=n_calls, network=network)
+    calls = flood.generate_calls_trace_block(
+        n_calls=n_calls,
+        network=network,
+        random_seed=random_seed,
+    )
     return flood.construct_load_test(
         calls=calls,
         rates=rates,
@@ -40,7 +44,9 @@ def generate_test_trace_transaction(
         rates=rates, duration=duration, durations=durations
     )
     calls = flood.generate_calls_trace_transaction(
-        n_calls=n_calls, network=network
+        n_calls=n_calls,
+        network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,
@@ -63,7 +69,9 @@ def generate_test_trace_replay_block_transactions(
         rates=rates, duration=duration, durations=durations
     )
     calls = flood.generate_calls_trace_replay_block_transactions(
-        n_calls=n_calls, network=network
+        n_calls=n_calls,
+        network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,
@@ -86,7 +94,9 @@ def generate_test_trace_replay_transaction(
         rates=rates, duration=duration, durations=durations
     )
     calls = flood.generate_calls_trace_replay_transaction(
-        n_calls=n_calls, network=network
+        n_calls=n_calls,
+        network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,

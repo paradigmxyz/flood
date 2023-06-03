@@ -19,7 +19,9 @@ def generate_test_eth_get_balance(
         rates=rates, duration=duration, durations=durations
     )
     calls = flood.generate_calls_eth_get_eth_balance(
-        n_calls=n_calls, network=network
+        n_calls=n_calls,
+        network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,
@@ -42,7 +44,9 @@ def generate_test_eth_get_transaction_count(
         rates=rates, duration=duration, durations=durations
     )
     calls = flood.generate_calls_eth_get_transaction_count(
-        n_calls=n_calls, network=network
+        n_calls=n_calls,
+        network=network,
+        random_seed=random_seed,
     )
     return flood.construct_load_test(
         calls=calls,
