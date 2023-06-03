@@ -13,7 +13,7 @@ For each RPC method, `flood` measures the effect of load on metrics such as:
 - different hardware configurations (e.g. local vs cloud vs low memory vs RAID-0)
 - different RPC providers (e.g. Alchemy vs Quicknode vs Infura)
 
-`flood` can generate tables, figures, and reports for easy sharing of results (example report [here])
+`flood` can generate tables, figures, and reports for easy sharing of results (example report [here](https://datasets.paradigm.xyz/notebooks/flood/example_report.html))
 
 
 ## Installation
