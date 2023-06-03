@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ctc.rpc
 import typing
 
 from flood import spec
@@ -22,6 +21,8 @@ def generate_calls_eth_get_block_by_number(
     block_numbers: typing.Sequence[int] | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -45,6 +46,8 @@ def generate_calls_eth_get_block_by_hash(
     block_hashes: typing.Sequence[str] | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -72,6 +75,8 @@ def generate_calls_eth_get_eth_balance(
     block_numbers: typing.Sequence[int] | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -107,6 +112,8 @@ def generate_calls_eth_get_transaction_count(
     block_numbers: typing.Sequence[int] | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -146,6 +153,8 @@ def generate_calls_eth_get_transaction_by_hash(
     transaction_hashes: typing.Sequence[str] | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if transaction_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -169,6 +178,8 @@ def generate_calls_eth_get_transaction_receipt(
     transaction_hashes: typing.Sequence[str] | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if transaction_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -210,6 +221,8 @@ def generate_calls_eth_get_logs(
     network: str | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if contract_address is None:
         contract_address = contracts['USDC']
     if block_ranges is None:
@@ -250,6 +263,8 @@ def generate_calls_eth_get_code(
     | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -285,6 +300,8 @@ def generate_calls_eth_get_storage_at(
     | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -313,6 +330,8 @@ def generate_calls_eth_get_storage_at(
 #     addresses: typing.Sequence[str],
 #     block_numbers: typing.Sequence[int] | None,
 # ) -> typing.Sequence[spec.Call]:
+#     import ctc.rpc
+
 #     if block_numbers is None:
 #         block_numbers = [None] * len(addresses)
 #     return [
@@ -335,6 +354,8 @@ def generate_calls_trace_block(
     network: str | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -358,6 +379,8 @@ def generate_calls_trace_transaction(
     network: str | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if transaction_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -381,6 +404,8 @@ def generate_calls_trace_replay_block_transactions(
     network: str | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if block_numbers is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
@@ -407,6 +432,8 @@ def generate_calls_trace_replay_transaction(
     network: str | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
     if transaction_hashes is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
