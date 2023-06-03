@@ -25,8 +25,8 @@ def generate_block_numbers(
 
     # generate blocks
     all_blocks = np.arange(start_block, end_block + 1)
-    chosen = gen.choice(all_blocks, size=n, replace=replace)
-    chosen = chosen.tolist()
+    chosen_array = gen.choice(all_blocks, size=n, replace=replace)
+    chosen: list[int] = chosen_array.tolist()
 
     # sort
     if sort:

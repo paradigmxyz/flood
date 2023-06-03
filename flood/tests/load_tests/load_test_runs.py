@@ -8,6 +8,9 @@ from flood import spec
 from . import load_test_construction
 from . import vegeta
 
+if typing.TYPE_CHECKING:
+    import multiprocessing
+
 
 def run_load_tests(
     *,
@@ -36,40 +39,102 @@ def run_load_tests(
         'disable': not verbose,
     }
 
+    results = {}
+
     # case: single node and single test
     if node is not None and test is not None:
-        result = run_load_test(node=node, test=test)
-        return {node['name']: result}
+        results[node['name']] = schedule_load_test(node=node, test=test)
 
     # case: single node and multiple tests
     elif node is not None and tests is not None:
-        results = {}
         for name, test in tqdm.tqdm(tests.items(), **pbar):
-            results[name] = run_load_test(node=node, verbose=verbose, test=test)
-        return results
+            results[name] = schedule_load_test(node=node, verbose=verbose, test=test)
 
     # case: multiple nodes and single tests
     elif nodes is not None and test is not None:
-        results = {}
         for name, nd in tqdm.tqdm(nodes.items(), **pbar):
-            results[name] = run_load_test(node=nd, verbose=verbose, test=test)
-        return results
+            results[name] = schedule_load_test(node=nd, verbose=verbose, test=test)
 
     # case: multiple nodes and multiple tests
     elif nodes is not None and tests is not None:
-        results = {}
         for node_name, node in nodes.items():
             for test_name, test in tests.items():
-                results[node_name + '__' + test_name] = run_load_test(
+                results[node_name + '__' + test_name] = schedule_load_test(
                     node=node,
                     verbose=verbose,
                     test=test,
                 )
-        return results
 
     # case: invalid input
     else:
         raise Exception('invalid user_io')
+
+    # join any multiprocessing results
+    joined = {}
+    for name, result in results.items():
+        if isinstance(result, dict):
+            joined[name] = result
+        else:
+            process, queue = result
+            process.join()
+            joined[name] = queue.get()
+
+    return joined
+
+
+def schedule_load_test(
+    *,
+    node: spec.NodeShorthand,
+    test: spec.LoadTest | None = None,
+    rates: typing.Sequence[int] | None = None,
+    calls: typing.Sequence[typing.Any] | None = None,
+    duration: int | None = None,
+    durations: typing.Sequence[int] | None = None,
+    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    verbose: bool | int = False,
+    _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
+) -> (
+    spec.LoadTestOutput
+    | tuple[multiprocessing.Process, multiprocessing.Queue[spec.LoadTestOutput]]
+):
+    """runs local tests synchronously, remote tests asynchronously"""
+
+    node = user_io.parse_node(node)
+    if node['remote'] is not None:
+        import multiprocessing
+
+        queue: multiprocessing.Queue[
+            spec.LoadTestOutput
+        ] = multiprocessing.Queue()
+        process = multiprocessing.Process(
+            target=run_load_test,
+            kwargs=dict(
+                node=node,
+                test=test,
+                rates=rates,
+                calls=calls,
+                duration=duration,
+                durations=durations,
+                vegeta_kwargs=vegeta_kwargs,
+                verbose=verbose,
+                _pbar_kwargs=_pbar_kwargs,
+                _container=queue,
+            ),
+        )
+        process.start()
+        return (process, queue)
+    else:
+        return run_load_test(
+            node=node,
+            test=test,
+            rates=rates,
+            calls=calls,
+            duration=duration,
+            durations=durations,
+            vegeta_kwargs=vegeta_kwargs,
+            verbose=verbose,
+            _pbar_kwargs=_pbar_kwargs,
+        )
 
 
 def run_load_test(
@@ -83,6 +148,7 @@ def run_load_test(
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    _container: multiprocessing.Queue[spec.LoadTestOutput] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test against a single node"""
 
@@ -101,19 +167,24 @@ def run_load_test(
 
     # run tests
     if node.get('remote') is None:
-        return _run_load_test_locally(
+        result = _run_load_test_locally(
             node=node,
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
         )
     else:
-        return _run_load_test_remotely(
+        result = _run_load_test_remotely(
             node=node,
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
         )
+
+    if _container is not None:
+        _container.put(result)
+
+    return result
 
 
 def _run_load_test_locally(
