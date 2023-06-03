@@ -258,6 +258,7 @@ def _print_single_run_preamble(
     rerun_of: str | None = None,
     output_dir: str | None,
 ) -> None:
+    import datetime
     import toolstr
 
     toolstr.print_text_box(
@@ -311,6 +312,21 @@ def _print_single_run_preamble(
         style=flood.styles['content'],
         text_style=flood.styles['metavar'],
     )
+    dt = datetime.datetime.now()
+    if dt.microsecond >= 500_000:
+        dt = dt + datetime.timedelta(
+            microseconds=1_000_000 - dt.microsecond
+        )
+    else:
+        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+    timestamp = (
+        toolstr.add_style('\[', flood.styles['content'])
+        + toolstr.add_style(str(dt), flood.styles['metavar'])
+        + toolstr.add_style(']', flood.styles['content'])
+    )
+    toolstr.print(
+        timestamp + ' Starting'
+    )
 
 
 def _get_node_str(node: flood.Node) -> str:
@@ -328,10 +344,25 @@ def _print_single_run_conclusion(
     verbose: bool | int,
     figures: bool,
 ) -> None:
+    import datetime
     import os
     import toolstr
 
-    print('Load tests completed.')
+    dt = datetime.datetime.now()
+    if dt.microsecond >= 500_000:
+        dt = dt + datetime.timedelta(
+            microseconds=1_000_000 - dt.microsecond
+        )
+    else:
+        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+    timestamp = (
+        toolstr.add_style('\[', flood.styles['content'])
+        + toolstr.add_style(str(dt), flood.styles['metavar'])
+        + toolstr.add_style(']', flood.styles['content'])
+    )
+    toolstr.print(
+        timestamp + ' Load tests completed.'
+    )
 
     # print message about metrics file
     if output_dir is not None:
