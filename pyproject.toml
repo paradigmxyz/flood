@@ -67,3 +67,8 @@ testpaths = [
 ]
 asyncio_mode = 'auto'
 
+[tool.black]
+line-length = 80
+skip-string-normalization = true
+target-version = ['py37']
+
