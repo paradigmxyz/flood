@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import flood
 from flood import spec
 from . import address_generators
 from . import block_generators
@@ -326,20 +327,50 @@ def generate_calls_eth_get_storage_at(
     ]
 
 
-# def generate_calls_eth_call(
-#     addresses: typing.Sequence[str],
-#     block_numbers: typing.Sequence[int] | None,
-# ) -> typing.Sequence[spec.Call]:
-#     import ctc.rpc
+_default_call_datas = {
+    'decimals': '0x313ce567',
+    'totalSupply': '0x18160ddd',
+    'symbol': '0x95d89b41',
+}
 
-#     if block_numbers is None:
-#         block_numbers = [None] * len(addresses)
-#     return [
-#         ctc.rpc.construct_eth_get_storage_at(
-#             address=address, block_number=block_number
-#         )
-#         for address, block_number in zip(addresses, block_numbers)
-#     ]
+
+def generate_calls_eth_call(
+    n_calls: int,
+    network: str,
+    random_seed: spec.RandomSeed | None = None,
+) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
+    if network != 'ethereum':
+        raise Exception('only ethereum supported for eth_call')
+
+    rng = flood.get_rng(random_seed=random_seed)
+    contract_addresses = rng.choice(
+        list(_default_contracts.values()),
+        size=n_calls,
+    )
+    call_datas = rng.choice(
+        list(_default_call_datas.values()),
+        size=n_calls,
+    )
+    block_numbers = block_generators.generate_block_numbers(
+        start_block=10_000_000,
+        end_block=16_000_000,
+        n=n_calls,
+        random_seed=random_seed,
+        network=network,
+    )
+
+    return [
+        ctc.rpc.construct_eth_call(
+            to_address=contract_address,
+            call_data=call_data,
+            block_number=block_number,
+        )
+        for contract_address, call_data, block_number in zip(
+            contract_addresses, call_datas, block_numbers
+        )
+    ]
 
 
 #
@@ -425,6 +456,62 @@ def generate_calls_trace_replay_block_transactions(
     ]
 
 
+def generate_calls_trace_replay_block_transactions_state_diff(
+    n_calls: int | None = None,
+    *,
+    block_numbers: typing.Sequence[int] | None = None,
+    network: str | None = None,
+    random_seed: spec.RandomSeed | None = None,
+) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
+    if block_numbers is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        block_numbers = block_generators.generate_block_numbers(
+            n=n_calls,
+            random_seed=random_seed,
+            start_block=0,
+            end_block=16_000_000,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_replay_block_transactions(
+            block_number=block_number,
+            trace_type=['stateDiff'],
+        )
+        for block_number in block_numbers
+    ]
+
+
+def generate_calls_trace_replay_block_transactions_vm_trace(
+    n_calls: int | None = None,
+    *,
+    block_numbers: typing.Sequence[int] | None = None,
+    network: str | None = None,
+    random_seed: spec.RandomSeed | None = None,
+) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
+    if block_numbers is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        block_numbers = block_generators.generate_block_numbers(
+            n=n_calls,
+            random_seed=random_seed,
+            start_block=0,
+            end_block=16_000_000,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_replay_block_transactions(
+            block_number=block_number,
+            trace_type=['vmTrace'],
+        )
+        for block_number in block_numbers
+    ]
+
+
 def generate_calls_trace_replay_transaction(
     n_calls: int | None = None,
     *,
@@ -448,6 +535,62 @@ def generate_calls_trace_replay_transaction(
         ctc.rpc.construct_trace_replay_transaction(
             transaction_hash=transaction_hash,
             trace_type=['trace'],
+        )
+        for transaction_hash in transaction_hashes
+    ]
+
+
+def generate_calls_trace_replay_transaction_state_diff(
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
+    network: str | None = None,
+    random_seed: spec.RandomSeed | None = None,
+) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
+    if transaction_hashes is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        if network is None:
+            raise Exception('must specify network')
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n=n_calls,
+            random_seed=random_seed,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_replay_transaction(
+            transaction_hash=transaction_hash,
+            trace_type=['stateDiff'],
+        )
+        for transaction_hash in transaction_hashes
+    ]
+
+
+def generate_calls_trace_replay_transaction_vm_trace(
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
+    network: str | None = None,
+    random_seed: spec.RandomSeed | None = None,
+) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
+    if transaction_hashes is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        if network is None:
+            raise Exception('must specify network')
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n=n_calls,
+            random_seed=random_seed,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_trace_replay_transaction(
+            transaction_hash=transaction_hash,
+            trace_type=['vmTrace'],
         )
         for transaction_hash in transaction_hashes
     ]
