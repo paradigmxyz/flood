@@ -12,8 +12,10 @@ def run_equality_test(
     *,
     verbose: bool | int = True,
     random_seed: flood.RandomSeed | None = None,
+    output_dir: str | None = None,
 ) -> None:
     import json
+    import os
     import requests
     import toolstr
 
@@ -29,6 +31,11 @@ def run_equality_test(
         raise NotImplementedError('must use test_name="all" for equality test')
     equality_tests = equality_test_sets.get_all_equality_tests()
 
+    if output_dir is None:
+        import tempfile
+
+        output_dir = tempfile.mkdtemp()
+
     # print preamble
     flood.print_text_box('Running equality test')
     flood.print_bullet(key='nodes', value='')
@@ -43,13 +50,18 @@ def run_equality_test(
     flood.print_bullet(key='methods', value='')
     for test in equality_tests:
         flood.print_bullet(key=test[0], value='', colon_str='', indent=4)
+    flood.print_bullet(key='output_dir', value=output_dir)
 
     successful = []
+    calls = {}
+    call_node_responses: typing.Any = {}
     headers = {'Content-Type': 'application/json', 'User-Agent': 'flood'}
     for test in equality_tests:
         # create call
         test_name, constructor, args, kwargs = test
         call = constructor(*args, **kwargs)
+        calls[test_name] = call
+        call_node_responses.setdefault(test_name, {})
 
         # dispatch call
         results = []
@@ -69,6 +81,7 @@ def run_equality_test(
                 result = None
             responses.append(response)
             results.append(result)
+            call_node_responses[test_name][node['name']] = result
 
         # print summary
         success = _summarize_result(
@@ -80,7 +93,20 @@ def run_equality_test(
         )
         if success:
             successful.append(test_name)
+    failed = [test[0] for test in equality_tests if test[0] not in successful]
 
+    # save output file
+    summary = {
+        'calls': calls,
+        'successful': successful,
+        'failed': failed,
+        'responses': call_node_responses,
+    }
+    file_path = os.path.join(output_dir, 'equality_results.json')
+    with open(file_path, 'w') as f:
+        json.dump(summary, f)
+
+    # summarize test
     print()
     flood.print_text_box('Equality Test Summary')
     print()
@@ -93,14 +119,14 @@ def run_equality_test(
         for name in sorted(successful):
             flood.print_bullet(key=name, value='', colon_str='')
     print()
-
-    failed = [test[0] for test in equality_tests if test[0] not in successful]
     flood.print_header('Differences detected (n = ' + str(len(failed)) + ')')
     if len(failed) == 0:
         print('[none]')
     else:
         for name in sorted(failed):
             flood.print_bullet(key=name, value='', colon_str='')
+    print()
+    toolstr.print('summary saved to: ' + file_path, style=flood.styles['comment'])
 
 
 def json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
