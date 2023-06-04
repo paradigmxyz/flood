@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 import flood
+from flood.user_io import file_io
 
 
 #
@@ -77,11 +78,29 @@ def _snake_case_to_camel_case(string: str) -> str:
 
 
 def generate_test(
+    *,
     test_name: str,
-    constants: typing.Mapping[str, typing.Any],
+    random_seed: flood.RandomSeed | None = None,
+    rates: typing.Sequence[int] | None = None,
+    durations: typing.Sequence[int] | None = None,
+    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+    network: str,
+    output_dir: str | None = None,
 ) -> flood.LoadTest:
+    if test_name is None:
+        raise Exception('must specify test_name')
     test_generator = get_test_generator(test_name)
-    test = test_generator(**constants)
+    test = test_generator(
+        rates=rates,
+        durations=durations,
+        vegeta_kwargs=vegeta_kwargs,
+        network=network,
+        random_seed=random_seed,
+    )
+    if output_dir is not None:
+        file_io._save_single_run_test(
+            test_name=test_name, output_dir=output_dir, test=test
+        )
     return test
 
 

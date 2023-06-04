@@ -52,10 +52,13 @@ def _save_single_run_test(
 
 
 def _save_single_run_results(
+    *,
     output_dir: str,
     test: flood.LoadTest,
     nodes: flood.Nodes,
     results: typing.Mapping[str, flood.LoadTestOutput],
+    figures: bool,
+    test_name: str,
 ) -> None:
     import os
     import json
@@ -76,6 +79,14 @@ def _save_single_run_results(
     }
     with open(path, 'w') as f:
         json.dump(payload, f)
+
+    if figures:
+        figures_dir = get_single_run_figures_path(output_dir=output_dir)
+        flood.plot_load_test_results(
+            outputs=results,
+            test_name=test_name,
+            output_dir=figures_dir,
+        )
 
 
 def load_single_run_test_payload(

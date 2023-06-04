@@ -29,7 +29,7 @@ def run_load_tests(
     if node is not None:
         node = user_io.parse_node(node)
     if nodes is not None:
-        nodes = user_io.parse_nodes(nodes)
+        nodes = user_io.parse_nodes(nodes, request_metadata=False)
     tqdm = user_io.outputs._get_tqdm()
     pbar = {
         'leave': False,

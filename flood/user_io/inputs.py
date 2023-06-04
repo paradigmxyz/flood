@@ -18,21 +18,11 @@ def get_ctc_alias_url(url: str) -> str | None:
         return None
 
 
-def get_nodes_network(nodes: typing.Mapping[str, spec.Node]) -> str:
-    raise NotImplementedError()
-
-
-#     request = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
-
-#     networks = []
-#     for node in nodes.values():
-#         chain_id = ctc.rpc.sync_eth_chain_id(context=provider)
-
-
 def parse_nodes(
     nodes: spec.NodesShorthand,
     *,
     verbose: bool | int = False,
+    request_metadata: bool = False,
 ) -> typing.Mapping[str, spec.Node]:
     """parse given nodes according to input specification"""
     if verbose:
@@ -69,7 +59,7 @@ def print_nodes_table(nodes: typing.Mapping[str, spec.Node]) -> None:
             node['client_version'],
         ]
         rows.append(row)
-    labels = ['node', 'url', 'version']
+    labels = ['node', 'url', 'metadata']
     print()
     flood.print_multiline_table(
         rows=rows,
@@ -88,7 +78,9 @@ def _get_node_str(node: flood.Node) -> str:
     return node_str
 
 
-def parse_node(node: str | spec.Node) -> spec.Node:
+def parse_node(
+    node: str | spec.Node, request_metadata: bool = True
+) -> spec.Node:
     """parse node according to input specification"""
     prefixes = ['http', 'https', 'ws', 'wss']
 
@@ -137,13 +129,23 @@ def parse_node(node: str | spec.Node) -> spec.Node:
             else:
                 url = 'https://' + url
 
-        client_version = get_node_client_version(url=url, remote=remote)
+        if request_metadata:
+            # get client version
+            client_version = get_node_client_version(url=url, remote=remote)
+
+            # get network
+            network = 'ethereum'
+
+        else:
+            client_version = None
+            network = None
 
         return {
             'name': name,
             'url': url,
             'remote': remote,
             'client_version': client_version,
+            'network': network,
         }
 
     else:
@@ -193,4 +195,19 @@ def parse_test_data(test: spec.LoadTest) -> spec.LoadTestColumnWise:
         'vegeta_kwargs': vegeta_kwargs,
         'calls': calls,
     }
+
+
+def parse_nodes_network(nodes: typing.Mapping[str, spec.Node]) -> str:
+    if len(nodes) == 0:
+        raise Exception('no nodes, cannot get network')
+    networks = [node['network'] for node in nodes.values()]
+    if len(set(networks)) != 1:
+        raise Exception('multiple networks')
+    if networks[0] is None:
+        raise Exception('network could not be determined')
+    network = networks[0]
+    if isinstance(network, str):
+        return network
+    else:
+        raise Exception('need str network')
 

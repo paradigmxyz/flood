@@ -120,31 +120,18 @@ def _run_single(
     metrics: typing.Sequence[str] | None = None,
     verbose: bool | int,
 ) -> None:
-    import os
-    import toolstr
-
-    # parse inputs
-    network = 'ethereum'
-
     # get test parameters
-    if test is not None:
-        test_data = flood.parse_test_data(test=test)
-        rates = test_data['rates']
-        durations = test_data['durations']
-        vegeta_kwargs = test_data['vegeta_kwargs']
-    else:
-        if test_name is None:
-            raise Exception('must specify test or test_name')
-        rates, durations = flood.generate_timings(
-            rates=rates,
-            duration=duration,
-            durations=durations,
-            mode=mode,
-        )
+    rates, durations, vegeta_kwargs = _get_single_test_parameters(
+        test=test,
+        rates=rates,
+        duration=duration,
+        durations=durations,
+        mode=mode,
+    )
 
     # print preamble
     if verbose:
-        _print_single_run_preamble(
+        _print_single_run_preamble_copy(
             test_name=test_name,
             rerun_of=rerun_of,
             rates=rates,
@@ -152,79 +139,30 @@ def _run_single(
             vegeta_kwargs=vegeta_kwargs,
             output_dir=output_dir,
         )
-        if output_dir is not None:
-            summary_path = os.path.join(output_dir, 'summary.txt')
-            with toolstr.write_stdout_to_file(summary_path):
-                _print_single_run_preamble(
-                    test_name=test_name,
-                    rerun_of=rerun_of,
-                    rates=rates,
-                    durations=durations,
-                    vegeta_kwargs=vegeta_kwargs,
-                    output_dir=output_dir,
-                )
 
     # parse nodes
-    nodes = flood.parse_nodes(nodes, verbose=verbose)
+    nodes = flood.parse_nodes(nodes, verbose=verbose, request_metadata=True)
 
-    # save test to disk
-    test = flood.generate_test(
-        test_name=test_name,
-        constants={
-            'rates': rates,
-            'durations': durations,
-            'vegeta_kwargs': vegeta_kwargs,
-            'network': network,
-            'random_seed': random_seed,
-        },
-    )
-    if output_dir is not None:
-        file_io._save_single_run_test(
-            test_name=test_name, output_dir=output_dir, test=test
+    # generate test and save to disk
+    if test is None:
+        test = flood.generate_test(
+            test_name=test_name,
+            rates=rates,
+            durations=durations,
+            vegeta_kwargs=vegeta_kwargs,
+            network=flood.parse_nodes_network(nodes),
+            random_seed=random_seed,
+            output_dir=output_dir,
         )
 
     # skip dry run
     if dry:
         return
 
-    if verbose:
-        import datetime
-
-        print()
-        print()
-        toolstr.print_header(
-            'Running load tests...',
-            style=flood.styles['content'],
-            text_style=flood.styles['metavar'],
-        )
-        dt = datetime.datetime.now()
-        if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
-        else:
-            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-        timestamp = (
-            toolstr.add_style('\[', flood.styles['content'])
-            + toolstr.add_style(str(dt), flood.styles['metavar'])
-            + toolstr.add_style(']', flood.styles['content'])
-        )
-        toolstr.print(timestamp + ' Starting')
-
     # run tests
-    try:
-        results = flood.run_load_tests(
-            nodes=nodes,
-            test=test,
-            verbose=verbose,
-        )
-    except Exception as e:
-        import traceback
-
-        print('THIS WAS THE ERROR:', e.args)
-        print()
-        print(traceback.format_exc())
-        print()
-        print("ERROR OVER")
-        raise e
+    if verbose:
+        _print_run_start()
+    results = flood.run_load_tests(nodes=nodes, test=test, verbose=verbose)
 
     # output results to file
     if output_dir is not None:
@@ -233,35 +171,51 @@ def _run_single(
             test=test,
             nodes=nodes,
             results=results,
+            figures=figures,
+            test_name=test_name,
         )
-
-        if figures:
-            figures_dir = file_io.get_single_run_figures_path(
-                output_dir=output_dir
-            )
-            flood.plot_load_test_results(
-                outputs=results,
-                test_name=test_name,
-                output_dir=figures_dir,
-            )
 
     # print summary
     if verbose:
-        _print_single_run_conclusion(
+        _print_single_run_conclusion_copy(
             output_dir=output_dir,
             results=results,
             metrics=metrics,
             verbose=verbose,
             figures=figures,
         )
-        with toolstr.write_stdout_to_file(summary_path, mode='a'):
-            _print_single_run_conclusion(
-                output_dir=output_dir,
-                results=results,
-                metrics=metrics,
-                verbose=verbose,
-                figures=figures,
-            )
+
+
+#
+# # helper functions
+#
+
+
+def _get_single_test_parameters(
+    test: flood.LoadTest | None = None,
+    rates: typing.Sequence[int] | None = None,
+    duration: int | None = None,
+    durations: typing.Sequence[int] | None = None,
+    mode: flood.LoadTestMode | None = None,
+    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+) -> tuple[
+    typing.Sequence[int],
+    typing.Sequence[int],
+    flood.VegetaKwargsShorthand | None,
+]:
+    if test is not None:
+        test_data = flood.parse_test_data(test=test)
+        rates = test_data['rates']
+        durations = test_data['durations']
+        vegeta_kwargs = test_data['vegeta_kwargs']
+    else:
+        rates, durations = flood.generate_timings(
+            rates=rates,
+            duration=duration,
+            durations=durations,
+            mode=mode,
+        )
+    return rates, durations, vegeta_kwargs
 
 
 #
@@ -270,6 +224,39 @@ def _run_single(
 
 
 def _print_single_run_preamble(
+    *,
+    test_name: str,
+    rates: typing.Sequence[int],
+    durations: typing.Sequence[int],
+    vegeta_kwargs: flood.VegetaKwargsShorthand | None,
+    rerun_of: str | None = None,
+    output_dir: str | None,
+) -> None:
+    import os
+    import toolstr
+
+    _print_single_run_preamble_copy(
+        test_name=test_name,
+        rerun_of=rerun_of,
+        rates=rates,
+        durations=durations,
+        vegeta_kwargs=vegeta_kwargs,
+        output_dir=output_dir,
+    )
+    if output_dir is not None:
+        summary_path = os.path.join(output_dir, 'summary.txt')
+        with toolstr.write_stdout_to_file(summary_path):
+            _print_single_run_preamble_copy(
+                test_name=test_name,
+                rerun_of=rerun_of,
+                rates=rates,
+                durations=durations,
+                vegeta_kwargs=vegeta_kwargs,
+                output_dir=output_dir,
+            )
+
+
+def _print_single_run_preamble_copy(
     *,
     test_name: str,
     rates: typing.Sequence[int],
@@ -308,7 +295,61 @@ def _print_single_run_preamble(
     print()
 
 
+def _print_run_start() -> None:
+    import datetime
+    import toolstr
+
+    print()
+    print()
+    toolstr.print_header(
+        'Running load tests...',
+        style=flood.styles['content'],
+        text_style=flood.styles['metavar'],
+    )
+    dt = datetime.datetime.now()
+    if dt.microsecond >= 500_000:
+        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+    else:
+        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+    timestamp = (
+        toolstr.add_style('\[', flood.styles['content'])
+        + toolstr.add_style(str(dt), flood.styles['metavar'])
+        + toolstr.add_style(']', flood.styles['content'])
+    )
+    toolstr.print(timestamp + ' Starting')
+
+
 def _print_single_run_conclusion(
+    *,
+    output_dir: str | None,
+    results: typing.Mapping[str, flood.LoadTestOutput],
+    metrics: typing.Sequence[str] | None,
+    verbose: bool | int,
+    figures: bool,
+) -> None:
+    _print_single_run_conclusion_copy(
+        output_dir=output_dir,
+        results=results,
+        metrics=metrics,
+        verbose=verbose,
+        figures=figures,
+    )
+    if output_dir is not None:
+        import os
+        import toolstr
+
+        summary_path = os.path.join(output_dir, 'summary.txt')
+        with toolstr.write_stdout_to_file(summary_path, mode='a'):
+            _print_single_run_conclusion_copy(
+                output_dir=output_dir,
+                results=results,
+                metrics=metrics,
+                verbose=verbose,
+                figures=figures,
+            )
+
+
+def _print_single_run_conclusion_copy(
     output_dir: str | None,
     results: typing.Mapping[str, flood.LoadTestOutput],
     metrics: typing.Sequence[str] | None,

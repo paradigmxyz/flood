@@ -19,7 +19,7 @@ def run_equality_test(
     import requests
     import toolstr
 
-    nodes = flood.parse_nodes(nodes)
+    nodes = flood.parse_nodes(nodes, request_metadata=True)
     for node in nodes.values():
         if node['remote'] is not None:
             raise Exception('remote not supported for equality test')
@@ -37,7 +37,11 @@ def run_equality_test(
         output_dir = tempfile.mkdtemp()
 
     # print preamble
-    flood.print_text_box('Running equality test')
+    flood.print_text_box('Equality test: ' + test_name)
+    flood.print_bullet(key='methods', value='')
+    for test in equality_tests:
+        flood.print_bullet(key=test[0], value='', colon_str='', indent=4)
+    flood.print_bullet(key='output_dir', value=output_dir)
     flood.print_bullet(key='nodes', value='')
     for n, node in enumerate(nodes.values()):
         toolstr.print(
@@ -47,11 +51,8 @@ def run_equality_test(
             indent=4,
             style=flood.styles['description'],
         )
-    flood.print_bullet(key='methods', value='')
-    for test in equality_tests:
-        flood.print_bullet(key=test[0], value='', colon_str='', indent=4)
-    flood.print_bullet(key='output_dir', value=output_dir)
 
+    # run test
     successful = []
     calls = {}
     call_node_responses: typing.Any = {}
