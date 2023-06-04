@@ -52,7 +52,7 @@ def print_nodes_table(nodes: typing.Mapping[str, spec.Node]) -> None:
     for node in nodes.values():
         url = node['url']
         if node['remote'] is not None:
-            url += '\n' + node['remote']
+            url = node['remote'] + '\n' + url
         row = [
             node['name'],
             url,
