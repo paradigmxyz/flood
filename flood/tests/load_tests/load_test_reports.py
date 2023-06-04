@@ -25,6 +25,29 @@ def create_load_test_report(
     _create_load_test_report_html(ipynb_path=ipynb_path)
 
 
+def print_load_test_summary(test: flood.LoadTest) -> None:
+    import toolstr
+
+    parsed = flood.parse_test_data(test)
+    rates = parsed['rates']
+    durations = parsed['durations']
+    vegeta_kwargs = parsed['vegeta_kwargs']
+
+    toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
+    if len(set(durations)) == 1:
+        toolstr.print_bullet(
+            key='sample duration',
+            value=durations[0],
+            styles=flood.styles,
+        )
+    else:
+        toolstr.print_bullet(
+            key='sample durations', value=durations, styles=flood.styles
+        )
+    if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
+        toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
+
+
 def _create_load_test_report_html(
     ipynb_path: str,
 ) -> None:
@@ -297,7 +320,13 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'content': """
             # show result figures
 
-            flood.plot_load_test_results(test_name=test_name, outputs=results, latency_yscale_log=True)
+            colors = flood.get_nodes_plot_colors(nodes=nodes)
+            flood.plot_load_test_results(
+                test_name=test_name,
+                outputs=results,
+                latency_yscale_log=True,
+                colors=colors,
+            )
         """,
         'inputs': [],
     },

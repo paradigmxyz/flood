@@ -10,6 +10,7 @@ def plot_load_test_results(
     test_name: str,
     output_dir: str | None = None,
     latency_yscale_log: bool = False,
+    colors: typing.Mapping[str, str] | None = None,
 ) -> None:
     import os
     import matplotlib.pyplot as plt  # type: ignore
@@ -21,7 +22,7 @@ def plot_load_test_results(
         os.makedirs(output_dir, exist_ok=True)
 
     plt.figure()
-    plot_load_test_success(outputs, test_name=test_name)
+    plot_load_test_success(outputs, test_name=test_name, colors=colors)
     if output_dir is not None:
         path = os.path.join(output_dir, 'success.png')
         plt.savefig(path)
@@ -29,7 +30,7 @@ def plot_load_test_results(
         plt.show()
 
     plt.figure()
-    plot_load_test_throughput(outputs, test_name=test_name)
+    plot_load_test_throughput(outputs, test_name=test_name, colors=colors)
     if output_dir is not None:
         path = os.path.join(output_dir, 'throughput.png')
         plt.savefig(path)
@@ -38,7 +39,10 @@ def plot_load_test_results(
 
     plt.figure()
     plot_load_test_latencies(
-        outputs, test_name=test_name, yscale_log=latency_yscale_log
+        outputs,
+        test_name=test_name,
+        yscale_log=latency_yscale_log,
+        colors=colors,
     )
     if output_dir is not None:
         path = os.path.join(output_dir, 'latencies.png')
@@ -140,15 +144,20 @@ def plot_load_test_result_metrics(
 
     if colors is None:
         colors = {
-            key: color
-            for key, color in zip(results.keys(), flood.color_defaults)
+            key: color for key, color in zip(results.keys(), flood.plot_colors)
         }
 
     for name, result in results.items():
         # determine colors
         result_colors = colors.get(name)
         if isinstance(result_colors, str):
-            result_colors = [result_colors] * len(metrics)
+            if result_colors in flood.plot_colors:
+                if len(metrics) == 1:
+                    result_colors = [flood.plot_colors[result_colors][1]]
+                else:
+                    result_colors = flood.plot_colors[result_colors]
+            else:
+                result_colors = [result_colors] * len(metrics)
         elif isinstance(result_colors, list):
             assert len(result_colors) >= len(metrics), 'not enough colors'
         elif isinstance(result_colors, dict):

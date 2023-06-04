@@ -8,7 +8,6 @@ from flood import spec
 if typing.TYPE_CHECKING:
     import types
 
-    import polars as pl
     import toolcli
 
 
@@ -23,6 +22,21 @@ styles: toolcli.StyleTheme = {
 
 
 plot_colors = {
+    'green_shades': [
+        'forestgreen',
+        'limegreen',
+        'chartreuse',
+    ],
+    'red_shades': [
+        'firebrick',
+        'red',
+        'salmon',
+    ],
+    'purple_shades': [
+        'rebeccapurple',
+        'blueviolet',
+        'mediumslateblue',
+    ],
     'orange_shades': [
         'darkgoldenrod',
         'darkorange',
@@ -40,10 +54,42 @@ plot_colors = {
     ],
 }
 
-color_defaults = [
-    'darkorange',
-    'dodgerblue',
-]
+
+def get_nodes_plot_colors(
+    nodes: typing.Mapping[str, flood.Node]
+) -> typing.Mapping[str, str]:
+    colors = {}
+    taken = set()
+    for node in nodes.values():
+
+        # print version
+        version = node['client_version']
+        if version is None:
+            version = ''
+
+        # decide color
+        if (
+            (version is not None and 'reth' in version)
+            or ('reth' in node['name'])
+        ) and 'orange_shades' not in taken:
+            color = 'orange_shades'
+        elif (
+            (version is not None and 'erigon' in version)
+            or ('erigon' in node['name'])
+        ) and 'blue_shades' not in taken:
+            color = 'blue_shades'
+        else:
+            for color_name in plot_colors.keys():
+                if color_name not in taken:
+                    color = color_name
+                    break
+            else:
+                raise Exception('out of colors')
+
+        colors[node['name']] = color
+        taken.add(color)
+
+    return colors
 
 
 def _get_tqdm() -> types.ModuleType:
@@ -61,29 +107,6 @@ def _get_tqdm() -> types.ModuleType:
     import tqdm  # type: ignore
 
     return tqdm
-
-
-def print_load_test_summary(test: flood.LoadTest) -> None:
-    import toolstr
-
-    parsed = flood.parse_test_data(test)
-    rates = parsed['rates']
-    durations = parsed['durations']
-    vegeta_kwargs = parsed['vegeta_kwargs']
-
-    toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
-    if len(set(durations)) == 1:
-        toolstr.print_bullet(
-            key='sample duration',
-            value=durations[0],
-            styles=flood.styles,
-        )
-    else:
-        toolstr.print_bullet(
-            key='sample durations', value=durations, styles=flood.styles
-        )
-    if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
-        toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
 
 
 def print_metric_tables(
