@@ -7,5 +7,5 @@ def test_equality_tests(flood_test_local_node_1, flood_test_local_node_2):
         flood_test_local_node_1,
         flood_test_local_node_2,
     )
-    subprocess.call(cmd.split(' '))
+    subprocess.check_call(cmd.split(' '))
 
