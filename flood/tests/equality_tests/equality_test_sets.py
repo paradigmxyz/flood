@@ -278,4 +278,3 @@ def get_trace_equality_tests(
             {},
         ),
     ]
-

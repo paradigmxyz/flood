@@ -201,4 +201,3 @@ def plot_load_test_result_metrics(
         ylabel=ylabel,
     )
     plt.legend(loc='center right')
-

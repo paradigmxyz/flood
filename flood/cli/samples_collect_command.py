@@ -48,4 +48,3 @@ def samples_collect_command(
         sizes=sizes,
         datatypes=datatypes,
     )
-

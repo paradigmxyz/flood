@@ -166,4 +166,3 @@ def load_samples(
         return df[columns[0]].to_list()
     else:
         return df.rows()
-

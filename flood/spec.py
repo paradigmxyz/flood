@@ -180,4 +180,3 @@ if typing.TYPE_CHECKING:
         test: LoadTest
         nodes: Nodes
         results: typing.Mapping[str, LoadTestOutput]
-

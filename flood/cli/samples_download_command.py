@@ -61,4 +61,3 @@ def download_samples_command(
         output_dir=output_dir,
         only_missing=missing,
     )
-

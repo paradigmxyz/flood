@@ -127,7 +127,9 @@ def run_equality_test(
         for name in sorted(failed):
             flood.print_bullet(key=name, value='', colon_str='')
     print()
-    toolstr.print('summary saved to: ' + file_path, style=flood.styles['comment'])
+    toolstr.print(
+        'summary saved to: ' + file_path, style=flood.styles['comment']
+    )
 
 
 def _json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
@@ -251,7 +253,6 @@ def _print_result_diff(
             n_printed = 0
             for i, (item0, item1) in enumerate(zip(result0, result1)):
                 if not _json_equal(item0, item1):
-
                     if n_printed >= 10:
                         print('...')
                         break
@@ -273,4 +274,3 @@ def _print_result_diff(
             flood.print_header('differences in values')
             for node, result in zip(nodes, results):
                 flood.print_bullet(key=node['name'], value=result)
-

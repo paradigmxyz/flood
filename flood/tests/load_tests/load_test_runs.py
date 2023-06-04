@@ -48,12 +48,16 @@ def run_load_tests(
     # case: single node and multiple tests
     elif node is not None and tests is not None:
         for name, test in tqdm.tqdm(tests.items(), **pbar):
-            results[name] = schedule_load_test(node=node, verbose=verbose, test=test)
+            results[name] = schedule_load_test(
+                node=node, verbose=verbose, test=test
+            )
 
     # case: multiple nodes and single tests
     elif nodes is not None and test is not None:
         for name, nd in tqdm.tqdm(nodes.items(), **pbar):
-            results[name] = schedule_load_test(node=nd, verbose=verbose, test=test)
+            results[name] = schedule_load_test(
+                node=nd, verbose=verbose, test=test
+            )
 
     # case: multiple nodes and multiple tests
     elif nodes is not None and tests is not None:
@@ -337,4 +341,3 @@ def _run_load_test_remotely(
     with open(results_path, 'r') as f:
         results: spec.SingleRunResultsPayload = json.load(f)
         return results['results'][node['name']]
-

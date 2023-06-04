@@ -143,4 +143,3 @@ def _generate_timings_for_soak_test(
             raise Exception('must specify 1 duration for soak test')
 
     return rates, durations
-

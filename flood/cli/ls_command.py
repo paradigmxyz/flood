@@ -36,4 +36,3 @@ def ls_command() -> None:
         text_style=flood.styles['metavar'],
     )
     toolstr.print_bullet(key='all', value='', colon_str='')
-

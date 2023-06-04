@@ -15,4 +15,3 @@ def generate_slots(
         n=n,
         random_seed=random_seed,
     )
-

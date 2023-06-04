@@ -167,4 +167,3 @@ def _create_vegeta_report(
         'last_response_timestamp': report['end'],
         'final_wait_time': report['wait'] / 1e9,
     }
-

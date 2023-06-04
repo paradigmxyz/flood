@@ -199,4 +199,3 @@ def _write_raw_samples(
 
             # write file
             sized_data.write_parquet(output_path)
-

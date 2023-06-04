@@ -48,4 +48,3 @@ def run_cli(raw_command: str | None = None) -> None:
         command_index=command_index,
         config=config,
     )
-

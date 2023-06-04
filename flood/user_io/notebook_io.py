@@ -25,7 +25,9 @@ if typing.TYPE_CHECKING:
 
     class NotebookChunkTemplate(typing.TypedDict):
         type: typing.Literal['chunk']
-        f: typing.Callable[..., typing.Sequence[nbformat.notebooknode.NotebookNode]]
+        f: typing.Callable[
+            ..., typing.Sequence[nbformat.notebooknode.NotebookNode]
+        ]
         inputs: typing.Sequence[str]
 
     NotebookCellPrecursor = typing.Union[
@@ -133,4 +135,3 @@ def create_notebook(
     # write notebook to file
     with open(output_path, 'w') as f:
         nbformat.write(notebook, f)  # type: ignore
-

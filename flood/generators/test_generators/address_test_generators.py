@@ -54,4 +54,3 @@ def generate_test_eth_get_transaction_count(
         duration=duration,
         durations=durations,
     )
-

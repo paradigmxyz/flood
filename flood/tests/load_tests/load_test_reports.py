@@ -372,4 +372,3 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'inputs': [],
     },
 ]
-

@@ -125,4 +125,3 @@ def load_single_run_results(
 ) -> typing.Mapping[str, flood.LoadTestOutput]:
     payload = load_single_run_results_payload(output_dir=output_dir)
     return payload['results']
-

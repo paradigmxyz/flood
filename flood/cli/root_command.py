@@ -166,4 +166,3 @@ def root_command(
             output_dir=output_dir or True,
             figures=figures,
         )
-

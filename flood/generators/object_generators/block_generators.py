@@ -101,7 +101,9 @@ def _generate_block_ranges_strides(
         random_phases = list(range(range_size))
         rng.shuffle(random_phases)
         for random_phase in random_phases:
-            strides = np.arange(start_block + random_phase, end_block, range_size)
+            strides = np.arange(
+                start_block + random_phase, end_block, range_size
+            )
             rng.shuffle(strides)
             n_missing = n - len(block_ranges)
             if n_missing > 0:
@@ -180,4 +182,3 @@ def _generate_block_ranges_individual(
         ranges_list = list(ranges)
         rng.shuffle(ranges_list)
         return ranges_list
-

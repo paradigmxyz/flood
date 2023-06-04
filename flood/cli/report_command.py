@@ -41,7 +41,6 @@ def report_command(
     output: str | None,
     metrics: typing.Sequence[str] | None,
 ) -> None:
-
     if output is None:
         import os
 
@@ -52,4 +51,3 @@ def report_command(
         output_dir=output,
         metrics=metrics,
     )
-

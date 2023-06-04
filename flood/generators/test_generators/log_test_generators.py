@@ -129,4 +129,3 @@ def generate_test_eth_get_logs(
 #         }
 
 #     return tests
-

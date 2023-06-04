@@ -210,4 +210,3 @@ def parse_nodes_network(nodes: typing.Mapping[str, spec.Node]) -> str:
         return network
     else:
         raise Exception('need str network')
-

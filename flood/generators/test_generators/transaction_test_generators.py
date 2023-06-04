@@ -53,4 +53,3 @@ def generate_test_eth_get_transaction_receipt(
         duration=duration,
         durations=durations,
     )
-

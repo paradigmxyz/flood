@@ -78,4 +78,3 @@ def generate_test_eth_call(
         duration=duration,
         durations=durations,
     )
-

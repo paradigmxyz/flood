@@ -204,4 +204,3 @@ def generate_test_trace_replay_transaction_vm_trace(
         duration=duration,
         durations=durations,
     )
-

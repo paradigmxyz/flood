@@ -16,4 +16,3 @@ def generate_transaction_hashes(
         n=n,
         random_seed=random_seed,
     )
-

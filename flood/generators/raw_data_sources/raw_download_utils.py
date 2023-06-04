@@ -69,4 +69,3 @@ def get_flood_samples_dir() -> str:
         return os.path.join(os.getcwd(), 'flood_samples')
     else:
         return flood_samples_dir
-

@@ -594,4 +594,3 @@ def generate_calls_trace_replay_transaction_vm_trace(
         )
         for transaction_hash in transaction_hashes
     ]
-

@@ -54,4 +54,3 @@ def generate_test_eth_get_block_by_number(
 #         duration=duration,
 #         durations=durations,
 #     )
-

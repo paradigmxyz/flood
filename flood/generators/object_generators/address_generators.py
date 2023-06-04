@@ -29,4 +29,3 @@ def generate_eoas(
         n=n,
         random_seed=random_seed,
     )
-

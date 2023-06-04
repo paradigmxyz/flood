@@ -86,4 +86,3 @@ def create_load_test(
         load_test.append(attack)
 
     return load_test
-

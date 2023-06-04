@@ -19,4 +19,3 @@ def get_rng(random_seed: spec.RandomSeed | None = None) -> np.random.Generator:
         return gen
     else:
         raise Exception('invalid seed format: ' + str(type(random_seed)))
-

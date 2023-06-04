@@ -57,4 +57,3 @@ def samples_ls_command() -> None:
                 print('-', filename)
             print()
             print('download using `flood samples download` command')
-

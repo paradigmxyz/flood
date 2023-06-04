@@ -61,7 +61,6 @@ def get_nodes_plot_colors(
     colors = {}
     taken = set()
     for node in nodes.values():
-
         # print version
         version = node['client_version']
         if version is None:
@@ -244,4 +243,3 @@ def print_multiline_table(*args: typing.Any, **kwargs: typing.Any) -> None:
         label_style=flood.styles.get('metavar'),
         border=flood.styles.get('content'),
     )
-
