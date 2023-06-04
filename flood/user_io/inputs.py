@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import flood
 from flood import spec
 
 
@@ -28,19 +29,63 @@ def get_nodes_network(nodes: typing.Mapping[str, spec.Node]) -> str:
 #         chain_id = ctc.rpc.sync_eth_chain_id(context=provider)
 
 
-def parse_nodes(nodes: spec.NodesShorthand) -> typing.Mapping[str, spec.Node]:
+def parse_nodes(
+    nodes: spec.NodesShorthand,
+    *,
+    verbose: bool | int = False,
+) -> typing.Mapping[str, spec.Node]:
     """parse given nodes according to input specification"""
+    if verbose:
+        flood.print_header('Gathering node data...')
+
     new_nodes: typing.MutableMapping[str, spec.Node] = {}
     if isinstance(nodes, list):
-        for node in nodes:
-            new_node = parse_node(node)
-            new_nodes[new_node['name']] = new_node
+        import multiprocessing
+
+        with multiprocessing.Pool() as pool:
+            results = pool.map(parse_node, nodes)
+        new_nodes = {result['name']: result for result in results}
     elif isinstance(nodes, dict):
         for key, value in nodes.items():
             new_nodes[key] = value
     else:
         raise Exception('invalid format for nodes')
+
+    if verbose:
+        print_nodes_table(new_nodes)
+
     return new_nodes
+
+
+def print_nodes_table(nodes: typing.Mapping[str, spec.Node]) -> None:
+    rows = []
+    for node in nodes.values():
+        url = node['url']
+        if node['remote'] is not None:
+            url += '\n' + node['remote']
+        row = [
+            node['name'],
+            url,
+            node['client_version'],
+        ]
+        rows.append(row)
+    labels = ['node', 'url', 'version']
+    print()
+    flood.print_multiline_table(
+        rows=rows,
+        labels=labels,
+        indent=4,
+    )
+
+
+def _get_node_str(node: flood.Node) -> str:
+    node_str = '"' + node['name'] + '", url=' + node['url']
+    remote = node['remote']
+    if remote is not None:
+        node_str += ' remote=' + remote
+    if node['client_version'] is not None:
+        node_str = node_str + ' version=' + node['client_version']
+    return node_str
 
 
 def parse_node(node: str | spec.Node) -> spec.Node:

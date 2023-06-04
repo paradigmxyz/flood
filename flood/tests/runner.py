@@ -124,11 +124,9 @@ def _run_single(
     import toolstr
 
     # parse inputs
-    nodes = flood.parse_nodes(nodes)
-    # network = flood.get_nodes_network(nodes)
     network = 'ethereum'
 
-    # create test
+    # get test parameters
     if test is not None:
         test_data = flood.parse_test_data(test=test)
         rates = test_data['rates']
@@ -143,16 +141,6 @@ def _run_single(
             durations=durations,
             mode=mode,
         )
-        test = flood.generate_test(
-            test_name=test_name,
-            constants={
-                'rates': rates,
-                'durations': durations,
-                'vegeta_kwargs': vegeta_kwargs,
-                'network': network,
-                'random_seed': random_seed,
-            },
-        )
 
     # print preamble
     if verbose:
@@ -163,9 +151,7 @@ def _run_single(
             durations=durations,
             vegeta_kwargs=vegeta_kwargs,
             output_dir=output_dir,
-            nodes=nodes,
         )
-
         if output_dir is not None:
             summary_path = os.path.join(output_dir, 'summary.txt')
             with toolstr.write_stdout_to_file(summary_path):
@@ -176,10 +162,22 @@ def _run_single(
                     durations=durations,
                     vegeta_kwargs=vegeta_kwargs,
                     output_dir=output_dir,
-                    nodes=nodes,
                 )
 
+    # parse nodes
+    nodes = flood.parse_nodes(nodes, verbose=verbose)
+
     # save test to disk
+    test = flood.generate_test(
+        test_name=test_name,
+        constants={
+            'rates': rates,
+            'durations': durations,
+            'vegeta_kwargs': vegeta_kwargs,
+            'network': network,
+            'random_seed': random_seed,
+        },
+    )
     if output_dir is not None:
         file_io._save_single_run_test(
             test_name=test_name, output_dir=output_dir, test=test
@@ -188,6 +186,28 @@ def _run_single(
     # skip dry run
     if dry:
         return
+
+    if verbose:
+        import datetime
+
+        print()
+        print()
+        toolstr.print_header(
+            'Running load tests...',
+            style=flood.styles['content'],
+            text_style=flood.styles['metavar'],
+        )
+        dt = datetime.datetime.now()
+        if dt.microsecond >= 500_000:
+            dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+        else:
+            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+        timestamp = (
+            toolstr.add_style('\[', flood.styles['content'])
+            + toolstr.add_style(str(dt), flood.styles['metavar'])
+            + toolstr.add_style(']', flood.styles['content'])
+        )
+        toolstr.print(timestamp + ' Starting')
 
     # run tests
     try:
@@ -255,11 +275,9 @@ def _print_single_run_preamble(
     rates: typing.Sequence[int],
     durations: typing.Sequence[int],
     vegeta_kwargs: flood.VegetaKwargsShorthand | None,
-    nodes: flood.Nodes,
     rerun_of: str | None = None,
     output_dir: str | None,
 ) -> None:
-    import datetime
     import toolstr
 
     toolstr.print_text_box(
@@ -287,53 +305,7 @@ def _print_single_run_preamble(
     toolstr.print_bullet(
         key='output directory', value=output_dir, styles=flood.styles
     )
-
-    if len(nodes) == 1:
-        node = list(nodes.values())[0]
-        toolstr.print_bullet(
-            key='node',
-            value=_get_node_str(node),
-            styles=flood.styles,
-        )
-    else:
-        toolstr.print_bullet(key='nodes', value='', styles=flood.styles)
-        for n, node in enumerate(nodes.values()):
-            toolstr.print(
-                toolstr.add_style(str(n + 1), flood.styles['metavar'])
-                + '. '
-                + _get_node_str(node),
-                indent=4,
-                style=flood.styles['description'],
-            )
-
     print()
-    print()
-    toolstr.print_header(
-        'Running load tests...',
-        style=flood.styles['content'],
-        text_style=flood.styles['metavar'],
-    )
-    dt = datetime.datetime.now()
-    if dt.microsecond >= 500_000:
-        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
-    else:
-        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-    timestamp = (
-        toolstr.add_style('\[', flood.styles['content'])
-        + toolstr.add_style(str(dt), flood.styles['metavar'])
-        + toolstr.add_style(']', flood.styles['content'])
-    )
-    toolstr.print(timestamp + ' Starting')
-
-
-def _get_node_str(node: flood.Node) -> str:
-    node_str = '"' + node['name'] + '", url=' + node['url']
-    remote = node['remote']
-    if remote is not None:
-        node_str += ' remote=' + remote
-    if node['client_version'] is not None:
-        node_str = node_str + ' version=' + node['client_version']
-    return node_str
 
 
 def _print_single_run_conclusion(
@@ -369,12 +341,7 @@ def _print_single_run_conclusion(
 
         print()
         print()
-        toolstr.print_bullet(
-            key='Saving results',
-            value='',
-            styles=flood.styles,
-            bullet_str='',
-        )
+        flood.print_header('Saving results...')
         toolstr.print_bullet(
             key=os.path.relpath(test_path, output_dir),
             value='',
@@ -402,7 +369,7 @@ def _print_single_run_conclusion(
     # print metrics
     print()
     print()
-    print('Summarizing performance metrics...')
+    flood.print_header('Summarizing performance metrics...')
     if verbose > 1:
         toolstr.print_bullet(
             key='metrics shown below',
@@ -424,5 +391,6 @@ def _print_single_run_conclusion(
     flood.print_metric_tables(
         results=results,
         metrics=metrics,
+        indent=4,
     )
 

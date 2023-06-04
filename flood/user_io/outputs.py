@@ -92,11 +92,12 @@ def print_metric_tables(
     *,
     decimals: int | None = None,
     comparison: bool = False,
+    indent: int | str | None = None,
 ) -> None:
     import toolstr
 
     if len(results) == 0:
-        print('no results')
+        toolstr.print('no results', indent=indent)
         print()
 
     names = list(results.keys())
@@ -149,6 +150,7 @@ def print_metric_tables(
         toolstr.print_text_box(
             toolstr.add_style(metric + ' vs load', flood.styles.get('metavar')),
             style=flood.styles.get('content'),
+            indent=indent,
         )
 
         # print table
@@ -158,6 +160,7 @@ def print_metric_tables(
             column_formats=column_formats,  # type: ignore
             label_style=flood.styles.get('metavar'),
             border=flood.styles.get('content'),
+            indent=indent,
         )
         if metric != metrics[-1]:
             print()
@@ -202,6 +205,17 @@ def print_table(*args: typing.Any, **kwargs: typing.Any) -> None:
     import toolstr
 
     toolstr.print_table(
+        *args,
+        **kwargs,
+        label_style=flood.styles.get('metavar'),
+        border=flood.styles.get('content'),
+    )
+
+
+def print_multiline_table(*args: typing.Any, **kwargs: typing.Any) -> None:
+    import toolstr
+
+    toolstr.print_multiline_table(
         *args,
         **kwargs,
         label_style=flood.styles.get('metavar'),
