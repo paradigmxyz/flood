@@ -3,14 +3,14 @@
 
 `flood` is a load testing tool for benchmarking EVM nodes over RPC
 
-For each RPC method, `flood` measures the effect of load on metrics such as:
+For each RPC method, `flood` measures how load affects metrics such as:
 1. throughput
 2. latency (mean, P50, P90, P95, P99, max)
 3. error rate
 
 `flood` makes it easy to compare the performance of:
 - different node clients (e.g. geth vs erigon vs reth)
-- different hardware configurations (e.g. local vs cloud vs low memory vs RAID-0)
+- different hardware/software configurations (e.g. local vs cloud vs low memory vs RAID-0)
 - different RPC providers (e.g. Alchemy vs Quicknode vs Infura)
 
 `flood` can generate tables, figures, and reports for easy sharing of results (example report [here](https://datasets.paradigm.xyz/notebooks/flood/example_report.html))
@@ -59,6 +59,12 @@ flood report tests/test1_output tests/test2_output
 
 ## Code Layout
 - `flood/cli`: command line interface
-- `flood/generators`: utilities for generating sequences of rpc calls with parameterized distributions
-- `flood/tests`: implementations of tests
-- `flood/user_io`: utiltiies for parsing user input
+- `flood/generators`: utilities for generating rpc calls with parameterized distributions
+- `flood/tests`: implementations of load tests and equality tests
+- `flood/user_io`: utiltiies for parsing user io
+
+
+## Contributing
+
+Contributions are welcome in the form of issues, PR's, and commentary. Check out the contributor guide in [CONTRIBUTING.md](CONTRIBUTING.md).
+
