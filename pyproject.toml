@@ -72,3 +72,5 @@ line-length = 80
 skip-string-normalization = true
 target-version = ['py37']
 
+[tool.ruff]
+line-length = 80
