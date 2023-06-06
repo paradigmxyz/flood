@@ -320,7 +320,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'content': """
             # show result figures
 
-            colors = flood.get_nodes_plot_colors(nodes=nodes)
+            colors = flood.get_nodes_plot_colors(nodes=results_payload['nodes'])
             flood.plot_load_test_results(
                 test_name=test_name,
                 outputs=results,
