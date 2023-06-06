@@ -26,6 +26,8 @@ Install [`vegeta`](https://github.com/tsenart/vegeta):
 
 After installation, make sure `vegeta` is on your `$PATH`. Running `vegeta -h` should output a path. If it does not, you probably have not set up `go` to install items to your `$PATH`. You may need to add something like `export PATH=$PATH:~/go/bin/` to your terminal config file (e.g. `~/.profile`).
 
+`flood` also requires `python >= 3.7`
+
 #### Installing `flood`
 
 ```
