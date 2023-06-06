@@ -1,14 +1,15 @@
 
-# 🌊🌊 flood 🌊🌊
+# <h1 align="center"> 🌊🌊 flood 🌊🌊 </h1>
+
+**`flood` is a load testing tool for benchmarking EVM nodes over RPC**
+
+![](./assets/cover.png)
 
 [![CI status](https://github.com/paradigmxyz/flood/workflows/Pytest/badge.svg)][gh-ci]
 [![Telegram Chat][tg-badge]][tg-url]
 
 [gh-ci]: https://github.com/paradigmxyz/flood/actions/workflows/ci.yml
 [tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fparadigm%5Fflood
-
-
-`flood` is a load testing tool for benchmarking EVM nodes over RPC
 
 For each RPC method, `flood` measures how load affects metrics such as:
 1. throughput
