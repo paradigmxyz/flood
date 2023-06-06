@@ -90,7 +90,7 @@ def _generate_timings_for_spike_test(
             pass
         else:
             raise Exception(
-                'must specify eith a single spike rate or a [before, during, after] triplet of rates'
+                'must specify eith a single spike rate or a [before, during, after] triplet of rates'  # noqa: E501
             )
 
     if duration is not None:
@@ -110,7 +110,7 @@ def _generate_timings_for_spike_test(
             pass
         else:
             raise Exception(
-                'must specify eith a single spike duration or a [before, during, after] triplet of rates'
+                'must specify eith a single spike duration or a [before, during, after] triplet of rates'  # noqa: E501
             )
     else:
         durations = [

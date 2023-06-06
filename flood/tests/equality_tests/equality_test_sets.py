@@ -90,7 +90,7 @@ def get_vanilla_equality_tests(
             [],
             {
                 'address': '0x4d9079bb4165aeb4084c526a32695dcfd2f77381',
-                'position': '0x0000000000000000000000000000000000000000000000000000000000000002',
+                'position': '0x0000000000000000000000000000000000000000000000000000000000000002',  # noqa: E501
                 'block_number': start_block,
             },
         ),
@@ -110,7 +110,7 @@ def get_vanilla_equality_tests(
             'eth_getBlockByHash',
             ctc.rpc.construct_eth_get_block_by_hash,
             [
-                '0x3dc4ef568ae2635db1419c5fec55c4a9322c05302ae527cd40bff380c1d465dd'
+                '0x3dc4ef568ae2635db1419c5fec55c4a9322c05302ae527cd40bff380c1d465dd'  # noqa: E501
             ],
             {},
         ),
@@ -118,7 +118,7 @@ def get_vanilla_equality_tests(
             'eth_getTransactionByHash',
             ctc.rpc.construct_eth_get_transaction_by_hash,
             [
-                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
             ],
             {},
         ),
@@ -126,7 +126,7 @@ def get_vanilla_equality_tests(
             'eth_getTransactionReceipt',
             ctc.rpc.construct_eth_get_transaction_receipt,
             [
-                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
             ],
             {},
         ),
@@ -218,7 +218,7 @@ def get_trace_equality_tests(
             {
                 'calls': [
                     {
-                        'to_address': '0x6b175474e89094c44da98b954eedeac495271d0f',
+                        'to_address': '0x6b175474e89094c44da98b954eedeac495271d0f',  # noqa: E501
                         'function_abi': function_abi,
                         'function_parameters': [
                             '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643'
@@ -234,7 +234,7 @@ def get_trace_equality_tests(
         #         ctc.rpc.construct_trace_filter,
         #         [],
         #         {
-        #             'to_addresses': ['0x6b175474e89094c44da98b954eedeac495271d0f'],
+        #             'to_addresses': ['0x6b175474e89094c44da98b954eedeac495271d0f'],  # noqa: E501
         #             'start_block': 10_000_000,
         #             'end_block': 10_000_001,
         #             'count': 10,
@@ -249,7 +249,7 @@ def get_trace_equality_tests(
         #     (
         #         'trace_raw_transaction',
         #         ctc.rpc.construct_trace_raw_transaction,
-        #         ['0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'],
+        #         ['0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'],  # noqa: E501
         #         {'trace_type': ['trace']},
         #     ),
         (
@@ -265,7 +265,7 @@ def get_trace_equality_tests(
             'trace_replay_transaction',
             ctc.rpc.construct_trace_replay_transaction,
             [
-                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
             ],
             {'trace_type': ['trace']},
         ),
@@ -273,7 +273,7 @@ def get_trace_equality_tests(
             'trace_transaction',
             ctc.rpc.construct_trace_transaction,
             [
-                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
             ],
             {},
         ),

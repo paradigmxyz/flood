@@ -168,7 +168,7 @@ def get_node_client_version(url: str, remote: str | None = None) -> str | None:
             cmd = [
                 """ssh""",
                 remote,
-                """curl -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\": \"2.0\", \"method\": \"web3_clientVersion\", \"params\": [], \"id\": 1}' """
+                """curl -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\": \"2.0\", \"method\": \"web3_clientVersion\", \"params\": [], \"id\": 1}' """  # noqa: E501
                 + url,
             ]
             output = subprocess.check_output(cmd, stderr=subprocess.DEVNULL)

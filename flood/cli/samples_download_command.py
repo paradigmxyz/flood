@@ -18,7 +18,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ('-s', '--sizes'),
-                'help': 'sample sizes, one of {XS, S, M, L, XL, all}, default L',
+                'help': 'sample sizes, one of {XS, S, M, L, XL, all}, default L',  # noqa: E501
                 'nargs': '+',
             },
             {

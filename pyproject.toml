@@ -74,3 +74,5 @@ target-version = ['py37']
 
 [tool.ruff]
 line-length = 80
+ignore = ["F403"]
+

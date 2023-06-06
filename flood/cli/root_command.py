@@ -32,7 +32,7 @@ help_message = """Load test JSON RPC endpoints
 [bold][title]Parameter Randomization[/bold][/title]
 - [metavar]flood[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
 - For each call, parameters are randomized to minimize caching effects
-- Specify random seed [metavar]-s <seed>[/metavar] for repeatable set of randomized calls"""
+- Specify random seed [metavar]-s <seed>[/metavar] for repeatable set of randomized calls"""  # noqa: E501
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -42,7 +42,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {
                 'name': 'test',
-                'help': 'test to run (use [metavar]flood ls[/metavar] for list)',
+                'help': 'test to run (use [metavar]flood ls[/metavar] for list)',  # noqa: E501
             },
             {
                 'name': 'nodes',

@@ -230,7 +230,7 @@ def _run_load_test_locally(
 
     # format output
     keys = results[0].keys()
-    return {key: [result[key] for result in results] for key in keys}  # type: ignore
+    return {key: [result[key] for result in results] for key in keys}  # type: ignore # noqa: E501
 
 
 def _run_load_test_remotely(
@@ -309,7 +309,8 @@ def _run_load_test_remotely(
         toolstr.print(
             timestamp + ' ' + node_name + ' Executing test on remote node'
         )
-    cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures'".format(
+    cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures'" # noqa: E501
+    cmd = cmd_template.format(
         host=remote,
         name=node['name'],
         url=node['url'],

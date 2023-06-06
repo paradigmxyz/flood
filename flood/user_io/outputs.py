@@ -96,7 +96,7 @@ def _get_tqdm() -> types.ModuleType:
 
     if 'jupyter_client' in sys.modules:
         try:
-            import ipywidgets  # type: ignore
+            import ipywidgets  # type: ignore # noqa: F401
             import tqdm.notebook as tqdm
 
             return tqdm

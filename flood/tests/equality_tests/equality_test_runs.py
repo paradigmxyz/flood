@@ -191,7 +191,6 @@ def _print_result_diff(
     results: typing.Sequence[typing.Any],
     nodes: typing.Sequence[flood.Node],
 ) -> None:
-    import toolstr
 
     result0 = results[0]
     result1 = results[1]

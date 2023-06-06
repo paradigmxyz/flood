@@ -6,10 +6,10 @@ import flood
 
 
 cmd_templates = {
-    'local_bare': 'flood {test_name} {local_node_1} {local_node_2} -d 1 -r 1 2 4',
-    # 'local_alias': 'flood {test_name} node1={local_node_1} node2={local_node_2} -d 1 -r 1 2 4',
-    'remote_bare': 'flood {test_name} {remote_node_1} {remote_node_2} -d 1 -r 20 40 60',
-    # 'remote_alias': 'flood {test_name} node1={remote_node_1} node2={remote_node_2} -d 1 -r 1 2 4',
+    'local_bare': 'flood {test_name} {local_node_1} {local_node_2} -d 1 -r 1 2 4',  # noqa: E501
+    # 'local_alias': 'flood {test_name} node1={local_node_1} node2={local_node_2} -d 1 -r 1 2 4',  # noqa: E501
+    'remote_bare': 'flood {test_name} {remote_node_1} {remote_node_2} -d 1 -r 20 40 60',  # noqa: E501
+    # 'remote_alias': 'flood {test_name} node1={remote_node_1} node2={remote_node_2} -d 1 -r 1 2 4',  # noqa: E501
 }
 
 

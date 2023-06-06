@@ -10,7 +10,7 @@ import flood
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': samples_ls_command,
-        'help': 'list raw EVM data samples that are downloaded and downloadable',
+        'help': 'list raw EVM data samples that are downloaded and downloadable',  # noqa: E501
         'args': [],
     }
 
