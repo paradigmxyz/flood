@@ -4,7 +4,7 @@ requires = ["flit_core >=3.2, <4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "flood"
+name = "paradigm-flood"
 readme = "README.md"
 requires-python = ">=3.7"
 dynamic = ["version", "description"]
@@ -34,11 +34,11 @@ dependencies = [
     'requests >=2.20.0, <3',
     'tqdm >=4.65.0, <5',
     'numpy >=1.19.0, <1.25',
-    'nbformat >= 5.8.0',
-    'toolplot >= 0.3.4',
-    'matplotlib >= 3.7.1',
-    'paradigm-data-portal >= 0.2.2',
-# 'checkthechain@git+https://github.com/checkthechain/checkthechain#7c3c48715902ff52392e2a97dc54863e046670d3',
+    'nbformat >= 5.8.0, <6',
+    'toolplot >= 0.3.4, <0.4',
+    'matplotlib >= 3.7.1, <4',
+    'paradigm-data-portal >= 0.2.2, <0.3',
+    'checkthechain >= 0.3.4, <0.4.0',
 ]
 
 [project.optional-dependencies]

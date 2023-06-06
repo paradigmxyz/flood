@@ -22,23 +22,17 @@ For each RPC method, `flood` measures how load affects metrics such as:
 
 Install [`vegeta`](https://github.com/tsenart/vegeta):
 - on mac: `brew update && brew install vegeta`
-- from source: `go install github.com/tsenart/vegeta@latest`
+- on linux: `go install github.com/tsenart/vegeta/v12@v12.8.4`
 
-Install latest [`ctc`](https://github.com/checkthechain/checkthechain):
-```
-git clone https://github.com/checkthechain/checkthechain
-cd checkthechain
-pip install -e ./
-```
+After installation, make sure `vegeta` is on your `$PATH`. Running `vegeta -h` should output a path. If it does not, you probably have not set up `go` to install items to your `$PATH`. You may need to add something like `export PATH=$PATH:~/go/bin/` to your terminal config file (e.g. `~/.profile`).
 
 #### Installing `flood`
 
+```
+pip install paradigm-flood
+```
 
-```
-git clone https://github.com/paradigmxyz/flood
-cd flood
-pip install -e ./
-```
+Typing `flood help` in your terminal should show help output. If it does not, you probably have not set up `pip` to install items to your `$PATH`. You may need to add something like `export PATH=$PATH:~/.local/bin` to your terminal config file (e.g. `~/.profile`). Alternatively, you can avoid setting up your `$PATH` and just type `python3 -m flood` instead of `flood`.
 
 ## Usage
 
