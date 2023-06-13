@@ -89,7 +89,7 @@ def parse_node(
     elif isinstance(node, str):
         # parse name
         if '=' in node:
-            name, url = node.split('=')
+            name, url = node.split('=', 1)
         else:
             name = node
             url = node
