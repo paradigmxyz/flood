@@ -132,12 +132,6 @@ def run_equality_test(
     )
 
 
-def _json_equal(lhs: typing.Any, rhs: typing.Any) -> bool:
-    import json
-
-    return json.dumps(lhs, sort_keys=True) == json.dumps(rhs, sort_keys=True)
-
-
 def _summarize_result(
     responses: typing.Sequence[typing.Any],
     results: typing.Sequence[typing.Any],
@@ -149,7 +143,7 @@ def _summarize_result(
 
     test_name, constructor, args, kwargs = test
 
-    if not _json_equal(results[0], results[1]):
+    if not toolstr.nested_equal(results[0], results[1]):
         print()
         flood.print_text_box('Discrepancies in ' + test_name)
         print()
@@ -171,7 +165,9 @@ def _summarize_result(
                 toolstr.print(
                     node['name'] + ' failed', style=flood.styles['title']
                 )
-                if response.status_code == 200:
+                if response is None:
+                    print('response: no response')
+                elif response.status_code == 200:
                     print('response:', response.json())
                 else:
                     print('response: status code ', response.status_code)
@@ -179,97 +175,23 @@ def _summarize_result(
         if results[0] is None or results[1] is None:
             return False
 
-        _print_result_diff(results=results, nodes=list(nodes.values()))
+        if len(results) == 2:
+            node0, node1 = list(nodes.values())
+            print()
+            flood.print_header('differences in response')
+            toolstr.print_nested_diff(
+                lhs=results[0],
+                rhs=results[1],
+                lhs_name=node0['name'],
+                rhs_name=node1['name'],
+                styles=flood.styles,
+                indent=4,
+            )
+        else:
+            print('omitting details when >2 nodes tested')
 
         return False
 
     else:
         return True
 
-
-def _print_result_diff(
-    results: typing.Sequence[typing.Any],
-    nodes: typing.Sequence[flood.Node],
-) -> None:
-
-    result0 = results[0]
-    result1 = results[1]
-
-    if type(result0) is not type(result1):
-        for node, result in zip(nodes, results):
-            print(node['name'], 'type:', type(result))
-        return
-
-    if isinstance(result0, dict):
-        keys0 = set(result0.keys())
-        keys1 = set(result1.keys())
-        if keys0 != keys1:
-            only_in_0 = keys0 - keys1
-            only_in_1 = keys1 - keys0
-            print()
-            flood.print_header('different fields in results')
-            if len(only_in_0) > 0:
-                print(
-                    '- present only in',
-                    nodes[0]['name'] + ':',
-                    ', '.join(only_in_0),
-                )
-            if len(only_in_1) > 0:
-                print(
-                    '- present only in',
-                    nodes[1]['name'] + ':',
-                    ', '.join(only_in_1),
-                )
-
-        rows = []
-        for key in keys0 & keys1:
-            if not _json_equal(result0[key], result1[key]):
-                row = [key, result0[key], result1[key]]
-                rows.append(row)
-        if len(rows) > 0:
-            print()
-            flood.print_header('differences in values')
-            flood.print_table(
-                rows,
-                labels=['field', nodes[0]['name'], nodes[1]['name']],
-                compact=3,
-                max_column_widths=[20, 30, 30],
-                indent=4,
-            )
-
-    elif isinstance(result0, list):
-        if len(result1) != len(result0):
-            print()
-            flood.print_header('different number of results')
-            for node, result in zip(nodes, results):
-                flood.print_bullet(
-                    key=node['name'], value=str(len(result)) + ' results'
-                )
-        else:
-            import json
-
-            print('differences:')
-            n_printed = 0
-            for i, (item0, item1) in enumerate(zip(result0, result1)):
-                if not _json_equal(item0, item1):
-                    if n_printed >= 10:
-                        print('...')
-                        break
-
-                    item0_str = json.dumps(item0)
-                    if len(item0_str) > 20:
-                        item0_str = item0_str[:17] + '...'
-                    item1_str = json.dumps(item1)
-                    if len(item1_str) > 20:
-                        item1_str = item1_str[:17] + '...'
-                    print('- item at index', i)
-                    print('    -', nodes[0]['name'] + ':', item0_str)
-                    print('    -', nodes[1]['name'] + ':', item1_str)
-
-                    n_printed += 1
-
-    else:
-        if result1 != result0:
-            flood.print_header('differences in values')
-            for node, result in zip(nodes, results):
-                flood.print_bullet(key=node['name'], value=result)
