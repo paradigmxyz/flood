@@ -69,7 +69,7 @@ def _create_load_test_report_ipynb(
 
     test_paths_map = {}
     for test_path in test_paths:
-        payload = flood.load_single_run_test_payload(output_dir=test_path)
+        payload = flood.load_single_run_test_payload(test_path)
         name = payload['name']
         test_paths_map[name] = test_path
 
@@ -193,7 +193,7 @@ _report_template_cells: notebook_io.NotebookTemplate = [
             # load data
 
             test_payloads = {{
-                test_name: flood.load_single_run_test_payload(output_dir=test_path)
+                test_name: flood.load_single_run_test_payload(test_path)
                 for test_name, test_path in test_paths.items()
             }}
 

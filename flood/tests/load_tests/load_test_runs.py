@@ -257,7 +257,7 @@ def _run_load_test_remotely(
     job_id = str(uuid.uuid4())
     tempdir = '/tmp/flood__' + job_id
     os.makedirs(tempdir)
-    flood.user_io.file_io._save_single_run_test(
+    flood.runners.single_runner.single_runner_io._save_single_run_test(
         test_name='',
         test=test,
         output_dir=tempdir,

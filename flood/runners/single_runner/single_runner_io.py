@@ -51,6 +51,7 @@ def _save_single_run_test(
         json.dump(payload, f)
 
 
+
 def _save_single_run_results(
     *,
     output_dir: str,
@@ -92,11 +93,15 @@ def _save_single_run_results(
 
 
 def load_single_run_test_payload(
-    output_dir: str,
+    path_spec: str,
 ) -> flood.SingleRunTestPayload:
+    import os
     import json
 
-    path = get_single_run_test_path(output_dir=output_dir)
+    if os.path.isfile(path_spec):
+        path = path_spec
+    else:
+        path = get_single_run_test_path(path_spec)
     with open(path) as f:
         test: flood.SingleRunTestPayload = json.load(f)
     return test
@@ -105,7 +110,7 @@ def load_single_run_test_payload(
 def load_single_run_test(
     output_dir: str,
 ) -> flood.LoadTest:
-    payload = load_single_run_test_payload(output_dir=output_dir)
+    payload = load_single_run_test_payload(output_dir)
     return payload['test']
 
 
@@ -125,3 +130,4 @@ def load_single_run_results(
 ) -> typing.Mapping[str, flood.LoadTestOutput]:
     payload = load_single_run_results_payload(output_dir=output_dir)
     return payload['results']
+

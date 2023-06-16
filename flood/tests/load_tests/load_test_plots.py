@@ -9,7 +9,7 @@ def plot_load_test_results(
     outputs: typing.Mapping[str, flood.LoadTestOutput],
     test_name: str,
     output_dir: str | None = None,
-    latency_yscale_log: bool = False,
+    latency_yscale_log: bool = True,
     colors: typing.Mapping[str, str] | None = None,
 ) -> None:
     import os

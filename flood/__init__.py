@@ -1,6 +1,7 @@
 """tool for benchmarking RPC endpoints"""
 
 from .generators import *
+from .runners import *
 from .spec import *
 from .tests import *
 from .user_io import *
