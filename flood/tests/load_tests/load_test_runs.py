@@ -260,6 +260,7 @@ def _run_load_test_remotely(
     test: spec.LoadTest,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    include_raw_output: bool = False,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
 
@@ -330,14 +331,20 @@ def _run_load_test_remotely(
         toolstr.print(
             timestamp + ' ' + node_name + ' Executing test on remote node'
         )
-    cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures'"  # noqa: E501
+    cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures {extra_kwargs}'"  # noqa: E501
+    if include_raw_output:
+        extra_kwargs = '--save-raw-output'
+    else:
+        extra_kwargs = ''
     cmd = cmd_template.format(
         host=remote,
         name=node['name'],
         url=node['url'],
         test=tempdir,
         output=tempdir,
+        extra_kwargs=extra_kwargs,
     )
+    cmd = cmd.strip()
     subprocess.check_output(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # retrieve benchmark results
