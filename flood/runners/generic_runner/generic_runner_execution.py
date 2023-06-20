@@ -22,6 +22,7 @@ def run(
     output_dir: str | bool | None = None,
     figures: bool = True,
     metrics: typing.Sequence[str] | None = None,
+    include_raw_output: bool = False,
 ) -> None:
     """generate and run tests against nodes"""
     import os
@@ -49,6 +50,7 @@ def run(
             verbose=verbose,
             metrics=metrics,
             figures=figures,
+            include_raw_output=include_raw_output,
         )
 
     if nodes is None:
@@ -69,6 +71,7 @@ def run(
             verbose=verbose,
             metrics=metrics,
             figures=figures,
+            include_raw_output=include_raw_output,
         )
     elif test_name in flood.get_multi_test_generators():
         raise NotImplementedError()

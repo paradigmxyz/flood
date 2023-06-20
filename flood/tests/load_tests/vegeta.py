@@ -5,6 +5,9 @@ import typing
 
 from ... import spec
 
+if typing.TYPE_CHECKING:
+    import polars as pl
+
 
 def run_vegeta_attack(
     *,
@@ -14,6 +17,7 @@ def run_vegeta_attack(
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     verbose: bool = False,
+    include_raw_output: bool = False,
 ) -> spec.LoadTestOutputDatum:
     attack = _construct_vegeta_attack(
         calls=calls,
@@ -31,6 +35,7 @@ def run_vegeta_attack(
         attack_output=attack_output,
         target_rate=rate,
         target_duration=duration,
+        include_raw_output=include_raw_output,
     )
     return report
 
@@ -127,6 +132,7 @@ def _create_vegeta_report(
     attack_output: bytes,
     target_rate: int,
     target_duration: int,
+    include_raw_output: bool,
 ) -> spec.LoadTestOutputDatum:
     import json
     import subprocess
@@ -143,6 +149,11 @@ def _create_vegeta_report(
         latency_min = report['latencies']['min'] / 1e9
     else:
         latency_min = None
+
+    if include_raw_output:
+        raw_output = encode_raw_vegeta_output(attack_output)
+    else:
+        raw_output = None
 
     return {
         'target_rate': target_rate,
@@ -166,4 +177,93 @@ def _create_vegeta_report(
         'last_request_timestamp': report['latest'],
         'last_response_timestamp': report['end'],
         'final_wait_time': report['wait'] / 1e9,
+        'raw_output': raw_output,
     }
+
+
+#
+# # output processing
+#
+
+
+def encode_raw_vegeta_output(raw_output: bytes) -> str:
+    import base64
+    import io
+    import gzip
+
+    # gzip compress
+    buf = io.BytesIO()
+    f = gzip.GzipFile(fileobj=buf, mode='wb')
+    f.write(raw_output)
+    f.close()
+    compressed = buf.getvalue()
+
+    # encode as base64
+    as_base64 = base64.b64encode(compressed).decode('utf-8')
+
+    return as_base64
+
+
+def decode_raw_vegeta_output(encoded_output: str) -> bytes:
+    import base64
+    import io
+    import gzip
+
+    # decode from base64
+    as_bytes = base64.b64decode(encoded_output.encode())
+
+    # gzip decompress
+    buf = io.BytesIO(as_bytes)
+    f = gzip.GzipFile(fileobj=buf, mode='rb')
+    decompressed = f.read()
+    f.close()
+
+    return decompressed
+
+
+def convert_raw_vegeta_output_to_dataframe(raw_output: bytes) -> pl.DataFrame:
+    import io
+    import subprocess
+    import polars as pl
+
+    cmd = 'vegeta encode --to csv'
+    report_output = (
+        subprocess.check_output(cmd.split(' '), input=raw_output)
+        .decode()
+        .strip()
+    )
+
+    buf = io.StringIO()
+    buf.write(report_output)
+    buf.seek(0)
+
+    schema = [
+        'timestamp',
+        'status_code',
+        'latency',
+        'bytes_out',
+        'bytes_in',
+        'error',
+        'response',
+        'name',
+        'index',
+        'method',
+        'url',
+        'response_headers',
+    ]
+    dtypes = {
+        'bytes_in': pl.Int64,
+        'bytes_out': pl.Int64,
+        'error': pl.Utf8,
+        'index': pl.Int64,
+        'latency': pl.Int64,
+        'method': pl.Utf8,
+        'name': pl.Utf8,
+        'response': pl.Utf8,
+        'response_headers': pl.Utf8,
+        'status_code': pl.Int64,
+        'timestamp': pl.Int64,
+        'url': pl.Utf8,
+    }
+    return pl.read_csv(buf, new_columns=schema, has_header=False, dtypes=dtypes)
+

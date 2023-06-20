@@ -24,6 +24,7 @@ def _run_single(
     figures: bool,
     metrics: typing.Sequence[str] | None = None,
     verbose: bool | int,
+    include_raw_output: bool = False,
 ) -> None:
     # get test parameters
     rates, durations, vegeta_kwargs = _get_single_test_parameters(
@@ -67,7 +68,12 @@ def _run_single(
     # run tests
     if verbose:
         single_runner_summary._print_run_start()
-    results = flood.run_load_tests(nodes=nodes, test=test, verbose=verbose)
+    results = flood.run_load_tests(
+        nodes=nodes,
+        test=test,
+        verbose=verbose,
+        include_raw_output=include_raw_output,
+    )
 
     # output results to file
     if output_dir is not None:

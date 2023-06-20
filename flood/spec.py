@@ -143,6 +143,7 @@ if typing.TYPE_CHECKING:
         last_request_timestamp: str
         last_response_timestamp: str
         final_wait_time: float
+        raw_output: str | None
 
     class LoadTestOutput(typing.TypedDict):
         target_rate: typing.Sequence[int]
@@ -165,8 +166,9 @@ if typing.TYPE_CHECKING:
         last_request_timestamp: typing.Sequence[str]
         last_response_timestamp: typing.Sequence[str]
         final_wait_time: typing.Sequence[float]
+        raw_output: typing.Sequence[str | None]
 
-    RunType = typing.Literal['single_run']
+    RunType = typing.Literal['single_test']
 
     class SingleRunTestPayload(typing.TypedDict):
         version: str
@@ -177,6 +179,5 @@ if typing.TYPE_CHECKING:
     class SingleRunResultsPayload(typing.TypedDict):
         version: str
         type: RunType
-        test: LoadTest
         nodes: Nodes
         results: typing.Mapping[str, LoadTestOutput]

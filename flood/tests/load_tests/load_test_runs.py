@@ -19,6 +19,7 @@ def run_load_tests(
     test: spec.LoadTest | None = None,
     tests: typing.Mapping[str, spec.LoadTest] | None = None,
     verbose: bool | int = False,
+    include_raw_output: bool = False,
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
     """run multiple load tests"""
     # parse user_io
@@ -36,27 +37,38 @@ def run_load_tests(
         'desc': 'nodes',
         'position': 0,
         'colour': flood.styles['content'],
-        'disable': not verbose,
+        # 'disable': not verbose,
+        'disable': True,
     }
 
     results = {}
 
     # case: single node and single test
     if node is not None and test is not None:
-        results[node['name']] = schedule_load_test(node=node, test=test)
+        results[node['name']] = schedule_load_test(
+            node=node,
+            test=test,
+            include_raw_output=include_raw_output,
+        )
 
     # case: single node and multiple tests
     elif node is not None and tests is not None:
         for name, test in tqdm.tqdm(tests.items(), **pbar):
             results[name] = schedule_load_test(
-                node=node, verbose=verbose, test=test
+                node=node,
+                verbose=verbose,
+                test=test,
+                include_raw_output=include_raw_output,
             )
 
     # case: multiple nodes and single tests
     elif nodes is not None and test is not None:
         for name, nd in tqdm.tqdm(nodes.items(), **pbar):
             results[name] = schedule_load_test(
-                node=nd, verbose=verbose, test=test
+                node=nd,
+                verbose=verbose,
+                test=test,
+                include_raw_output=include_raw_output,
             )
 
     # case: multiple nodes and multiple tests
@@ -67,6 +79,7 @@ def run_load_tests(
                     node=node,
                     verbose=verbose,
                     test=test,
+                    include_raw_output=include_raw_output,
                 )
 
     # case: invalid input
@@ -96,6 +109,7 @@ def schedule_load_test(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     verbose: bool | int = False,
+    include_raw_output: bool = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> (
     spec.LoadTestOutput
@@ -121,6 +135,7 @@ def schedule_load_test(
                 durations=durations,
                 vegeta_kwargs=vegeta_kwargs,
                 verbose=verbose,
+                include_raw_output=include_raw_output,
                 _pbar_kwargs=_pbar_kwargs,
                 _container=queue,
             ),
@@ -137,6 +152,7 @@ def schedule_load_test(
             durations=durations,
             vegeta_kwargs=vegeta_kwargs,
             verbose=verbose,
+            include_raw_output=include_raw_output,
             _pbar_kwargs=_pbar_kwargs,
         )
 
@@ -153,6 +169,7 @@ def run_load_test(
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     _container: multiprocessing.Queue[spec.LoadTestOutput] | None = None,
+    include_raw_output: bool = False,
 ) -> spec.LoadTestOutput:
     """run a load test against a single node"""
 
@@ -176,6 +193,7 @@ def run_load_test(
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
+            include_raw_output=include_raw_output,
         )
     else:
         result = _run_load_test_remotely(
@@ -197,6 +215,7 @@ def _run_load_test_locally(
     test: spec.LoadTest | None,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    include_raw_output: bool = False,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
 
@@ -209,7 +228,8 @@ def _run_load_test_locally(
         desc='samples',
         position=1,
         colour=flood.styles['content'],
-        disable=not verbose,
+        # disable=not verbose,
+        disable=True,
         **_pbar_kwargs,
     )
 
@@ -223,6 +243,7 @@ def _run_load_test_locally(
             rate=attack['rate'],
             vegeta_kwargs=attack['vegeta_kwargs'],
             verbose=verbose >= 2,
+            include_raw_output=include_raw_output,
         )
         results.append(result)
         if verbose >= 2:
@@ -309,7 +330,7 @@ def _run_load_test_remotely(
         toolstr.print(
             timestamp + ' ' + node_name + ' Executing test on remote node'
         )
-    cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures'" # noqa: E501
+    cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures'"  # noqa: E501
     cmd = cmd_template.format(
         host=remote,
         name=node['name'],
@@ -342,3 +363,4 @@ def _run_load_test_remotely(
     with open(results_path, 'r') as f:
         results: spec.SingleRunResultsPayload = json.load(f)
         return results['results'][node['name']]
+

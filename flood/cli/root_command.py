@@ -101,6 +101,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'dest': 'figures',
                 'action': 'store_false',
             },
+            {
+                'name': ['--save-raw-output'],
+                'help': 'save raw output from Vegeta',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             'eth_getBlockByNumber localhost:8545',
@@ -123,6 +128,7 @@ def root_command(
     quiet: bool,
     figures: bool,
     equality: bool,
+    save_raw_output: bool,
 ) -> None:
     verbose = not quiet
     if nodes is not None and len(nodes) == 0:
@@ -165,4 +171,5 @@ def root_command(
             dry=dry,
             output_dir=output_dir or True,
             figures=figures,
+            include_raw_output=save_raw_output,
         )

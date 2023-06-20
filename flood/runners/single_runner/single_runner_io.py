@@ -4,6 +4,9 @@ import typing
 
 import flood
 
+if typing.TYPE_CHECKING:
+    import polars as pl
+
 
 _path_templates = {
     'single_run_test': '{output_dir}/test.json',
@@ -41,7 +44,7 @@ def _save_single_run_test(
             os.makedirs(output_dir, exist_ok=True)
 
     path = _path_templates['single_run_test'].format(output_dir=output_dir)
-    payload = {
+    payload: flood.SingleRunTestPayload = {
         'version': flood.__version__,
         'type': 'single_test',
         'name': test_name,
@@ -49,7 +52,6 @@ def _save_single_run_test(
     }
     with open(path, 'w') as f:
         json.dump(payload, f)
-
 
 
 def _save_single_run_results(
@@ -71,10 +73,9 @@ def _save_single_run_results(
             os.makedirs(output_dir)
 
     path = _path_templates['single_run_results'].format(output_dir=output_dir)
-    payload = {
+    payload: flood.SingleRunResultsPayload = {
         'version': flood.__version__,
         'type': 'single_test',
-        'test': test,
         'nodes': nodes,
         'results': results,
     }
@@ -130,4 +131,34 @@ def load_single_run_results(
 ) -> typing.Mapping[str, flood.LoadTestOutput]:
     payload = load_single_run_results_payload(output_dir=output_dir)
     return payload['results']
+
+
+def load_single_run_raw_output(
+    output_dir: str,
+    sample_index: int | None = None,
+) -> typing.Mapping[str, pl.DataFrame]:
+    import polars as pl
+
+    results = load_single_run_results(output_dir=output_dir)
+    node_dfs = {}
+    for node_name, node_results in results.items():
+        raw_output = node_results['raw_output']
+        if raw_output is None:
+            raise Exception('raw_outputs were not saved for test')
+        else:
+            if sample_index is not None:
+                indices = [sample_index]
+            else:
+                indices = list(range(len(raw_output)))
+            dfs = []
+            for index in indices:
+                item = raw_output[index]
+                if item is None:
+                    raise Exception('raw_outputs were not saved for test')
+                decoded = flood.decode_raw_vegeta_output(item)
+                df = flood.convert_raw_vegeta_output_to_dataframe(decoded)
+                df = df.with_columns(pl.lit(index).alias('sample_index'))
+                dfs.append(df)
+            node_dfs[node_name] = pl.concat(dfs)
+    return node_dfs
 

@@ -24,7 +24,7 @@ def get_multi_test_generators() -> (
     typing.Mapping[str, flood.MultiLoadTestGenerator]
 ):
     return {
-        get_test_generator_display_name(item): item  # type: ignore
+        get_test_generator_display_name(item, multi=True): item  # type: ignore
         for item in dir(flood)
         if item.startswith('generate_tests_')
     }
