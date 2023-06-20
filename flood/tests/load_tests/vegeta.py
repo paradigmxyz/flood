@@ -267,3 +267,90 @@ def convert_raw_vegeta_output_to_dataframe(raw_output: bytes) -> pl.DataFrame:
     }
     return pl.read_csv(buf, new_columns=schema, has_header=False, dtypes=dtypes)
 
+
+def compute_raw_output_metrics(
+    raw_output: typing.Mapping[str, pl.DataFrame],
+    results: typing.Mapping[str, spec.LoadTestOutput],
+) -> typing.Mapping[str, spec.LoadTestOutput]:
+    import polars as pl
+
+    metrics: typing.MutableMapping[str, spec.LoadTestOutput] = {}
+    for node_name, node_results in results.items():
+        node_metrics = []
+        for i, (target_rate, target_duration) in enumerate(
+            zip(node_results['target_rate'], node_results['target_duration'])
+        ):
+            sample_metrics = compute_raw_output_sample_metrics(
+                df=raw_output[node_name].filter(pl.col('sample_index') == i),
+                target_rate=target_rate,
+                target_duration=target_duration,
+            )
+            sample_metrics['raw_output'] = None
+            node_metrics.append(sample_metrics)
+        metrics[node_name] = {
+            metric: [sample_metrics[metric] for sample_metrics in node_metrics]  # type: ignore # noqa: E501
+            for metric in node_results.keys()
+        }
+    return metrics
+
+
+def compute_raw_output_sample_metrics(
+    df: pl.DataFrame, target_rate: int, target_duration: int
+) -> spec.LoadTestOutputDatum:
+    import polars as pl
+    actual_rate = (
+        pl.count()
+        / (pl.col('timestamp').max() - pl.col('timestamp').min())
+        * 1e9
+    )
+    actual_rate = actual_rate.alias('actual_rate')
+    successful = df.filter(pl.col('status_code') == 200)
+    total_duration = (  # type: ignore
+        df.select(pl.col('timestamp') + pl.col('latency')).max()
+    ) - df['timestamp'].min()
+    total_duration = total_duration.rows()[0][0]
+    status_codes = {}
+    for k, v in df['status_code'].value_counts().rows():
+        status_codes[str(k)] = v
+    errors = df.filter(~pl.col('error').is_null())['error'].unique().to_list()
+
+    metrics_df = df.select(
+        pl.lit(target_rate).alias('target_rate'),
+        actual_rate,
+        pl.lit(target_duration).alias('target_duration'),
+        (pl.max('timestamp') - pl.min('timestamp')).alias('actual_duration')
+        / 1e9,
+        pl.count().alias('requests'),
+        pl.lit(len(successful) / total_duration).alias('throughput') * 1e9,
+        (len(successful) / pl.count()).alias('success'),
+        pl.min('latency').alias('min') / 1e9,
+        pl.mean('latency').alias('mean') / 1e9,
+        pl.median('latency').alias('p50') / 1e9,
+        pl.quantile('latency', 0.90).alias('p90') / 1e9,
+        pl.quantile('latency', 0.95).alias('p95') / 1e9,
+        pl.quantile('latency', 0.99).alias('p99') / 1e9,
+        pl.max('latency').alias('max') / 1e9,
+        pl.struct(**status_codes, eager=True).alias('status_codes'),
+        pl.Series([errors]).alias('errors'),
+        (pl.col('timestamp').min() / 1e3)
+        .cast(pl.Datetime)
+        .cast(str)
+        .alias('first_request_timestamp'),
+        (pl.col('timestamp').max() / 1e3)
+        .cast(pl.Datetime)
+        .cast(str)
+        .alias('last_request_timestamp'),
+        ((pl.col('timestamp') + pl.col('latency')) / 1e3)
+        .max()
+        .cast(pl.Datetime)
+        .cast(str)
+        .alias('last_response_timestamp'),
+        (
+            (pl.col('timestamp') + pl.col('latency')).max()
+            - pl.max('timestamp')
+        ).alias('final_wait_time')
+        / 1e9,
+    )
+
+    return metrics_df.to_dicts()[0]  # type: ignore
+
