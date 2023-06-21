@@ -134,12 +134,17 @@ def load_single_run_results(
 
 
 def load_single_run_raw_output(
-    output_dir: str,
+    *,
+    output_dir: str | None = None,
+    results: typing.Mapping[str, flood.LoadTestOutput] | None = None,
     sample_index: int | None = None,
 ) -> typing.Mapping[str, pl.DataFrame]:
     import polars as pl
 
-    results = load_single_run_results(output_dir=output_dir)
+    if results is None:
+        if output_dir is None:
+            raise Exception('must specify output_dir or results')
+        results = load_single_run_results(output_dir=output_dir)
     node_dfs = {}
     for node_name, node_results in results.items():
         raw_output = node_results['raw_output']

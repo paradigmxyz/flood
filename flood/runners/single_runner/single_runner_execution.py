@@ -25,7 +25,11 @@ def _run_single(
     metrics: typing.Sequence[str] | None = None,
     verbose: bool | int,
     include_raw_output: bool = False,
+    deep_check: bool = False,
 ) -> None:
+    if deep_check:
+        include_raw_output = True
+
     # get test parameters
     rates, durations, vegeta_kwargs = _get_single_test_parameters(
         test=test,
@@ -88,6 +92,10 @@ def _run_single(
             test_name=test_name,
         )
 
+    # perform deep check
+    if deep_check:
+        _perform_deep_check(results, verbose=verbose)
+
     # print summary
     if verbose:
         single_runner_summary._print_single_run_conclusion_copy(
@@ -102,6 +110,49 @@ def _run_single(
 #
 # # helper functions
 #
+
+
+def _perform_deep_check(
+    results: typing.Mapping[str, flood.LoadTestOutput],
+    verbose: bool | int = False,
+) -> None:
+    """
+    check that responses for each success are
+    1) well-formed json
+    and 2) error = None
+    """
+    import base64
+    import json
+
+    errors = False
+
+    raw_output = flood.load_single_run_raw_output(results=results)
+    for result_name, result in raw_output.items():
+        for status_code, response in zip(
+            result['status_code'], result['response'].to_list()
+        ):
+            if status_code == 200:
+                try:
+                    decoded = json.loads(base64.b64decode(response))
+                    if decoded.get('result') is None:
+                        errors = True
+                except Exception:
+                    errors = True
+
+            if errors:
+                break
+        if errors:
+            break
+
+    if verbose:
+        if errors:
+            print()
+            print('[deep check passed]')
+        else:
+            print('[deep check failed]')
+
+    if errors:
+        raise Exception('some calls that were reported successful had bad data')
 
 
 def _get_single_test_parameters(
