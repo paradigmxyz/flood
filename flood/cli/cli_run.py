@@ -21,6 +21,7 @@ def run_cli(raw_command: str | None = None) -> None:
         (): 'flood.cli.root_command',
         ('help',): 'toolcli.command_utils.standard_subcommands.help_command',
         ('ls',): 'flood.cli.ls_command',
+        ('print',): 'flood.cli.print_command',
         ('report',): 'flood.cli.report_command',
         ('samples', 'collect'): 'flood.cli.samples_collect_command',
         ('samples', 'download'): 'flood.cli.samples_download_command',
