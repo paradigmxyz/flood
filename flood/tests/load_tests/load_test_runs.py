@@ -91,10 +91,17 @@ def run_load_tests(
     for name, result in results.items():
         if isinstance(result, dict):
             joined[name] = result
-        else:
+        elif isinstance(result, tuple):
             process, queue = result
             process.join()
-            joined[name] = queue.get()
+            results_path = queue.get()
+            with open(results_path, 'r') as f:
+                import json
+
+                test_results: spec.SingleRunResultsPayload = json.load(f)
+                joined[name] = test_results['results'][name]
+        else:
+            raise Exception('invalid result type')
 
     return joined
 
@@ -113,7 +120,8 @@ def schedule_load_test(
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> (
     spec.LoadTestOutput
-    | tuple[multiprocessing.Process, multiprocessing.Queue[spec.LoadTestOutput]]
+    | str
+    | tuple[multiprocessing.Process, multiprocessing.Queue[str]]
 ):
     """runs local tests synchronously, remote tests asynchronously"""
 
@@ -121,9 +129,7 @@ def schedule_load_test(
     if node['remote'] is not None:
         import multiprocessing
 
-        queue: multiprocessing.Queue[
-            spec.LoadTestOutput
-        ] = multiprocessing.Queue()
+        queue: multiprocessing.Queue[str] = multiprocessing.Queue()
         process = multiprocessing.Process(
             target=run_load_test,
             kwargs=dict(
@@ -168,9 +174,9 @@ def run_load_test(
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
-    _container: multiprocessing.Queue[spec.LoadTestOutput] | None = None,
+    _container: multiprocessing.Queue[str] | None = None,
     include_raw_output: bool = False,
-) -> spec.LoadTestOutput:
+) -> spec.LoadTestOutput | str:
     """run a load test against a single node"""
 
     # parse user_io
@@ -188,7 +194,7 @@ def run_load_test(
 
     # run tests
     if node.get('remote') is None:
-        result = _run_load_test_locally(
+        result: spec.LoadTestOutput | str = _run_load_test_locally(
             node=node,
             test=test,
             verbose=verbose,
@@ -201,9 +207,12 @@ def run_load_test(
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
+            include_raw_output=include_raw_output,
         )
 
     if _container is not None:
+        if not isinstance(result, str):
+            raise Exception('_container only supportted for remote testing')
         _container.put(result)
 
     return result
@@ -218,6 +227,23 @@ def _run_load_test_locally(
     include_raw_output: bool = False,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
+    import datetime
+    import toolstr
+
+    if verbose:
+        dt = datetime.datetime.now()
+        if dt.microsecond >= 500_000:
+            dt = dt + datetime.timedelta(
+                microseconds=1_000_000 - dt.microsecond
+            )
+        else:
+            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+        timestamp = (
+            toolstr.add_style('\[', flood.styles['content'])
+            + toolstr.add_style(str(dt), flood.styles['metavar'])
+            + toolstr.add_style(']', flood.styles['content'])
+        )
+        toolstr.print(timestamp + ' Running load test for ' + node['name'])
 
     # construct progress bar
     if _pbar_kwargs is None:
@@ -236,6 +262,26 @@ def _run_load_test_locally(
     # perform tests
     results = []
     for attack in tqdm.tqdm(test, **tqdm_kwargs):
+        if verbose:
+            dt = datetime.datetime.now()
+            if dt.microsecond >= 500_000:
+                dt = dt + datetime.timedelta(
+                    microseconds=1_000_000 - dt.microsecond
+                )
+            else:
+                dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+            timestamp = (
+                toolstr.add_style('\[', flood.styles['content'])
+                + toolstr.add_style(str(dt), flood.styles['metavar'])
+                + toolstr.add_style(']', flood.styles['content'])
+            )
+            toolstr.print(
+                timestamp
+                + ' Running attack at rate = '
+                + str(attack['rate'])
+                + ' rps'
+            )
+
         result = vegeta.run_vegeta_attack(
             url=node['url'],
             calls=attack['calls'],
@@ -261,10 +307,9 @@ def _run_load_test_remotely(
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     include_raw_output: bool = False,
-) -> spec.LoadTestOutput:
+) -> str:
     """run a load test from local node"""
 
-    import json
     import os
     import subprocess
     import uuid
@@ -366,8 +411,5 @@ def _run_load_test_remotely(
     cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 
-    # return results
-    with open(results_path, 'r') as f:
-        results: spec.SingleRunResultsPayload = json.load(f)
-        return results['results'][node['name']]
+    return results_path
 

@@ -63,6 +63,8 @@ def _run_single(
 
     # skip dry run
     if dry:
+        print()
+        print('[dry run, exitting]')
         return
 
     # run tests
