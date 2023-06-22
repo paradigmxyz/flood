@@ -148,7 +148,7 @@ def _summarize_result(
 
     test_name, constructor, args, kwargs = test
 
-    if not toolstr.nested_equal(results[0], results[1]):
+    if results[0] is None or not toolstr.nested_equal(results[0], results[1]):
         print()
         flood.print_text_box('Discrepancies in ' + test_name)
         print()
