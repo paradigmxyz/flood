@@ -32,7 +32,9 @@ def run_equality_test(
     if test_name != 'all':
         equality_tests = [t for t in equality_tests if t[0] == test_name]
         if not equality_tests:
-            raise NotImplementedError(f'no matching test found for name "{test_name}"')
+            raise NotImplementedError(
+                'no matching test found for name "' + test_name + '"'
+            )
 
     if output_dir is None:
         import tempfile
