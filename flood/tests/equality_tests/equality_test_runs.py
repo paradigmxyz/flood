@@ -26,10 +26,15 @@ def run_equality_test(
     if len(nodes) != 2:
         raise Exception('should use two nodes in equality test')
 
+    equality_tests = equality_test_sets.get_all_equality_tests()
+
     # get tests
     if test_name != 'all':
-        raise NotImplementedError('must use test_name="all" for equality test')
-    equality_tests = equality_test_sets.get_all_equality_tests()
+        equality_tests = [t for t in equality_tests if t[0] == test_name]
+        if not equality_tests:
+            raise NotImplementedError(
+                'no matching test found for name "' + test_name + '"'
+            )
 
     if output_dir is None:
         import tempfile
