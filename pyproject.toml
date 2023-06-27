@@ -39,7 +39,9 @@ dependencies = [
     'matplotlib >= 3.7.1, <4',
     'paradigm-data-portal >= 0.2.2, <0.3',
     'checkthechain >= 0.3.6, <0.4.0',
-    'nbconvert > 5.6.0, <6',
+    'nbconvert > 6, <7',
+    'ipython_genutils > 0.1, <1',
+    'ipykernel > 6, <7',
 ]
 
 [project.optional-dependencies]
