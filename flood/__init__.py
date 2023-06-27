@@ -7,7 +7,7 @@ from .tests import *
 from .user_io import *
 
 
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 
 def _clean_package_imports() -> None:
