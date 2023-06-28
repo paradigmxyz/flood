@@ -194,9 +194,46 @@ def _print_single_run_conclusion_copy(
 
     # print metric values
     print()
-    flood.print_metric_tables(
-        results=results,
-        metrics=metrics,
-        indent=4,
-    )
+    flood.print_metric_tables(results=results, metrics=metrics, indent=4)
+
+    # deep inspection tables
+    import polars as pl
+
+    example_output = next(iter(results.values()))
+    if (
+        example_output.get('raw_output') is not None
+        and example_output['raw_output'][0] is not None
+    ):
+        dfs = flood.load_single_run_raw_output(
+            results=results,
+            sample_index=list(range(len(example_output['raw_output']))),
+        )
+        success_dfs = {
+            name: df.filter(pl.col('status_code') == 200)
+            for name, df in dfs.items()
+        }
+        fail_dfs = {
+            name: df.filter(pl.col('status_code') != 200)
+            for name, df in dfs.items()
+        }
+        success_deep_outputs = flood.compute_raw_output_metrics(
+            raw_output=success_dfs, results=results
+        )
+        fail_deep_outputs = flood.compute_raw_output_metrics(
+            raw_output=fail_dfs, results=results
+        )
+        print()
+        flood.print_metric_tables(
+            results=success_deep_outputs,
+            metrics=[m for m in metrics if m not in ['success', 'throughput']],
+            suffix=', successful calls',
+            indent=4,
+        )
+        print()
+        flood.print_metric_tables(
+            results=fail_deep_outputs,
+            metrics=[m for m in metrics if m not in ['success', 'throughput']],
+            suffix=', failed calls',
+            indent=4,
+        )
 

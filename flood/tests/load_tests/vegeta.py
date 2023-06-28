@@ -297,6 +297,31 @@ def compute_raw_output_metrics(
 def compute_raw_output_sample_metrics(
     df: pl.DataFrame, target_rate: int, target_duration: int
 ) -> spec.LoadTestOutputDatum:
+    if len(df) == 0:
+        return {
+            'target_rate': target_rate,
+            'actual_rate': 0,
+            'target_duration': target_duration,
+            'actual_duration': None,
+            'requests': 0,
+            'throughput': None,
+            'success': None,
+            'min': None,
+            'mean': None,
+            'p50': None,
+            'p90': None,
+            'p95': None,
+            'p99': None,
+            'max': None,
+            'status_codes': {},
+            'errors': [],
+            'first_request_timestamp': None,
+            'last_request_timestamp': None,
+            'last_response_timestamp': None,
+            'final_wait_time': None,
+            'raw_output': None,
+        }
+
     import polars as pl
     actual_rate = (
         pl.count()

@@ -124,48 +124,48 @@ if typing.TYPE_CHECKING:
 
     class LoadTestOutputDatum(typing.TypedDict):
         target_rate: int
-        actual_rate: float
+        actual_rate: float | None
         target_duration: int
-        actual_duration: float
+        actual_duration: float | None
         requests: int
-        throughput: float
-        success: float
+        throughput: float | None
+        success: float | None
         min: float | None
-        mean: float
-        p50: float
-        p90: float
-        p95: float
-        p99: float
-        max: float
+        mean: float | None
+        p50: float | None
+        p90: float | None
+        p95: float | None
+        p99: float | None
+        max: float | None
         status_codes: typing.Mapping[str, int]
         errors: typing.Sequence[str]
-        first_request_timestamp: str
-        last_request_timestamp: str
-        last_response_timestamp: str
-        final_wait_time: float
+        first_request_timestamp: str | None
+        last_request_timestamp: str | None
+        last_response_timestamp: str | None
+        final_wait_time: float | None
         raw_output: str | None
 
     class LoadTestOutput(typing.TypedDict):
         target_rate: typing.Sequence[int]
-        actual_rate: typing.Sequence[float]
+        actual_rate: typing.Sequence[float | None]
         target_duration: typing.Sequence[int]
-        actual_duration: typing.Sequence[float]
+        actual_duration: typing.Sequence[float | None]
         requests: typing.Sequence[int]
-        throughput: typing.Sequence[float]
-        success: typing.Sequence[float]
+        throughput: typing.Sequence[float | None]
+        success: typing.Sequence[float | None]
         min: typing.Sequence[float | None]
-        mean: typing.Sequence[float]
-        p50: typing.Sequence[float]
-        p90: typing.Sequence[float]
-        p95: typing.Sequence[float]
-        p99: typing.Sequence[float]
-        max: typing.Sequence[float]
+        mean: typing.Sequence[float | None]
+        p50: typing.Sequence[float | None]
+        p90: typing.Sequence[float | None]
+        p95: typing.Sequence[float | None]
+        p99: typing.Sequence[float | None]
+        max: typing.Sequence[float | None]
         status_codes: typing.Sequence[typing.Mapping[str, int]]
         errors: typing.Sequence[typing.Sequence[str]]
-        first_request_timestamp: typing.Sequence[str]
-        last_request_timestamp: typing.Sequence[str]
-        last_response_timestamp: typing.Sequence[str]
-        final_wait_time: typing.Sequence[float]
+        first_request_timestamp: typing.Sequence[str | None]
+        last_request_timestamp: typing.Sequence[str | None]
+        last_response_timestamp: typing.Sequence[str | None]
+        final_wait_time: typing.Sequence[float | None]
         raw_output: typing.Sequence[str | None]
 
     RunType = typing.Literal['single_test']

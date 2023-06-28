@@ -137,7 +137,7 @@ def load_single_run_raw_output(
     *,
     output_dir: str | None = None,
     results: typing.Mapping[str, flood.LoadTestOutput] | None = None,
-    sample_index: int | None = None,
+    sample_index: int | typing.Sequence[int] | None = None,
 ) -> typing.Mapping[str, pl.DataFrame]:
     import polars as pl
 
@@ -152,7 +152,12 @@ def load_single_run_raw_output(
             raise Exception('raw_outputs were not saved for test')
         else:
             if sample_index is not None:
-                indices = [sample_index]
+                if isinstance(sample_index, int):
+                    indices = [sample_index]
+                elif isinstance(sample_index, list):
+                    indices = sample_index
+                else:
+                    raise Exception('invalid format for sample_index')
             else:
                 indices = list(range(len(raw_output)))
             dfs = []

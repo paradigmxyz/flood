@@ -11,44 +11,108 @@ def plot_load_test_results(
     output_dir: str | None = None,
     latency_yscale_log: bool = True,
     colors: typing.Mapping[str, str] | None = None,
+    title_suffix: str | None = None,
+    file_suffix: str | None = None,
+    plot_success_rate: bool = True,
+    plot_throughput: bool = True,
+    plot_latency: bool = True,
 ) -> None:
     import os
     import matplotlib.pyplot as plt  # type: ignore
     import toolplot
+
+    if title_suffix is None:
+        title_suffix = ''
+    if file_suffix is None:
+        file_suffix = ''
 
     toolplot.setup_plot_formatting()
 
     if output_dir is not None:
         os.makedirs(output_dir, exist_ok=True)
 
-    plt.figure()
-    plot_load_test_success(outputs, test_name=test_name, colors=colors)
-    if output_dir is not None:
-        path = os.path.join(output_dir, 'success.png')
-        plt.savefig(path)
-    else:
-        plt.show()
+    if plot_success_rate:
+        plt.figure()
+        plot_load_test_success(outputs, test_name=test_name, colors=colors)
+        if output_dir is not None:
+            path = os.path.join(
+                output_dir, 'success_rate' + file_suffix + '.png'
+            )
+            plt.savefig(path)
+        else:
+            plt.show()
 
-    plt.figure()
-    plot_load_test_throughput(outputs, test_name=test_name, colors=colors)
-    if output_dir is not None:
-        path = os.path.join(output_dir, 'throughput.png')
-        plt.savefig(path)
-    else:
-        plt.show()
+    if plot_throughput:
+        plt.figure()
+        plot_load_test_throughput(outputs, test_name=test_name, colors=colors)
+        if output_dir is not None:
+            path = os.path.join(output_dir, 'throughput' + file_suffix + '.png')
+            plt.savefig(path)
+        else:
+            plt.show()
 
-    plt.figure()
-    plot_load_test_latencies(
-        outputs,
-        test_name=test_name,
-        yscale_log=latency_yscale_log,
-        colors=colors,
-    )
-    if output_dir is not None:
-        path = os.path.join(output_dir, 'latencies.png')
-        plt.savefig(path)
-    else:
-        plt.show()
+    if plot_latency:
+        plt.figure()
+        plot_load_test_latencies(
+            outputs,
+            test_name=test_name,
+            yscale_log=latency_yscale_log,
+            colors=colors,
+        )
+        if output_dir is not None:
+            path = os.path.join(output_dir, 'latencies' + file_suffix + '.png')
+            plt.savefig(path)
+        else:
+            plt.show()
+
+    # deep graphs
+    example_output = next(iter(outputs.values()))
+    if (
+        example_output.get('raw_output') is not None
+        and example_output['raw_output'][0] is not None
+    ):
+        import polars as pl
+
+        dfs = flood.load_single_run_raw_output(
+            results=outputs,
+            sample_index=list(range(len(example_output['raw_output']))),
+        )
+        success_dfs = {
+            name: df.filter(pl.col('status_code') == 200)
+            for name, df in dfs.items()
+        }
+        fail_dfs = {
+            name: df.filter(pl.col('status_code') != 200)
+            for name, df in dfs.items()
+        }
+        success_deep_outputs = flood.compute_raw_output_metrics(
+            raw_output=success_dfs, results=outputs
+        )
+        fail_deep_outputs = flood.compute_raw_output_metrics(
+            raw_output=fail_dfs, results=outputs
+        )
+        plot_load_test_results(
+            outputs=success_deep_outputs,
+            test_name=test_name,
+            title_suffix=', successful calls only',
+            file_suffix='_successful_calls',
+            plot_success_rate=False,
+            plot_throughput=False,
+            output_dir=output_dir,
+            latency_yscale_log=latency_yscale_log,
+            colors=colors,
+        )
+        plot_load_test_results(
+            outputs=fail_deep_outputs,
+            test_name='failed ' + test_name,
+            title_suffix=', failed calls only',
+            file_suffix='_failed_calls',
+            plot_success_rate=False,
+            plot_throughput=False,
+            output_dir=output_dir,
+            latency_yscale_log=latency_yscale_log,
+            colors=colors,
+        )
 
 
 def plot_load_test_success(
@@ -201,3 +265,4 @@ def plot_load_test_result_metrics(
         ylabel=ylabel,
     )
     plt.legend(loc='center right')
+

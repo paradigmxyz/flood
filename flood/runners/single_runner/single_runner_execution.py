@@ -145,11 +145,11 @@ def _perform_deep_check(
             break
 
     if verbose:
+        print()
         if errors:
-            print()
-            print('[deep check passed]')
+            flood.print_timestamped('[deep check failed]')
         else:
-            print('[deep check failed]')
+            flood.print_timestamped('[deep check passed]')
 
     if errors:
         raise Exception('some calls that were reported successful had bad data')
