@@ -227,23 +227,9 @@ def _run_load_test_locally(
     include_raw_output: bool = False,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
-    import datetime
-    import toolstr
 
     if verbose:
-        dt = datetime.datetime.now()
-        if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(
-                microseconds=1_000_000 - dt.microsecond
-            )
-        else:
-            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-        timestamp = (
-            toolstr.add_style('\[', flood.styles['content'])
-            + toolstr.add_style(str(dt), flood.styles['metavar'])
-            + toolstr.add_style(']', flood.styles['content'])
-        )
-        toolstr.print(timestamp + ' Running load test for ' + node['name'])
+        flood.print_timestamped('Running load test for ' + node['name'])
 
     # construct progress bar
     if _pbar_kwargs is None:
@@ -263,21 +249,8 @@ def _run_load_test_locally(
     results = []
     for attack in tqdm.tqdm(test, **tqdm_kwargs):
         if verbose:
-            dt = datetime.datetime.now()
-            if dt.microsecond >= 500_000:
-                dt = dt + datetime.timedelta(
-                    microseconds=1_000_000 - dt.microsecond
-                )
-            else:
-                dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-            timestamp = (
-                toolstr.add_style('\[', flood.styles['content'])
-                + toolstr.add_style(str(dt), flood.styles['metavar'])
-                + toolstr.add_style(']', flood.styles['content'])
-            )
-            toolstr.print(
-                timestamp
-                + ' Running attack at rate = '
+            flood.print_timestamped(
+                'Running attack at rate = '
                 + str(attack['rate'])
                 + ' rps'
             )
@@ -332,20 +305,6 @@ def _run_load_test_remotely(
 
     # send call data to remote server
     if verbose:
-        import datetime
-
-        dt = datetime.datetime.now()
-        if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(
-                microseconds=1_000_000 - dt.microsecond
-            )
-        else:
-            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-        timestamp = (
-            toolstr.add_style('\[', flood.styles['content'])
-            + toolstr.add_style(str(dt), flood.styles['metavar'])
-            + toolstr.add_style(']', flood.styles['content'])
-        )
         node_name = (
             toolstr.add_style('\[', flood.styles['content'])
             + toolstr.add_style('node', flood.styles['metavar'])
@@ -353,29 +312,13 @@ def _run_load_test_remotely(
             + node['name']
             + toolstr.add_style(']', flood.styles['content'])
         )
-        toolstr.print(
-            timestamp + ' ' + node_name + ' Sending tests to remote node'
-        )
+        flood.print_timestamped(node_name + ' Sending tests to remote node')
     cmd = 'rsync -r ' + tempdir + ' ' + remote + ':' + os.path.dirname(tempdir)
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # initiate benchmarks
     if verbose:
-        dt = datetime.datetime.now()
-        if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(
-                microseconds=1_000_000 - dt.microsecond
-            )
-        else:
-            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-        timestamp = (
-            toolstr.add_style('\[', flood.styles['content'])
-            + toolstr.add_style(str(dt), flood.styles['metavar'])
-            + toolstr.add_style(']', flood.styles['content'])
-        )
-        toolstr.print(
-            timestamp + ' ' + node_name + ' Executing test on remote node'
-        )
+        flood.print_timestamped(node_name + ' Executing test on remote node')
     cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures {extra_kwargs}'"  # noqa: E501
     if include_raw_output:
         extra_kwargs = '--save-raw-output'
@@ -394,19 +337,7 @@ def _run_load_test_remotely(
 
     # retrieve benchmark results
     if verbose:
-        dt = datetime.datetime.now()
-        if dt.microsecond >= 500_000:
-            dt = dt + datetime.timedelta(
-                microseconds=1_000_000 - dt.microsecond
-            )
-        else:
-            dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-        timestamp = (
-            toolstr.add_style('\[', flood.styles['content'])
-            + toolstr.add_style(str(dt), flood.styles['metavar'])
-            + toolstr.add_style(']', flood.styles['content'])
-        )
-        toolstr.print(timestamp + ' ' + node_name + ' Retrieving results')
+        toolstr.print(node_name + ' Retrieving results')
     results_path = os.path.join(tempdir, 'results.json')
     cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)

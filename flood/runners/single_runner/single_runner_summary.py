@@ -79,7 +79,6 @@ def _print_single_run_preamble_copy(
 
 
 def _print_run_start() -> None:
-    import datetime
     import toolstr
 
     print()
@@ -89,17 +88,7 @@ def _print_run_start() -> None:
         style=flood.styles['content'],
         text_style=flood.styles['metavar'],
     )
-    dt = datetime.datetime.now()
-    if dt.microsecond >= 500_000:
-        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
-    else:
-        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-    timestamp = (
-        toolstr.add_style('\[', flood.styles['content'])
-        + toolstr.add_style(str(dt), flood.styles['metavar'])
-        + toolstr.add_style(']', flood.styles['content'])
-    )
-    toolstr.print(timestamp + ' Starting')
+    flood.print_timestamped('Starting')
 
 
 def _print_single_run_conclusion(
@@ -139,21 +128,10 @@ def _print_single_run_conclusion_copy(
     verbose: bool | int,
     figures: bool,
 ) -> None:
-    import datetime
     import os
     import toolstr
 
-    dt = datetime.datetime.now()
-    if dt.microsecond >= 500_000:
-        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
-    else:
-        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
-    timestamp = (
-        toolstr.add_style('\[', flood.styles['content'])
-        + toolstr.add_style(str(dt), flood.styles['metavar'])
-        + toolstr.add_style(']', flood.styles['content'])
-    )
-    toolstr.print(timestamp + ' Load tests completed.')
+    flood.print_timestamped(' Load tests completed.')
 
     # print message about metrics file
     if output_dir is not None:

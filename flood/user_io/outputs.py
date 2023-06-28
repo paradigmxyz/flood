@@ -112,6 +112,7 @@ def print_metric_tables(
     results: typing.Mapping[str, spec.LoadTestOutput],
     metrics: typing.Sequence[str],
     *,
+    suffix: str = '',
     decimals: int | None = None,
     comparison: bool = False,
     indent: int | str | None = None,
@@ -127,10 +128,10 @@ def print_metric_tables(
     for metric in metrics:
         # create labels
         if metric == 'success':
-            suffix = ''
+            metric_suffix = ''
         else:
-            suffix = ' (s)'
-        unitted_names = [name + suffix for name in names]
+            metric_suffix = ' (s)'
+        unitted_names = [name + metric_suffix for name in names]
         labels = ['rate (rps)'] + unitted_names
         if comparison:
             if len(results) != 2:
@@ -152,7 +153,7 @@ def print_metric_tables(
                 row.append(row[-2] / row[-1])
 
         # compute column formats
-        if all(value > 1 for value in values):
+        if all(value > 1 for value in values if value is not None):
             use_decimals = 1
         else:
             if decimals is None:
@@ -170,7 +171,9 @@ def print_metric_tables(
 
         # print header
         toolstr.print_text_box(
-            toolstr.add_style(metric + ' vs load', flood.styles.get('metavar')),
+            toolstr.add_style(
+                metric + ' vs load' + suffix, flood.styles.get('metavar')
+            ),
             style=flood.styles.get('content'),
             indent=indent,
         )
@@ -243,3 +246,21 @@ def print_multiline_table(*args: typing.Any, **kwargs: typing.Any) -> None:
         label_style=flood.styles.get('metavar'),
         border=flood.styles.get('content'),
     )
+
+
+def print_timestamped(message: str) -> None:
+    import datetime
+    import toolstr
+
+    dt = datetime.datetime.now()
+    if dt.microsecond >= 500_000:
+        dt = dt + datetime.timedelta(microseconds=1_000_000 - dt.microsecond)
+    else:
+        dt = dt - datetime.timedelta(microseconds=dt.microsecond)
+    timestamp = (
+        toolstr.add_style('\[', flood.styles['content'])
+        + toolstr.add_style(str(dt), flood.styles['metavar'])
+        + toolstr.add_style(']', flood.styles['content'])
+    )
+    toolstr.print(timestamp + ' ' + message)
+
