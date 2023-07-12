@@ -250,9 +250,7 @@ def _run_load_test_locally(
     for attack in tqdm.tqdm(test, **tqdm_kwargs):
         if verbose:
             flood.print_timestamped(
-                'Running attack at rate = '
-                + str(attack['rate'])
-                + ' rps'
+                'Running attack at rate = ' + str(attack['rate']) + ' rps'
             )
 
         result = vegeta.run_vegeta_attack(
@@ -292,6 +290,28 @@ def _run_load_test_remotely(
     remote = node['remote']
     if remote is None:
         raise Exception('not a remote node')
+
+    # check remote installation
+    local_installation = flood.get_local_installation()
+    remote_installation = flood.get_remote_installation(remote)
+    local_flood_version = local_installation['flood_version']
+    remote_flood_version = remote_installation['flood_version']
+    remote_vegeta_path = remote_installation['vegeta_path']
+    if remote_flood_version is None:
+        raise Exception(
+            'could not find flood installation on remote host ' + node['name']
+        )
+    if remote_vegeta_path is None:
+        raise Exception(
+            'could not find vegeta installation on remote host ' + node['name']
+        )
+    if local_flood_version != local_flood_version:
+        raise Exception(
+            'local version of flood '
+            + str(local_flood_version)
+            + ' does not match remote version of flood '
+            + remote_flood_version
+        )
 
     # save call data, saving methods to preserve ordering in json
     job_id = str(uuid.uuid4())
