@@ -191,7 +191,6 @@ def _summarize_result(
                 rhs_name=node1['name'],
                 styles=flood.styles,
                 indent=4,
-                max_diffs=100,
             )
             lines = [line for line in as_str.split('\n')]
             max_lines = 100
