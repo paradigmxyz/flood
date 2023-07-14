@@ -135,7 +135,7 @@ def _print_single_run_conclusion_text(
     import os
     import toolstr
 
-    flood.print_timestamped(' Load tests completed.')
+    flood.print_timestamped('Load tests completed.')
 
     # print message about metrics file
     if output_dir is not None:

@@ -339,7 +339,7 @@ def _run_load_test_remotely(
 
     # retrieve benchmark results
     if verbose:
-        toolstr.print(node_name + ' Retrieving results')
+        flood.print_timestamped(node_name + ' Retrieving results')
     results_path = os.path.join(tempdir, 'results.json')
     cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
