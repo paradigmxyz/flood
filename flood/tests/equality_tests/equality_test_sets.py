@@ -443,7 +443,7 @@ def get_trace_equality_tests(
             [],
             {
                 'to_address': '0x6b175474e89094c44da98b954eedeac495271d0f',
-                'call_data': '0x70a082310000000000000000000000006e0d01a76c3cf4288372a29124a26d4353ee51be',
+                'call_data': '0x70a082310000000000000000000000006e0d01a76c3cf4288372a29124a26d4353ee51be',  # noqa: E501
                 'block_number': '0xc65d40',
                 'gas_price': '0x6ba9382b14',
                 'trace_type': {'tracer': 'callTracer'},
@@ -455,7 +455,7 @@ def get_trace_equality_tests(
             [],
             {
                 'to_address': '0x6b175474e89094c44da98b954eedeac495271d0f',
-                'call_data': '0x70a082310000000000000000000000006e0d01a76c3cf4288372a29124a26d4353ee51be',
+                'call_data': '0x70a082310000000000000000000000006e0d01a76c3cf4288372a29124a26d4353ee51be',  # noqa: E501
                 'block_number': '0xc65d40',
                 'gas_price': '0x6ba9382b14',
                 'trace_type': {'tracer': 'prestateTracer'},
