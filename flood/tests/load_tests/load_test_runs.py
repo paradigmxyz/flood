@@ -95,6 +95,7 @@ def run_load_tests(
             process.join()
             if process.exitcode != 0:
                 import sys
+
                 sys.exit()
             results_path = queue.get()
             with open(results_path, 'r') as f:
@@ -239,13 +240,37 @@ def _run_load_test_locally(
             print()
 
     # format output
-    keys = results[0].keys()
-    output_data = {key: [result[key] for result in results] for key in keys}  # type: ignore # noqa: E501
+    output_data: spec.LoadTestOutput = _list_of_maps_to_map_of_lists(results)  # type: ignore # noqa: true
+
+    # format deep output
     if include_deep_output is None or len(include_deep_output) == 0:
         for key in list(output_data.keys()):
             if key.startswith('deep_'):
-                output_data[key] = None
+                output_data[key] = None  # type: ignore
+    else:
+        output_data['deep_rpc_error_pairs'] = [
+            result['deep_rpc_error_pairs'] for result in results
+        ]
+
+        # convert list of map of map into map of map of list
+        categories: list[spec.ResponseCategory] = list(
+            results[0]['deep_metrics'].keys()  # type: ignore
+        )
+        deep_metrics = {}
+        for category in categories:
+            deep_metrics[category] = _list_of_maps_to_map_of_lists(
+                    [result['deep_metrics'][category] for result in results]  # type: ignore # noqa: true
+            )
+        output_data['deep_metrics'] = deep_metrics  # type: ignore
+
     return output_data
+
+
+def _list_of_maps_to_map_of_lists(
+    list_of_maps: typing.Sequence[typing.Mapping[typing.Any, typing.Any]]
+) -> typing.Mapping[typing.Any, typing.Sequence[typing.Any]]:
+    keys = list_of_maps[0].keys()
+    return {key: [m[key] for m in list_of_maps] for key in keys}
 
 
 def _run_load_test_remotely(

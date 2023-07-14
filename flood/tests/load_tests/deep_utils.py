@@ -41,9 +41,17 @@ def compute_deep_datum(
             except Exception:
                 invalid_json_error.append(True)
                 rpc_error.append(False)
+        else:
+            invalid_json_error.append(False)
+            rpc_error.append(False)
     all_df = all_df.with_columns(
         pl.Series('invalid_json_error', invalid_json_error),
         pl.Series('rpc_error', rpc_error),
+    )
+    all_df = all_df.with_columns(
+        (~pl.col('invalid_json_error') & ~pl.col('rpc_error')).alias(
+            'deep_success'
+        )
     )
 
     # get error pairs
@@ -116,6 +124,8 @@ def _convert_raw_vegeta_output_to_dataframe(raw_output: bytes) -> pl.DataFrame:
 def _gather_error_pairs(
     df: pl.DataFrame, calls: typing.Sequence[typing.Any]
 ) -> typing.Sequence[spec.ErrorPair]:
+    import polars as pl
+
     calls_by_id = {}
     for call in calls:
         call_id = call.get('id')
