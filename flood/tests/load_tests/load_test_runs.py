@@ -240,7 +240,7 @@ def _run_load_test_locally(
             print()
 
     # format output
-    output_data: spec.LoadTestOutput = _list_of_maps_to_map_of_lists(results)  # type: ignore # noqa: true
+    output_data: spec.LoadTestOutput = _list_of_maps_to_map_of_lists(results)  # type: ignore # noqa: E501
 
     # format deep output
     if include_deep_output is None or len(include_deep_output) == 0:
@@ -259,7 +259,7 @@ def _run_load_test_locally(
         deep_metrics = {}
         for category in categories:
             deep_metrics[category] = _list_of_maps_to_map_of_lists(
-                    [result['deep_metrics'][category] for result in results]  # type: ignore # noqa: true
+                    [result['deep_metrics'][category] for result in results]  # type: ignore # noqa: E501
             )
         output_data['deep_metrics'] = deep_metrics  # type: ignore
 
