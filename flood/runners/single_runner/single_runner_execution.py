@@ -20,15 +20,17 @@ def _run_single(
     mode: flood.LoadTestMode | None = None,
     vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
     dry: bool,
-    output_dir: str | None = None,
+    output_dir: str,
     figures: bool,
     metrics: typing.Sequence[str] | None = None,
     verbose: bool | int,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[flood.DeepOutput] | None = None,
     deep_check: bool = False,
 ) -> None:
-    if deep_check:
-        include_raw_output = True
+    if include_deep_output is None:
+        include_deep_output = []
+    if deep_check and 'metrics' not in include_deep_output:
+        include_deep_output = list(include_deep_output) + ['metrics']
 
     # get test parameters
     rates, durations, vegeta_kwargs = _get_single_test_parameters(
@@ -55,14 +57,19 @@ def _run_single(
 
     # generate test and save to disk
     if test is None:
-        test = flood.generate_test(
+        test_parameters: flood.TestGenerationParameters = {
+            'test_name': test_name,
+            'rates': rates,
+            'durations': durations,
+            'vegeta_kwargs': vegeta_kwargs,
+            'network': flood.parse_nodes_network(nodes),
+            'random_seed': random_seed,
+        }
+        test = flood.generate_test(**test_parameters)
+        flood.runners.single_runner.single_runner_io._save_single_run_test(
             test_name=test_name,
-            rates=rates,
-            durations=durations,
-            vegeta_kwargs=vegeta_kwargs,
-            network=flood.parse_nodes_network(nodes),
-            random_seed=random_seed,
             output_dir=output_dir,
+            test_parameters=test_parameters,
         )
 
     # skip dry run
@@ -78,7 +85,7 @@ def _run_single(
         nodes=nodes,
         test=test,
         verbose=verbose,
-        include_raw_output=include_raw_output,
+        include_deep_output=include_deep_output,
     )
 
     # output results to file
@@ -92,67 +99,16 @@ def _run_single(
             test_name=test_name,
         )
 
-    # perform deep check
-    if deep_check:
-        _perform_deep_check(results, verbose=verbose)
-
     # print summary
     if verbose:
-        single_runner_summary._print_single_run_conclusion_copy(
+        single_runner_summary._print_single_run_conclusion(
             output_dir=output_dir,
             results=results,
             metrics=metrics,
             verbose=verbose,
             figures=figures,
+            deep_check=deep_check,
         )
-
-
-#
-# # helper functions
-#
-
-
-def _perform_deep_check(
-    results: typing.Mapping[str, flood.LoadTestOutput],
-    verbose: bool | int = False,
-) -> None:
-    """
-    check that responses for each success are
-    1) well-formed json
-    and 2) error = None
-    """
-    import base64
-    import json
-
-    errors = False
-
-    raw_output = flood.load_single_run_raw_output(results=results)
-    for result_name, result in raw_output.items():
-        for status_code, response in zip(
-            result['status_code'], result['response'].to_list()
-        ):
-            if status_code == 200:
-                try:
-                    decoded = json.loads(base64.b64decode(response))
-                    if decoded.get('result') is None:
-                        errors = True
-                except Exception:
-                    errors = True
-
-            if errors:
-                break
-        if errors:
-            break
-
-    if verbose:
-        print()
-        if errors:
-            flood.print_timestamped('[deep check failed]')
-        else:
-            flood.print_timestamped('[deep check passed]')
-
-    if errors:
-        raise Exception('some calls that were reported successful had bad data')
 
 
 def _get_single_test_parameters(

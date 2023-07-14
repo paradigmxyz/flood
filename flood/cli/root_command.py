@@ -103,7 +103,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ['--save-raw-output'],
-                'help': 'save raw output from Vegeta',
+                'help': 'save the contents of every RPC response',
                 'action': 'store_true',
             },
             {
@@ -163,6 +163,13 @@ def root_command(
         )
 
     else:
+
+        include_deep_output: typing.List[flood.DeepOutput] = []
+        if deep_check:
+            include_deep_output.append('metrics')
+        if save_raw_output:
+            include_deep_output.append('raw')
+
         if rates is not None:
             rates = [int(rate) for rate in rates]
         flood.run(
@@ -175,9 +182,9 @@ def root_command(
             rates=rates,
             duration=duration,
             dry=dry,
-            output_dir=output_dir or True,
+            output_dir=output_dir,
             figures=figures,
-            include_raw_output=save_raw_output,
+            include_deep_output=include_deep_output,
             deep_check=deep_check,
         )
 

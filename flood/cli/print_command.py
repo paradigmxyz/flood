@@ -25,16 +25,16 @@ def get_command_spec() -> toolcli.CommandSpec:
 def print_command(output_dir: str, metrics: typing.Sequence[str]) -> None:
 
     test_payload = flood.load_single_run_test_payload(output_dir)
-    test = test_payload['test']
+    test = flood.generate_test(**test_payload['test_parameters'])
     results_payload = flood.load_single_run_results_payload(output_dir)
     results = results_payload['results']
 
     # print test summary
     flood.runners.single_runner.single_runner_summary._print_single_run_preamble_copy(
         test_name=test_payload['name'],
-        rates=[subtest['rate'] for subtest in test],
-        durations=[subtest['duration'] for subtest in test],
-        vegeta_kwargs=[subtest['vegeta_kwargs'] for subtest in test],
+        rates=[subtest['rate'] for subtest in test['attacks']],
+        durations=[subtest['duration'] for subtest in test['attacks']],
+        vegeta_kwargs=[subtest['vegeta_kwargs'] for subtest in test['attacks']],
         output_dir=output_dir,
     )
 

@@ -5,7 +5,6 @@ import typing
 import flood
 from flood import user_io
 from flood import spec
-from . import load_test_construction
 from . import vegeta
 
 if typing.TYPE_CHECKING:
@@ -19,7 +18,7 @@ def run_load_tests(
     test: spec.LoadTest | None = None,
     tests: typing.Mapping[str, spec.LoadTest] | None = None,
     verbose: bool | int = False,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
     """run multiple load tests"""
     # parse user_io
@@ -48,17 +47,17 @@ def run_load_tests(
         results[node['name']] = schedule_load_test(
             node=node,
             test=test,
-            include_raw_output=include_raw_output,
+            include_deep_output=include_deep_output,
         )
 
     # case: single node and multiple tests
     elif node is not None and tests is not None:
-        for name, test in tqdm.tqdm(tests.items(), **pbar):
+        for name, each_test in tqdm.tqdm(tests.items(), **pbar):
             results[name] = schedule_load_test(
                 node=node,
                 verbose=verbose,
-                test=test,
-                include_raw_output=include_raw_output,
+                test=each_test,
+                include_deep_output=include_deep_output,
             )
 
     # case: multiple nodes and single tests
@@ -68,7 +67,7 @@ def run_load_tests(
                 node=nd,
                 verbose=verbose,
                 test=test,
-                include_raw_output=include_raw_output,
+                include_deep_output=include_deep_output,
             )
 
     # case: multiple nodes and multiple tests
@@ -79,7 +78,7 @@ def run_load_tests(
                     node=node,
                     verbose=verbose,
                     test=test,
-                    include_raw_output=include_raw_output,
+                    include_deep_output=include_deep_output,
                 )
 
     # case: invalid input
@@ -94,6 +93,9 @@ def run_load_tests(
         elif isinstance(result, tuple):
             process, queue = result
             process.join()
+            if process.exitcode != 0:
+                import sys
+                sys.exit()
             results_path = queue.get()
             with open(results_path, 'r') as f:
                 import json
@@ -109,14 +111,9 @@ def run_load_tests(
 def schedule_load_test(
     *,
     node: spec.NodeShorthand,
-    test: spec.LoadTest | None = None,
-    rates: typing.Sequence[int] | None = None,
-    calls: typing.Sequence[typing.Any] | None = None,
-    duration: int | None = None,
-    durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    test: spec.LoadTest,
     verbose: bool | int = False,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
 ) -> (
     spec.LoadTestOutput
@@ -135,13 +132,8 @@ def schedule_load_test(
             kwargs=dict(
                 node=node,
                 test=test,
-                rates=rates,
-                calls=calls,
-                duration=duration,
-                durations=durations,
-                vegeta_kwargs=vegeta_kwargs,
                 verbose=verbose,
-                include_raw_output=include_raw_output,
+                include_deep_output=include_deep_output,
                 _pbar_kwargs=_pbar_kwargs,
                 _container=queue,
             ),
@@ -152,13 +144,8 @@ def schedule_load_test(
         return run_load_test(
             node=node,
             test=test,
-            rates=rates,
-            calls=calls,
-            duration=duration,
-            durations=durations,
-            vegeta_kwargs=vegeta_kwargs,
             verbose=verbose,
-            include_raw_output=include_raw_output,
+            include_deep_output=include_deep_output,
             _pbar_kwargs=_pbar_kwargs,
         )
 
@@ -166,31 +153,16 @@ def schedule_load_test(
 def run_load_test(
     *,
     node: spec.NodeShorthand,
-    test: spec.LoadTest | None = None,
-    rates: typing.Sequence[int] | None = None,
-    calls: typing.Sequence[typing.Any] | None = None,
-    duration: int | None = None,
-    durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    test: spec.LoadTest,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     _container: multiprocessing.Queue[str] | None = None,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> spec.LoadTestOutput | str:
     """run a load test against a single node"""
 
     # parse user_io
     node = user_io.parse_node(node)
-    if test is None:
-        if rates is None or calls is None:
-            raise Exception('specify rates and calls')
-        test = load_test_construction.create_load_test(
-            rates=rates,
-            calls=calls,
-            duration=duration,
-            durations=durations,
-            vegeta_kwargs=vegeta_kwargs,
-        )
 
     # run tests
     if node.get('remote') is None:
@@ -199,7 +171,7 @@ def run_load_test(
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
-            include_raw_output=include_raw_output,
+            include_deep_output=include_deep_output,
         )
     else:
         result = _run_load_test_remotely(
@@ -207,7 +179,7 @@ def run_load_test(
             test=test,
             verbose=verbose,
             _pbar_kwargs=_pbar_kwargs,
-            include_raw_output=include_raw_output,
+            include_deep_output=include_deep_output,
         )
 
     if _container is not None:
@@ -224,7 +196,7 @@ def _run_load_test_locally(
     test: spec.LoadTest | None,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> spec.LoadTestOutput:
     """run a load test from local node"""
 
@@ -260,7 +232,7 @@ def _run_load_test_locally(
             rate=attack['rate'],
             vegeta_kwargs=attack['vegeta_kwargs'],
             verbose=verbose >= 2,
-            include_raw_output=include_raw_output,
+            include_deep_output=include_deep_output,
         )
         results.append(result)
         if verbose >= 2:
@@ -277,12 +249,13 @@ def _run_load_test_remotely(
     test: spec.LoadTest,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> str:
     """run a load test from local node"""
 
     import os
     import subprocess
+    import sys
     import uuid
     import toolstr
 
@@ -301,11 +274,13 @@ def _run_load_test_remotely(
         raise Exception(
             'could not find flood installation on remote host ' + node['name']
         )
+        sys.exit()
     if remote_vegeta_path is None:
         raise Exception(
             'could not find vegeta installation on remote host ' + node['name']
         )
-    if local_flood_version != local_flood_version:
+        sys.exit()
+    if local_flood_version != remote_flood_version:
         raise Exception(
             'local version of flood '
             + str(local_flood_version)
@@ -319,7 +294,7 @@ def _run_load_test_remotely(
     os.makedirs(tempdir)
     flood.runners.single_runner.single_runner_io._save_single_run_test(
         test_name='',
-        test=test,
+        test_parameters=test['test_parameters'],
         output_dir=tempdir,
     )
 
@@ -340,17 +315,19 @@ def _run_load_test_remotely(
     if verbose:
         flood.print_timestamped(node_name + ' Executing test on remote node')
     cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures {extra_kwargs}'"  # noqa: E501
-    if include_raw_output:
-        extra_kwargs = '--save-raw-output'
-    else:
-        extra_kwargs = ''
+    extra_kwargs = ''
+    if include_deep_output is not None:
+        if 'raw' in include_deep_output:
+            extra_kwargs += ' --save-raw-output'
+        if 'metrics' in include_deep_output:
+            extra_kwargs += ' --deep-check'
     cmd = cmd_template.format(
         host=remote,
         name=node['name'],
         url=node['url'],
         test=tempdir,
         output=tempdir,
-        extra_kwargs=extra_kwargs,
+        extra_kwargs=extra_kwargs.lstrip(),
     )
     cmd = cmd.strip()
     subprocess.check_output(cmd.split(' '), stderr=subprocess.DEVNULL)

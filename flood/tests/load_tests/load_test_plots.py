@@ -6,7 +6,8 @@ import flood
 
 
 def plot_load_test_results(
-    outputs: typing.Mapping[str, flood.LoadTestOutput],
+    outputs: typing.Mapping[str, flood.LoadTestOutput]
+    | typing.Mapping[str, flood.LoadTestDeepOutput],
     test_name: str,
     output_dir: str | None = None,
     latency_yscale_log: bool = True,
@@ -66,33 +67,15 @@ def plot_load_test_results(
             plt.show()
 
     # deep graphs
-    example_output = next(iter(outputs.values()))
-    if (
-        example_output.get('raw_output') is not None
-        and example_output['raw_output'][0] is not None
-    ):
-        import polars as pl
-
-        dfs = flood.load_single_run_raw_output(
-            results=outputs,
-            sample_index=list(range(len(example_output['raw_output']))),
-        )
-        success_dfs = {
-            name: df.filter(pl.col('status_code') == 200)
-            for name, df in dfs.items()
-        }
-        fail_dfs = {
-            name: df.filter(pl.col('status_code') != 200)
-            for name, df in dfs.items()
-        }
-        success_deep_outputs = flood.compute_raw_output_metrics(
-            raw_output=success_dfs, results=outputs
-        )
-        fail_deep_outputs = flood.compute_raw_output_metrics(
-            raw_output=fail_dfs, results=outputs
-        )
+    has_deep_outputs = any(
+        output.get('deep_metrics') is not None for output in outputs.values()
+    )
+    if has_deep_outputs is not None:
         plot_load_test_results(
-            outputs=success_deep_outputs,
+            outputs={
+                name: output['deep_metrics']['successful']  # type: ignore
+                for name, output in outputs.items()
+            },
             test_name=test_name,
             title_suffix=', successful calls only',
             file_suffix='_successful_calls',
@@ -103,7 +86,10 @@ def plot_load_test_results(
             colors=colors,
         )
         plot_load_test_results(
-            outputs=fail_deep_outputs,
+            outputs={
+                name: output['deep_metrics']['failed']  # type: ignore
+                for name, output in outputs.items()
+            },
             test_name='failed ' + test_name,
             title_suffix=', failed calls only',
             file_suffix='_failed_calls',
@@ -116,7 +102,8 @@ def plot_load_test_results(
 
 
 def plot_load_test_success(
-    results: typing.Mapping[str, flood.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput]
+    | typing.Mapping[str, flood.LoadTestDeepOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
@@ -135,7 +122,8 @@ def plot_load_test_success(
 
 
 def plot_load_test_throughput(
-    results: typing.Mapping[str, flood.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput]
+    | typing.Mapping[str, flood.LoadTestDeepOutput],
     colors: typing.Mapping[str, str] | None = None,
     test_name: str | None = None,
 ) -> None:
@@ -154,7 +142,8 @@ def plot_load_test_throughput(
 
 
 def plot_load_test_latencies(
-    results: typing.Mapping[str, flood.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput]
+    | typing.Mapping[str, flood.LoadTestDeepOutput],
     colors: typing.Mapping[
         str,
         str | typing.Sequence[str] | typing.Mapping[str, str],
@@ -188,7 +177,8 @@ def plot_load_test_latencies(
 
 
 def plot_load_test_result_metrics(
-    results: typing.Mapping[str, flood.LoadTestOutput],
+    results: typing.Mapping[str, flood.LoadTestOutput]
+    | typing.Mapping[str, flood.LoadTestDeepOutput],
     metrics: typing.Sequence[str],
     *,
     colors: typing.Mapping[

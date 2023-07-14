@@ -14,7 +14,7 @@ def generate_test_eth_get_balance(
     network: str,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -39,7 +39,7 @@ def generate_test_eth_get_transaction_count(
     network: str,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )

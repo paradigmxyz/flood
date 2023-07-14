@@ -98,13 +98,15 @@ def _print_single_run_conclusion(
     metrics: typing.Sequence[str] | None,
     verbose: bool | int,
     figures: bool,
+    deep_check: bool,
 ) -> None:
-    _print_single_run_conclusion_copy(
+    _print_single_run_conclusion_text(
         output_dir=output_dir,
         results=results,
         metrics=metrics,
         verbose=verbose,
         figures=figures,
+        deep_check=deep_check,
     )
     if output_dir is not None:
         import os
@@ -112,21 +114,23 @@ def _print_single_run_conclusion(
 
         summary_path = os.path.join(output_dir, 'summary.txt')
         with toolstr.write_stdout_to_file(summary_path, mode='a'):
-            _print_single_run_conclusion_copy(
+            _print_single_run_conclusion_text(
                 output_dir=output_dir,
                 results=results,
                 metrics=metrics,
                 verbose=verbose,
                 figures=figures,
+                deep_check=deep_check,
             )
 
 
-def _print_single_run_conclusion_copy(
+def _print_single_run_conclusion_text(
     output_dir: str | None,
     results: typing.Mapping[str, flood.LoadTestOutput],
     metrics: typing.Sequence[str] | None,
     verbose: bool | int,
     figures: bool,
+    deep_check: bool,
 ) -> None:
     import os
     import toolstr
@@ -197,43 +201,31 @@ def _print_single_run_conclusion_copy(
     flood.print_metric_tables(results=results, metrics=metrics, indent=4)
 
     # deep inspection tables
-    import polars as pl
+    if deep_check:
 
-    example_output = next(iter(results.values()))
-    if (
-        example_output.get('raw_output') is not None
-        and example_output['raw_output'][0] is not None
-    ):
-        dfs = flood.load_single_run_raw_output(
-            results=results,
-            sample_index=list(range(len(example_output['raw_output']))),
-        )
-        success_dfs = {
-            name: df.filter(pl.col('status_code') == 200)
-            for name, df in dfs.items()
-        }
-        fail_dfs = {
-            name: df.filter(pl.col('status_code') != 200)
-            for name, df in dfs.items()
-        }
-        success_deep_outputs = flood.compute_raw_output_metrics(
-            raw_output=success_dfs, results=results
-        )
-        fail_deep_outputs = flood.compute_raw_output_metrics(
-            raw_output=fail_dfs, results=results
-        )
-        print()
-        flood.print_metric_tables(
-            results=success_deep_outputs,
-            metrics=[m for m in metrics if m not in ['success', 'throughput']],
-            suffix=', successful calls',
-            indent=4,
-        )
-        print()
-        flood.print_metric_tables(
-            results=fail_deep_outputs,
-            metrics=[m for m in metrics if m not in ['success', 'throughput']],
-            suffix=', failed calls',
-            indent=4,
-        )
+        # extract data per category
+        deep_results_by_category: typing.MutableMapping[
+            flood.ResponseCategory,
+            typing.MutableMapping[str, flood.LoadTestDeepOutput],
+        ]
+        deep_results_by_category = {}
+        for result_name, result in results.items():
+            deep_metrics = result['deep_metrics']
+            if deep_metrics is not None:
+                for category, category_results in deep_metrics.items():
+                    deep_results_by_category.setdefault(category, {})
+                    deep_results_by_category[category][result_name] = category_results
+            else:
+                raise Exception('deep metrics not available')
+
+        metric_names = [
+            m for m in metrics if m not in ['success', 'throughput']
+        ]
+        for category, result_category_results in deep_results_by_category.items():
+            flood.print_metric_tables(
+                results=result_category_results,
+                metrics=metric_names,
+                suffix=', ' + category + ' calls',
+                indent=4,
+            )
 

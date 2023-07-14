@@ -4,9 +4,7 @@ from __future__ import annotations
 import typing
 
 from ... import spec
-
-if typing.TYPE_CHECKING:
-    import polars as pl
+from . import deep_utils
 
 
 def run_vegeta_attack(
@@ -17,7 +15,7 @@ def run_vegeta_attack(
     duration: int,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     verbose: bool = False,
-    include_raw_output: bool = False,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> spec.LoadTestOutputDatum:
     attack = _construct_vegeta_attack(
         calls=calls,
@@ -35,7 +33,8 @@ def run_vegeta_attack(
         attack_output=attack_output,
         target_rate=rate,
         target_duration=duration,
-        include_raw_output=include_raw_output,
+        include_deep_output=include_deep_output,
+        calls=calls,
     )
     return report
 
@@ -132,7 +131,8 @@ def _create_vegeta_report(
     attack_output: bytes,
     target_rate: int,
     target_duration: int,
-    include_raw_output: bool,
+    include_deep_output: typing.Sequence[spec.DeepOutput] | None,
+    calls: typing.Sequence[typing.Any],
 ) -> spec.LoadTestOutputDatum:
     import json
     import subprocess
@@ -150,10 +150,25 @@ def _create_vegeta_report(
     else:
         latency_min = None
 
-    if include_raw_output:
-        raw_output = encode_raw_vegeta_output(attack_output)
-    else:
-        raw_output = None
+    # compute deep data
+    deep_raw_output = None
+    deep_metrics = None
+    deep_rpc_error_pairs = None
+    if include_deep_output is None:
+        include_deep_output = []
+    if 'raw' in include_deep_output:
+        deep_raw_output = deep_utils.encode_raw_vegeta_output(attack_output)
+    if 'metrics' in include_deep_output:
+        if 'metrics' in include_deep_output:
+            (
+                deep_metrics,
+                deep_rpc_error_pairs,
+            ) = deep_utils.compute_deep_datum(
+                raw_output=attack_output,
+                target_rate=target_rate,
+                target_duration=target_duration,
+                calls=calls,
+            )
 
     return {
         'target_rate': target_rate,
@@ -177,205 +192,8 @@ def _create_vegeta_report(
         'last_request_timestamp': report['latest'],
         'last_response_timestamp': report['end'],
         'final_wait_time': report['wait'] / 1e9,
-        'raw_output': raw_output,
+        'deep_raw_output': deep_raw_output,
+        'deep_metrics': deep_metrics,
+        'deep_rpc_error_pairs': deep_rpc_error_pairs,
     }
-
-
-#
-# # output processing
-#
-
-
-def encode_raw_vegeta_output(raw_output: bytes) -> str:
-    import base64
-    import io
-    import gzip
-
-    # gzip compress
-    buf = io.BytesIO()
-    f = gzip.GzipFile(fileobj=buf, mode='wb')
-    f.write(raw_output)
-    f.close()
-    compressed = buf.getvalue()
-
-    # encode as base64
-    as_base64 = base64.b64encode(compressed).decode('utf-8')
-
-    return as_base64
-
-
-def decode_raw_vegeta_output(encoded_output: str) -> bytes:
-    import base64
-    import io
-    import gzip
-
-    # decode from base64
-    as_bytes = base64.b64decode(encoded_output.encode())
-
-    # gzip decompress
-    buf = io.BytesIO(as_bytes)
-    f = gzip.GzipFile(fileobj=buf, mode='rb')
-    decompressed = f.read()
-    f.close()
-
-    return decompressed
-
-
-def convert_raw_vegeta_output_to_dataframe(raw_output: bytes) -> pl.DataFrame:
-    import io
-    import subprocess
-    import polars as pl
-
-    cmd = 'vegeta encode --to csv'
-    report_output = (
-        subprocess.check_output(cmd.split(' '), input=raw_output)
-        .decode()
-        .strip()
-    )
-
-    buf = io.StringIO()
-    buf.write(report_output)
-    buf.seek(0)
-
-    schema = [
-        'timestamp',
-        'status_code',
-        'latency',
-        'bytes_out',
-        'bytes_in',
-        'error',
-        'response',
-        'name',
-        'index',
-        'method',
-        'url',
-        'response_headers',
-    ]
-    dtypes = {
-        'bytes_in': pl.Int64,
-        'bytes_out': pl.Int64,
-        'error': pl.Utf8,
-        'index': pl.Int64,
-        'latency': pl.Int64,
-        'method': pl.Utf8,
-        'name': pl.Utf8,
-        'response': pl.Utf8,
-        'response_headers': pl.Utf8,
-        'status_code': pl.Int64,
-        'timestamp': pl.Int64,
-        'url': pl.Utf8,
-    }
-    return pl.read_csv(buf, new_columns=schema, has_header=False, dtypes=dtypes)
-
-
-def compute_raw_output_metrics(
-    raw_output: typing.Mapping[str, pl.DataFrame],
-    results: typing.Mapping[str, spec.LoadTestOutput],
-) -> typing.Mapping[str, spec.LoadTestOutput]:
-    import polars as pl
-
-    metrics: typing.MutableMapping[str, spec.LoadTestOutput] = {}
-    for node_name, node_results in results.items():
-        node_metrics = []
-        for i, (target_rate, target_duration) in enumerate(
-            zip(node_results['target_rate'], node_results['target_duration'])
-        ):
-            sample_metrics = compute_raw_output_sample_metrics(
-                df=raw_output[node_name].filter(pl.col('sample_index') == i),
-                target_rate=target_rate,
-                target_duration=target_duration,
-            )
-            sample_metrics['raw_output'] = None
-            node_metrics.append(sample_metrics)
-        metrics[node_name] = {
-            metric: [sample_metrics[metric] for sample_metrics in node_metrics]  # type: ignore # noqa: E501
-            for metric in node_results.keys()
-        }
-    return metrics
-
-
-def compute_raw_output_sample_metrics(
-    df: pl.DataFrame, target_rate: int, target_duration: int
-) -> spec.LoadTestOutputDatum:
-    if len(df) == 0:
-        return {
-            'target_rate': target_rate,
-            'actual_rate': 0,
-            'target_duration': target_duration,
-            'actual_duration': None,
-            'requests': 0,
-            'throughput': None,
-            'success': None,
-            'min': None,
-            'mean': None,
-            'p50': None,
-            'p90': None,
-            'p95': None,
-            'p99': None,
-            'max': None,
-            'status_codes': {},
-            'errors': [],
-            'first_request_timestamp': None,
-            'last_request_timestamp': None,
-            'last_response_timestamp': None,
-            'final_wait_time': None,
-            'raw_output': None,
-        }
-
-    import polars as pl
-    actual_rate = (
-        pl.count()
-        / (pl.col('timestamp').max() - pl.col('timestamp').min())
-        * 1e9
-    )
-    actual_rate = actual_rate.alias('actual_rate')
-    successful = df.filter(pl.col('status_code') == 200)
-    total_duration = (  # type: ignore
-        df.select(pl.col('timestamp') + pl.col('latency')).max()
-    ) - df['timestamp'].min()
-    total_duration = total_duration.rows()[0][0]
-    status_codes = {}
-    for k, v in df['status_code'].value_counts().rows():
-        status_codes[str(k)] = v
-    errors = df.filter(~pl.col('error').is_null())['error'].unique().to_list()
-
-    metrics_df = df.select(
-        pl.lit(target_rate).alias('target_rate'),
-        actual_rate,
-        pl.lit(target_duration).alias('target_duration'),
-        (pl.max('timestamp') - pl.min('timestamp')).alias('actual_duration')
-        / 1e9,
-        pl.count().alias('requests'),
-        pl.lit(len(successful) / total_duration).alias('throughput') * 1e9,
-        (len(successful) / pl.count()).alias('success'),
-        pl.min('latency').alias('min') / 1e9,
-        pl.mean('latency').alias('mean') / 1e9,
-        pl.median('latency').alias('p50') / 1e9,
-        pl.quantile('latency', 0.90).alias('p90') / 1e9,
-        pl.quantile('latency', 0.95).alias('p95') / 1e9,
-        pl.quantile('latency', 0.99).alias('p99') / 1e9,
-        pl.max('latency').alias('max') / 1e9,
-        pl.struct(**status_codes, eager=True).alias('status_codes'),
-        pl.Series([errors]).alias('errors'),
-        (pl.col('timestamp').min() / 1e3)
-        .cast(pl.Datetime)
-        .cast(str)
-        .alias('first_request_timestamp'),
-        (pl.col('timestamp').max() / 1e3)
-        .cast(pl.Datetime)
-        .cast(str)
-        .alias('last_request_timestamp'),
-        ((pl.col('timestamp') + pl.col('latency')) / 1e3)
-        .max()
-        .cast(pl.Datetime)
-        .cast(str)
-        .alias('last_response_timestamp'),
-        (
-            (pl.col('timestamp') + pl.col('latency')).max()
-            - pl.max('timestamp')
-        ).alias('final_wait_time')
-        / 1e9,
-    )
-
-    return metrics_df.to_dicts()[0]  # type: ignore
 

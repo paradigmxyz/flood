@@ -4,9 +4,10 @@ import typing
 
 import flood
 
-if typing.TYPE_CHECKING:
-    import polars as pl
 
+#
+# # path utiltiies
+#
 
 _path_templates = {
     'single_run_test': '{output_dir}/test.json',
@@ -29,10 +30,15 @@ def get_single_run_figures_path(output_dir: str) -> str:
     )
 
 
+#
+# # save utilities
+#
+
+
 def _save_single_run_test(
     test_name: str,
     output_dir: str,
-    test: flood.LoadTest,
+    test_parameters: flood.TestGenerationParameters,
 ) -> None:
     import os
     import json
@@ -48,7 +54,7 @@ def _save_single_run_test(
         'version': flood.__version__,
         'type': 'single_test',
         'name': test_name,
-        'test': test,
+        'test_parameters': test_parameters,
     }
     with open(path, 'w') as f:
         json.dump(payload, f)
@@ -93,8 +99,14 @@ def _save_single_run_results(
         )
 
 
+#
+# # load utiltiies
+#
+
+
 def load_single_run_test_payload(
     path_spec: str,
+    allow_other_versions: bool = False,
 ) -> flood.SingleRunTestPayload:
     import os
     import json
@@ -105,14 +117,20 @@ def load_single_run_test_payload(
         path = get_single_run_test_path(path_spec)
     with open(path) as f:
         test: flood.SingleRunTestPayload = json.load(f)
+
+    if test['version'] != flood.__version__:
+        if allow_other_versions:
+            pass
+        else:
+            raise Exception(
+                'loaded test version ('
+                + str(test['version'])
+                + ') does not match current flood version ('
+                + flood.__version__
+                + ')'
+            )
+
     return test
-
-
-def load_single_run_test(
-    output_dir: str,
-) -> flood.LoadTest:
-    payload = load_single_run_test_payload(output_dir)
-    return payload['test']
 
 
 def load_single_run_results_payload(
@@ -124,51 +142,4 @@ def load_single_run_results_payload(
     with open(path) as f:
         results: flood.SingleRunResultsPayload = json.load(f)
     return results
-
-
-def load_single_run_results(
-    output_dir: str,
-) -> typing.Mapping[str, flood.LoadTestOutput]:
-    payload = load_single_run_results_payload(output_dir=output_dir)
-    return payload['results']
-
-
-def load_single_run_raw_output(
-    *,
-    output_dir: str | None = None,
-    results: typing.Mapping[str, flood.LoadTestOutput] | None = None,
-    sample_index: int | typing.Sequence[int] | None = None,
-) -> typing.Mapping[str, pl.DataFrame]:
-    import polars as pl
-
-    if results is None:
-        if output_dir is None:
-            raise Exception('must specify output_dir or results')
-        results = load_single_run_results(output_dir=output_dir)
-    node_dfs = {}
-    for node_name, node_results in results.items():
-        raw_output = node_results['raw_output']
-        if raw_output is None:
-            raise Exception('raw_outputs were not saved for test')
-        else:
-            if sample_index is not None:
-                if isinstance(sample_index, int):
-                    indices = [sample_index]
-                elif isinstance(sample_index, list):
-                    indices = sample_index
-                else:
-                    raise Exception('invalid format for sample_index')
-            else:
-                indices = list(range(len(raw_output)))
-            dfs = []
-            for index in indices:
-                item = raw_output[index]
-                if item is None:
-                    raise Exception('raw_outputs were not saved for test')
-                decoded = flood.decode_raw_vegeta_output(item)
-                df = flood.convert_raw_vegeta_output_to_dataframe(decoded)
-                df = df.with_columns(pl.lit(index).alias('sample_index'))
-                dfs.append(df)
-            node_dfs[node_name] = pl.concat(dfs)
-    return node_dfs
 

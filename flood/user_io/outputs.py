@@ -109,7 +109,7 @@ def _get_tqdm() -> types.ModuleType:
 
 
 def print_metric_tables(
-    results: typing.Mapping[str, spec.LoadTestOutput],
+    results: typing.Mapping[str, spec.LoadTestOutput | spec.LoadTestDeepOutput],
     metrics: typing.Sequence[str],
     *,
     suffix: str = '',

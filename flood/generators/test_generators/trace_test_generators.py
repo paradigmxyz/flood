@@ -14,7 +14,7 @@ def generate_test_trace_block(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -39,7 +39,7 @@ def generate_test_trace_transaction(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -64,7 +64,7 @@ def generate_test_trace_replay_block_transactions(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -89,7 +89,7 @@ def generate_test_trace_replay_block_transactions_state_diff(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -114,7 +114,7 @@ def generate_test_trace_replay_block_transactions_vm_trace(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -139,7 +139,7 @@ def generate_test_trace_replay_transaction(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -164,7 +164,7 @@ def generate_test_trace_replay_transaction_state_diff(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -189,7 +189,7 @@ def generate_test_trace_replay_transaction_vm_trace(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: spec.RandomSeed | None = None,
-) -> spec.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )

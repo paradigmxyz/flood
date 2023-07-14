@@ -184,7 +184,7 @@ def parse_test_data(test: spec.LoadTest) -> spec.LoadTestColumnWise:
     durations = []
     vegeta_kwargs = []
     calls = []
-    for attack in test:
+    for attack in test['attacks']:
         rates.append(attack['rate'])
         durations.append(attack['duration'])
         vegeta_kwargs.append(attack['vegeta_kwargs'])

@@ -13,7 +13,7 @@ def generate_test_eth_get_code(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: flood.RandomSeed | None = None,
-) -> flood.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -38,7 +38,7 @@ def generate_test_eth_get_storage_at(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: flood.RandomSeed | None = None,
-) -> flood.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
@@ -63,7 +63,7 @@ def generate_test_eth_call(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: flood.RandomSeed | None = None,
-) -> flood.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )

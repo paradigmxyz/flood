@@ -107,23 +107,27 @@ def generate_test(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
     network: str,
-    output_dir: str | None = None,
+    # output_dir: str | None = None,
 ) -> flood.LoadTest:
     if test_name is None:
         raise Exception('must specify test_name')
     test_generator = get_test_generator(test_name)
-    test = test_generator(
+    test_parameters: flood.TestGenerationParameters = {
+        'test_name': test_name,
+        'random_seed': random_seed,
+        'rates': rates,
+        'durations': durations,
+        'vegeta_kwargs': vegeta_kwargs,
+        'network': network,
+    }
+    attacks = test_generator(
         rates=rates,
         durations=durations,
         vegeta_kwargs=vegeta_kwargs,
         network=network,
         random_seed=random_seed,
     )
-    if output_dir is not None:
-        flood.runners.single_runner.single_runner_io._save_single_run_test(
-            test_name=test_name, output_dir=output_dir, test=test
-        )
-    return test
+    return {'attacks': attacks, 'test_parameters': test_parameters}
 
 
 def generate_tests(

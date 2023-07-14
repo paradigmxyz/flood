@@ -38,7 +38,7 @@ def create_load_test(
     | typing.Sequence[flood.VegetaKwargs]
     | None = None,
     repeat_calls: bool = False,
-) -> flood.LoadTest:
+) -> typing.Sequence[flood.VegetaAttack]:
     # validate inputs
     if len(rates) == 0:
         raise Exception('must specify at least one rate')
