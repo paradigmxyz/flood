@@ -184,14 +184,25 @@ def _summarize_result(
             node0, node1 = list(nodes.values())
             print()
             flood.print_header('differences in response')
-            toolstr.print_nested_diff(
+            as_str = toolstr.create_nested_diff_str(
                 lhs=results[0],
                 rhs=results[1],
                 lhs_name=node0['name'],
                 rhs_name=node1['name'],
                 styles=flood.styles,
                 indent=4,
+                max_diffs=100,
             )
+            lines = [line for line in as_str.split('\n')]
+            max_lines = 100
+            if len(lines) > max_lines:
+                as_str = (
+                    '\n'.join(lines[:max_lines])
+                    + '\n... (skipping '
+                    + str(len(lines) - max_lines)
+                    + ' lines)'
+                )
+            toolstr.print(as_str)
         else:
             print('omitting details when >2 nodes tested')
 
