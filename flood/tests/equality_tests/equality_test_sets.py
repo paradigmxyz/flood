@@ -201,6 +201,14 @@ def get_trace_equality_tests(
 
     return [
         (
+            'trace_transaction',
+            ctc.rpc.construct_trace_transaction,
+            [
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
+            ],
+            {},
+        ),
+        (
             'trace_block',
             ctc.rpc.construct_trace_block,
             [],
@@ -271,6 +279,24 @@ def get_trace_equality_tests(
             },
         ),
         (
+            'trace_replay_block_transactions_state_diffs',
+            ctc.rpc.construct_trace_replay_block_transactions,
+            [],
+            {
+                'block_number': block_number,
+                'trace_type': ['stateDiff'],
+            },
+        ),
+        (
+            'trace_replay_block_transactions_vm_traces',
+            ctc.rpc.construct_trace_replay_block_transactions,
+            [],
+            {
+                'block_number': block_number,
+                'trace_type': ['vmTrace'],
+            },
+        ),
+        (
             'trace_replay_transaction',
             ctc.rpc.construct_trace_replay_transaction,
             [
@@ -279,11 +305,19 @@ def get_trace_equality_tests(
             {'trace_type': ['trace']},
         ),
         (
-            'trace_transaction',
-            ctc.rpc.construct_trace_transaction,
+            'trace_replay_transaction_state_diff',
+            ctc.rpc.construct_trace_replay_transaction,
             [
                 '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
             ],
-            {},
+            {'trace_type': ['stateDiff']},
+        ),
+        (
+            'trace_replay_transaction_vm_trace',
+            ctc.rpc.construct_trace_replay_transaction,
+            [
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'  # noqa: E501
+            ],
+            {'trace_type': ['vmTrace']},
         ),
     ]
