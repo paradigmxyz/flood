@@ -202,7 +202,6 @@ def _print_single_run_conclusion_text(
 
     # deep inspection tables
     if deep_check:
-
         # extract data per category
         deep_results_by_category: typing.MutableMapping[
             flood.ResponseCategory,
@@ -214,14 +213,19 @@ def _print_single_run_conclusion_text(
             if deep_metrics is not None:
                 for category, category_results in deep_metrics.items():
                     deep_results_by_category.setdefault(category, {})
-                    deep_results_by_category[category][result_name] = category_results
+                    deep_results_by_category[category][
+                        result_name
+                    ] = category_results
             else:
                 raise Exception('deep metrics not available')
 
         metric_names = [
             m for m in metrics if m not in ['success', 'throughput']
         ]
-        for category, result_category_results in deep_results_by_category.items():
+        for (
+            category,
+            result_category_results,
+        ) in deep_results_by_category.items():
             flood.print_metric_tables(
                 results=result_category_results,
                 metrics=metric_names,

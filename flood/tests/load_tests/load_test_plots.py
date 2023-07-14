@@ -70,7 +70,7 @@ def plot_load_test_results(
     has_deep_outputs = any(
         output.get('deep_metrics') is not None for output in outputs.values()
     )
-    if has_deep_outputs is not None:
+    if has_deep_outputs:
         plot_load_test_results(
             outputs={
                 name: output['deep_metrics']['successful']  # type: ignore

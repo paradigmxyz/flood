@@ -66,7 +66,7 @@ def compute_deep_datum(
 
 
 def _convert_raw_vegeta_output_to_dataframe(raw_output: bytes) -> pl.DataFrame:
-    """convert raw output of a vegeta attack to a dataframe, 1 row per response"""
+    """convert raw vegeta attack output to dataframe, 1 row per response"""
     import io
     import subprocess
     import polars as pl
@@ -220,7 +220,7 @@ def _compute_raw_output_sample_metrics(
         / 1e9,
     )
 
-    output: spec.LoadTestDeepOutputDatum = metrics_df.to_dicts()[0]  # type: ignore
+    output: spec.LoadTestDeepOutputDatum = metrics_df.to_dicts()[0]  # type: ignore # noqa: E501
     output['n_invalid_json_errors'] = int(df['invalid_json_error'].sum())
     output['n_rpc_errors'] = int(df['rpc_error'].sum())
 

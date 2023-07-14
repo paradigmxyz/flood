@@ -193,7 +193,7 @@ def run_load_test(
 def _run_load_test_locally(
     *,
     node: spec.Node,
-    test: spec.LoadTest | None,
+    test: spec.LoadTest,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
@@ -219,7 +219,7 @@ def _run_load_test_locally(
 
     # perform tests
     results = []
-    for attack in tqdm.tqdm(test, **tqdm_kwargs):
+    for attack in tqdm.tqdm(test['attacks'], **tqdm_kwargs):
         if verbose:
             flood.print_timestamped(
                 'Running attack at rate = ' + str(attack['rate']) + ' rps'
@@ -240,7 +240,12 @@ def _run_load_test_locally(
 
     # format output
     keys = results[0].keys()
-    return {key: [result[key] for result in results] for key in keys}  # type: ignore # noqa: E501
+    output_data = {key: [result[key] for result in results] for key in keys}  # type: ignore # noqa: E501
+    if include_deep_output is None or len(include_deep_output) == 0:
+        for key in list(output_data.keys()):
+            if key.startswith('deep_'):
+                output_data[key] = None
+    return output_data
 
 
 def _run_load_test_remotely(
