@@ -53,10 +53,13 @@ def print_nodes_table(nodes: typing.Mapping[str, spec.Node]) -> None:
         url = node['url']
         if node['remote'] is not None:
             url = node['remote'] + '\n' + url
+        client_version = node['client_version']
+        if client_version is not None:
+            client_version = client_version.replace('/', '\n')
         row = [
             node['name'],
             url,
-            node['client_version'],
+            client_version,
         ]
         rows.append(row)
     labels = ['node', 'url', 'metadata']
