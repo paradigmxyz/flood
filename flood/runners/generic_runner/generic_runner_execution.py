@@ -18,13 +18,13 @@ def run(
     durations: typing.Sequence[int] | None = None,
     mode: flood.LoadTestMode | None = None,
     vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
-    dry: bool,
+    dry: bool = False,
     output_dir: str | None = None,
     figures: bool = True,
     metrics: typing.Sequence[str] | None = None,
     include_deep_output: typing.Sequence[flood.DeepOutput] | None = None,
     deep_check: bool = False,
-) -> None:
+) -> flood.RunOutput:
     """generate and run tests against nodes"""
     import os
 
@@ -39,7 +39,7 @@ def run(
             test,
             nodes,
         ) = _load_old_test_data(test_name=test_name, nodes=nodes)
-        return single_runner_execution._run_single(
+        output = single_runner_execution._run_single(
             rerun_of=path_spec,
             test=test,
             #
@@ -54,6 +54,7 @@ def run(
             include_deep_output=include_deep_output,
             deep_check=deep_check,
         )
+        return {'single_run': output}
 
     # generate new test
     else:
@@ -61,7 +62,7 @@ def run(
             raise Exception('must specify nodes')
 
         if test_name in flood.get_single_test_generators():
-            single_runner_execution._run_single(
+            output = single_runner_execution._run_single(
                 rates=rates,
                 duration=duration,
                 durations=durations,
@@ -78,6 +79,7 @@ def run(
                 include_deep_output=include_deep_output,
                 deep_check=deep_check,
             )
+            return {'single_run': output}
         elif test_name in flood.get_multi_test_generators():
             raise NotImplementedError('multi tests not supported yet')
         else:

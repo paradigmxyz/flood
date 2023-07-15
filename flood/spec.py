@@ -259,3 +259,13 @@ if typing.TYPE_CHECKING:
         nodes: Nodes
         results: typing.Mapping[str, LoadTestOutput]
 
+    # runner outputs
+
+    class RunOutput(typing.TypedDict):
+        single_run: SingleRunOutput
+
+    class SingleRunOutput(typing.TypedDict):
+        output_dir: str
+        test: LoadTest
+        results: typing.Mapping[str, LoadTestOutput]
+

@@ -26,7 +26,7 @@ def _run_single(
     verbose: bool | int,
     include_deep_output: typing.Sequence[flood.DeepOutput] | None = None,
     deep_check: bool = False,
-) -> None:
+) -> flood.SingleRunOutput:
     if include_deep_output is None:
         include_deep_output = []
     if deep_check and 'metrics' not in include_deep_output:
@@ -76,7 +76,7 @@ def _run_single(
     if dry:
         print()
         print('[dry run, exitting]')
-        return
+        return  # type: ignore
 
     # run tests
     if verbose:
@@ -109,6 +109,12 @@ def _run_single(
             figures=figures,
             deep_check=deep_check,
         )
+
+    return {
+        'output_dir': output_dir,
+        'test': test,
+        'results': results,
+    }
 
 
 def _get_single_test_parameters(
