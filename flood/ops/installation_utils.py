@@ -17,7 +17,7 @@ def get_local_installation() -> flood.FloodInstallation:
     try:
         import os
 
-        module_dir = flood.__path__[0]
+        module_dir = os.path.realpath(flood.__path__[0])
         parent_dir = os.path.dirname(module_dir)
         parent_dir_files = os.listdir(parent_dir)
         if 'pyproject.toml' in parent_dir_files and '.git' in parent_dir_files:
