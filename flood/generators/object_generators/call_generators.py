@@ -219,6 +219,7 @@ def generate_calls_eth_get_logs(
     contract_address: str | None = None,
     topics: typing.Sequence[str | None] | None = None,
     block_ranges: typing.Sequence[tuple[int, int]] | None = None,
+    block_range_size: int | None = None,
     network: str | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[spec.Call]:
@@ -229,11 +230,13 @@ def generate_calls_eth_get_logs(
     if block_ranges is None:
         if n_calls is None:
             raise Exception('must specify more parameters')
+        if block_range_size is None:
+            block_range_size = 100
         block_ranges = block_generators.generate_block_ranges(
             start_block=10_000_000,
             end_block=16_000_000,
             n=n_calls,
-            range_size=100,
+            range_size=block_range_size,
             random_seed=random_seed,
             network=network,
         )

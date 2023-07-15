@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import typing
 
 import flood
@@ -13,6 +14,8 @@ def generate_test_eth_get_logs(
     durations: typing.Sequence[int] | None = None,
     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
     random_seed: flood.RandomSeed | None = None,
+    contract_address: str | None = None,
+    block_range_size: int | None = None,
 ) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
         rates=rates, duration=duration, durations=durations
@@ -21,6 +24,8 @@ def generate_test_eth_get_logs(
         n_calls,
         network=network,
         random_seed=random_seed,
+        contract_address=contract_address,
+        block_range_size=block_range_size,
     )
     return flood.create_load_test(
         calls=calls,
@@ -28,6 +33,23 @@ def generate_test_eth_get_logs(
         duration=duration,
         durations=durations,
     )
+
+
+generate_test_eth_get_logs_lusd_transfers_s = functools.partial(
+    generate_test_eth_get_logs,
+    contract_address='0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
+    block_range_size=100,
+)
+generate_test_eth_get_logs_lusd_transfers_m = functools.partial(
+    generate_test_eth_get_logs,
+    contract_address='0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
+    block_range_size=1000,
+)
+generate_test_eth_get_logs_lusd_transfers_l = functools.partial(
+    generate_test_eth_get_logs,
+    contract_address='0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
+    block_range_size=10000,
+)
 
 
 # def generate_tests_eth_get_logs_by_contract(

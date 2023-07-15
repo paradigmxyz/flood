@@ -56,11 +56,18 @@ def get_test_generator_display_name(
         prefix = 'generate_test_'
 
     if not isinstance(test, str):
-        import types
 
-        if not isinstance(test, types.FunctionType):
-            raise Exception('should be str or function')
-        test = test.__name__
+        test_id = id(test)
+        for key, value in vars(flood).items():
+            if id(value) == test_id:
+                test = key
+                break
+        else:
+            import types
+            if isinstance(test, types.FunctionType):
+                test = test.__name__
+            else:
+                raise Exception('should be str or function')
 
     if not test.startswith(prefix):
         raise Exception()
