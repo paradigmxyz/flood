@@ -269,3 +269,18 @@ if typing.TYPE_CHECKING:
         test: LoadTest
         results: typing.Mapping[str, LoadTestOutput]
 
+    #
+    # # env / ops management
+    #
+
+    class FloodInstallation(typing.TypedDict):
+        vegeta_path: str | None
+        flood_version: str | None
+        git_dir: str | None
+        git_commit: str | None
+        semver: str | None
+
+
+class SshError(Exception):
+    pass
+

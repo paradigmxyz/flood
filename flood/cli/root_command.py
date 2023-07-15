@@ -111,6 +111,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'validate the contents of every RPC response',
                 'action': 'store_true',
             },
+            {
+                'name': ['--remote-update'],
+                'help': 'attempt to update nodes to latest flood version',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             'eth_getBlockByNumber localhost:8545',
@@ -135,6 +140,7 @@ def root_command(
     equality: bool,
     save_raw_output: bool,
     deep_check: bool,
+    remote_update: bool,
 ) -> None:
     verbose = not quiet
     if nodes is not None and len(nodes) == 0:

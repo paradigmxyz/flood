@@ -1,27 +1,19 @@
 from __future__ import annotations
 
 import subprocess
-import typing
 
 import flood
 
 
-class SshError(Exception):
-    pass
-
-
-class FloodInstallation(typing.TypedDict):
-    vegeta_path: str | None
-    flood_version: str | None
-
-
-def get_local_installation() -> FloodInstallation:
+def get_local_installation() -> flood.FloodInstallation:
     result = subprocess.check_output(['which', 'vegeta'])
     vegeta_path = result.decode().rstrip()
 
     flood_version = flood.__version__
 
     # add git commit hash if not in a tagged release
+    use_git_dir = None
+    use_git_commit = None
     try:
         import os
 
@@ -46,18 +38,23 @@ def get_local_installation() -> FloodInstallation:
 
                 # specify commit in flood version
                 flood_version = flood.__version__ + '-' + git_commit[:8]
+            use_git_dir = git_dir
+            use_git_commit = git_commit
     except Exception:
         pass
 
     return {
         'flood_version': flood_version,
         'vegeta_path': vegeta_path,
+        'git_dir': use_git_dir,
+        'git_commit': use_git_commit,
+        'semver': flood.__version__,
     }
 
 
 def get_remote_installation(
     host: str, username: str | None = None
-) -> FloodInstallation:
+) -> flood.FloodInstallation:
     # create command
     if username is not None:
         url = username + '@' + host
@@ -66,8 +63,7 @@ def get_remote_installation(
     template = (
         "ssh {url} bash -c "
         "'source ~/.profile; "
-        "echo $(which vegeta); "
-        "echo $(python3 -m flood version)'"
+        "echo $(python3 -m flood version --json)'"
     )
     cmd = template.format(url=url)
 
@@ -77,15 +73,20 @@ def get_remote_installation(
             cmd.split(' '), stderr=subprocess.DEVNULL
         )
     except Exception:
-        raise SshError('could not ssh')
+        raise flood.SshError('could not ssh')
 
-    vegeta_path: str | None
-    flood_version: str | None
+    try:
+        import json
 
-    vegeta_path, flood_version = result.decode()[:-1].split('\n')
-    if vegeta_path == '':
-        vegeta_path = None
-    if flood_version == '':
-        flood_version = None
-    return {'vegeta_path': vegeta_path, 'flood_version': flood_version}
+        output: flood.FloodInstallation = json.loads(result.decode().strip())
+        return output
+
+    except Exception:
+        return {
+            'vegeta_path': None,
+            'flood_version': None,
+            'git_dir': None,
+            'git_commit': None,
+            'semver': None,
+        }
 
