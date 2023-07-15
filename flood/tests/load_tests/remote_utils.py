@@ -19,8 +19,38 @@ def get_local_installation() -> FloodInstallation:
     result = subprocess.check_output(['which', 'vegeta'])
     vegeta_path = result.decode().rstrip()
 
+    flood_version = flood.__version__
+
+    # add git commit hash if not in a tagged release
+    try:
+        import os
+
+        module_dir = flood.__path__[0]
+        parent_dir = os.path.dirname(module_dir)
+        parent_dir_files = os.listdir(parent_dir)
+        if 'pyproject.toml' in parent_dir_files and '.git' in parent_dir_files:
+            git_dir = os.path.join(parent_dir, '.git')
+
+            # check whether in tagged release
+            try:
+                cmd = 'git --git-dir={git_dir} describe --tags --exact-match'
+                cmd = cmd.format(git_dir=git_dir)
+                subprocess.check_call(cmd.split(' '), stderr=subprocess.DEVNULL)
+            except subprocess.CalledProcessError:
+                # get git commit
+                cmd = 'git --git-dir={git_dir} rev-parse HEAD'.format(
+                    git_dir=git_dir
+                )
+                output = subprocess.check_output(cmd.split(' '))
+                git_commit = output.decode().strip()
+
+                # specify commit in flood version
+                flood_version = flood.__version__ + '-' + git_commit[:8]
+    except Exception:
+        pass
+
     return {
-        'flood_version': flood.__version__,
+        'flood_version': flood_version,
         'vegeta_path': vegeta_path,
     }
 
