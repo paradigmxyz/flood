@@ -42,18 +42,18 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {
                 'name': 'test',
-                'help': 'test to run (use [metavar]flood ls[/metavar] for list)',  # noqa: E501
+                'help': 'test to run (see [metavar]flood ls[/metavar] for list)',  # noqa: E501
             },
             {
                 'name': 'nodes',
                 'nargs': '*',
-                'help': 'nodes to test, see syntax above',
+                'help': 'nodes to test (see syntax above)',
             },
             {
                 'name': ['-s', '--seed'],
                 'dest': 'random_seed',
                 'type': int,
-                'help': 'random seed to use, default is current timestamp',
+                'help': 'random seed to use, (default = current timestamp)',
             },
             {
                 'name': ['-q', '--quiet'],
@@ -74,17 +74,17 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['-r', '--rates'],
                 'nargs': '+',
-                'help': 'rates to use in load test (requests per second)',
+                'help': 'rates to use in load test, units = reqs per second\n(default is test-specific, use [metavar]--dry[/metavar] to view)',  # noqa: E501
             },
             {
                 'name': ['-d', '--duration'],
                 'type': int,
-                'help': 'amount of time to test each rate',
+                'help': 'number of seconds to test each rate (default = [metavar]30[/metavar])',  # noqa: E501
             },
             {
                 'name': ['-o', '--output'],
                 'dest': 'output_dir',
-                'help': 'directory to save results, default is tmp dir',
+                'help': 'directory to save results, (default = new tmp dir)',
             },
             {
                 'name': ['--dry'],
@@ -94,7 +94,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['--metrics'],
                 'nargs': '+',
-                'help': 'space-separated list of performance metrics to show',
+                'help': 'space-separated list of performance metrics to show\n(default = [metavar]success throughput p90[/metavar])',  # noqa: E501
             },
             {
                 'name': ['--no-figures'],
@@ -120,7 +120,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ['--vegeta-args'],
-                'help': 'extra args for vegeta, e.g. `"-timeout 5s -cpus 1"`\nfor single args, use --vegeta-args="..." (no space)',  # noqa: E501
+                'help': 'extra args for vegeta, e.g. [metavar]"-timeout 5s -cpus 1"[/metavar]\nfor single args, use [metavar]--vegeta-args="..."[/metavar] (no space)',  # noqa: E501
             },
         ],
         'examples': [
