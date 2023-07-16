@@ -12,15 +12,19 @@ def update_local(version: str | None = None) -> None:
 
 
 def _update_local_git(version: str | None = None) -> None:
+    import os
     import subprocess
 
     installation = installation_utils.get_local_installation()
     git_dir = installation['git_dir']
     if git_dir is None:
         raise Exception('git installation not specified')
+    repo_dir = os.path.dirname(git_dir)
     if version is None:
         # git pull
-        cmd = 'git --git-dir={git_dir} pull'.format(git_dir=git_dir)
+        cmd = 'git --git-dir={git_dir} --work-tree={repo_dir} pull'.format(
+            git_dir=git_dir, repo_dir=repo_dir
+        )
         subprocess.call(cmd.split(' '))
     else:
         if '.' in version:
@@ -30,12 +34,16 @@ def _update_local_git(version: str | None = None) -> None:
             )
 
         # git fetch
-        cmd = 'git --git-dir={git_dir} fetch origin'.format(git_dir=git_dir)
+        cmd = 'git --git-dir={git_dir} --work-tree={repo_dir} fetch origin'.format(  # noqa: E501
+            git_dir=git_dir, repo_dir=repo_dir
+        )
         subprocess.call(cmd.split(' '))
 
         # git checkout commit
-        cmd = 'git --git-dir={git_dir} checkout {version}'.format(
-            git_dir=git_dir, version=version
+        cmd = 'git --git-dir={git_dir} --work-tree={repo_dir} checkout {version}'.format(  # noqa: E501
+            git_dir=git_dir,
+            version=version,
+            repo_dir=repo_dir,
         )
         subprocess.call(cmd.split(' '))
 
