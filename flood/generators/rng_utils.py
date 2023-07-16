@@ -12,7 +12,9 @@ def get_rng(random_seed: spec.RandomSeed | None = None) -> np.random.Generator:
     import numpy as np
 
     if random_seed is None:
-        random_seed = 0
+        import time
+
+        random_seed = int(time.time())
     if isinstance(random_seed, int):
         gen = np.random.Generator(np.random.PCG64(random_seed))
     if isinstance(gen, np.random.Generator):

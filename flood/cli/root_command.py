@@ -68,6 +68,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['-m', '--mode'],
                 'choices': ['stress', 'spike', 'soak'],
+                'hidden': True,
                 'help': 'load test type: stress, spike, or soak',
             },
             {
