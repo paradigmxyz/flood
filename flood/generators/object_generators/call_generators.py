@@ -63,6 +63,38 @@ def generate_calls_eth_get_block_by_hash(
     ]
 
 
+def generate_calls_eth_fee_history(
+    n_calls: int | None = None,
+    *,
+    network: str | None = None,
+    random_seed: spec.RandomSeed | None = None,
+    block_numbers: typing.Sequence[int] | None = None,
+    block_count: int | None = None
+) -> typing.Sequence[spec.Call]:
+    import ctc.rpc
+
+    if block_numbers is None:
+        if n_calls is None:
+            raise Exception('must specify more parameters')
+        block_numbers = block_generators.generate_block_numbers(
+            n=n_calls,
+            random_seed=random_seed,
+            start_block=13_000_000,
+            end_block=17_000_000,
+            network=network,
+        )
+    if block_count is None:
+        block_count = 1024
+
+    return [
+        ctc.rpc.construct_eth_fee_history(
+            block_number,
+            block_count=block_count,
+        )
+        for block_number in block_numbers
+    ]
+
+
 #
 # # addresses
 #
