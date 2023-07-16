@@ -57,5 +57,13 @@ def _update_local_pip(version: str | None = None) -> None:
 
 
 def update_remote(hostname: str, version: str | None = None) -> None:
-    raise NotImplementedError()
+    import subprocess
+
+    if version is None:
+        cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m flood update'"
+        cmd = cmd.format(host=hostname)
+    else:
+        cmd = "ssh {host} bash -c 'source ~/.profile; python3 -m flood update --version {version}'"  # noqa: E501
+        cmd = cmd.format(host=hostname, version=version)
+    subprocess.call(cmd.split(' '))
 
