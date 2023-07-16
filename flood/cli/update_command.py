@@ -22,6 +22,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': update_command,
         'help': help_text,
+        'hidden': True,
         'args': [
             {
                 'name': ('--version'),

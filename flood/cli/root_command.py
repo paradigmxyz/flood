@@ -119,9 +119,8 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ['--vegeta-args'],
-                'help': 'extra args for vegeta, e.g. `"-timeout 5s -cpus 1"`',
-                'nargs': '+',
-            }
+                'help': 'extra args for vegeta, e.g. `"-timeout 5s -cpus 1"`\nneed to use --vegeta-args="..." (no space)',
+            },
         ],
         'examples': [
             'eth_getBlockByNumber localhost:8545',
@@ -147,7 +146,7 @@ def root_command(
     save_raw_output: bool,
     deep_check: bool,
     remote_update: bool,
-    vegeta_args: typing.Sequence[str],
+    vegeta_args: str,
 ) -> None:
 
     verbose = not quiet

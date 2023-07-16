@@ -65,8 +65,9 @@ def _print_single_run_preamble_copy(
         toolstr.print_bullet(
             key='sample durations', value=durations, styles=flood.styles
         )
-    if vegeta_args is None or len(vegeta_args) == 0:
-        toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
+    toolstr.print_bullet(
+        key='extra args', value=vegeta_args, styles=flood.styles
+    )
 
     if rerun_of is not None:
         toolstr.print_bullet(
