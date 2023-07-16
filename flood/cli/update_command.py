@@ -25,21 +25,21 @@ def get_command_spec() -> toolcli.CommandSpec:
         'hidden': True,
         'args': [
             {
+                'name': ('nodes'),
+                'help': 'hostnames to update (requires ssh)',
+                'nargs': '*',
+            },
+            {
                 'name': ('--version'),
                 'help': 'version to update to',
                 'nargs': '?',
-            },
-            {
-                'name': ('--nodes'),
-                'help': 'hostnames to update (requires ssh)',
-                'nargs': '+',
             },
         ],
     }
 
 
 def update_command(version: str | None, nodes: typing.Sequence[str]) -> None:
-    if nodes is None:
+    if nodes is None or len(nodes) == 0:
         flood.update_local(version=version)
     else:
         for node in nodes:
