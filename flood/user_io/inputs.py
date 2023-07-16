@@ -185,17 +185,17 @@ def get_node_client_version(url: str, remote: str | None = None) -> str | None:
 def parse_test_data(test: spec.LoadTest) -> spec.LoadTestColumnWise:
     rates = []
     durations = []
-    vegeta_kwargs = []
+    vegeta_args = []
     calls = []
     for attack in test['attacks']:
         rates.append(attack['rate'])
         durations.append(attack['duration'])
-        vegeta_kwargs.append(attack['vegeta_kwargs'])
+        vegeta_args.append(attack['vegeta_args'])
         calls.append(attack['calls'])
     return {
         'rates': rates,
         'durations': durations,
-        'vegeta_kwargs': vegeta_kwargs,
+        'vegeta_args': vegeta_args,
         'calls': calls,
     }
 

@@ -112,7 +112,7 @@ def generate_test(
     random_seed: flood.RandomSeed | None = None,
     rates: typing.Sequence[int] | None = None,
     durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
     network: str,
     # output_dir: str | None = None,
 ) -> flood.LoadTest:
@@ -124,13 +124,13 @@ def generate_test(
         'random_seed': random_seed,
         'rates': rates,
         'durations': durations,
-        'vegeta_kwargs': vegeta_kwargs,
+        'vegeta_args': vegeta_args,
         'network': network,
     }
     attacks = test_generator(
         rates=rates,
         durations=durations,
-        vegeta_kwargs=vegeta_kwargs,
+        vegeta_args=vegeta_args,
         network=network,
         random_seed=random_seed,
     )
@@ -143,7 +143,7 @@ def generate_tests(
     random_seed: flood.RandomSeed | None = None,
     rates: typing.Sequence[int] | None = None,
     durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
     network: str,
     output_dir: str | None = None,
     common_parameters: typing.Mapping[str, typing.Any] | None = None,
@@ -156,7 +156,7 @@ def generate_tests(
     tests = test_generator(
         rates=rates,
         durations=durations,
-        vegeta_kwargs=vegeta_kwargs,
+        vegeta_args=vegeta_args,
         network=network,
         random_seed=random_seed,
         common_parameters=common_parameters,

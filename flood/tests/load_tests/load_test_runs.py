@@ -231,7 +231,7 @@ def _run_load_test_locally(
             calls=attack['calls'],
             duration=attack['duration'],
             rate=attack['rate'],
-            vegeta_kwargs=attack['vegeta_kwargs'],
+            vegeta_args=attack['vegeta_args'],
             verbose=verbose >= 2,
             include_deep_output=include_deep_output,
         )

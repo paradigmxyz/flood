@@ -12,7 +12,7 @@ def generate_test_eth_get_block_by_number(
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
     network: str,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[flood.VegetaAttack]:
     n_calls = flood.estimate_call_count(
@@ -28,6 +28,7 @@ def generate_test_eth_get_block_by_number(
         rates=rates,
         duration=duration,
         durations=durations,
+        vegeta_args=vegeta_args,
     )
 
 
@@ -37,7 +38,7 @@ def generate_test_eth_get_block_by_number(
 #     duration: int | None = None,
 #     durations: typing.Sequence[int] | None = None,
 #     network: str,
-#     vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+#     vegeta_args: typing.Mapping[str, str | None] | None = None,
 #     random_seed: spec.RandomSeed | None = None,
 # ) -> typing.Sequence[flood.VegetaAttack]:
 #     n_calls = flood.estimate_call_count(
@@ -53,4 +54,5 @@ def generate_test_eth_get_block_by_number(
 #         rates=rates,
 #         duration=duration,
 #         durations=durations,
+        # vegeta_args=vegeta_args,
 #     )

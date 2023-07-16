@@ -11,7 +11,7 @@ def _print_single_run_preamble(
     test_name: str,
     rates: typing.Sequence[int],
     durations: typing.Sequence[int],
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None,
+    vegeta_args: flood.VegetaArgsShorthand | None,
     rerun_of: str | None = None,
     output_dir: str | None,
 ) -> None:
@@ -23,7 +23,7 @@ def _print_single_run_preamble(
         rerun_of=rerun_of,
         rates=rates,
         durations=durations,
-        vegeta_kwargs=vegeta_kwargs,
+        vegeta_args=vegeta_args,
         output_dir=output_dir,
     )
     if output_dir is not None:
@@ -34,7 +34,7 @@ def _print_single_run_preamble(
                 rerun_of=rerun_of,
                 rates=rates,
                 durations=durations,
-                vegeta_kwargs=vegeta_kwargs,
+                vegeta_args=vegeta_args,
                 output_dir=output_dir,
             )
 
@@ -44,7 +44,7 @@ def _print_single_run_preamble_copy(
     test_name: str,
     rates: typing.Sequence[int],
     durations: typing.Sequence[int],
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None,
+    vegeta_args: flood.VegetaArgsShorthand | None,
     rerun_of: str | None = None,
     output_dir: str | None,
 ) -> None:
@@ -65,7 +65,7 @@ def _print_single_run_preamble_copy(
         toolstr.print_bullet(
             key='sample durations', value=durations, styles=flood.styles
         )
-    if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
+    if vegeta_args is None or len(vegeta_args) == 0:
         toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
 
     if rerun_of is not None:

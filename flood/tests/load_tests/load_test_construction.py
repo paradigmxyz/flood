@@ -34,8 +34,8 @@ def create_load_test(
     rates: typing.Sequence[int],
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: flood.VegetaKwargs
-    | typing.Sequence[flood.VegetaKwargs]
+    vegeta_args: flood.VegetaArgs
+    | typing.Sequence[flood.VegetaArgs]
     | None = None,
     repeat_calls: bool = False,
 ) -> typing.Sequence[flood.VegetaAttack]:
@@ -51,11 +51,14 @@ def create_load_test(
     assert len(durations) == len(rates)
 
     # pluralize singular vegeta kwargs
-    if vegeta_kwargs is None:
-        vegeta_kwargs = {}
-    if isinstance(vegeta_kwargs, dict):
-        vegeta_kwargs = [vegeta_kwargs] * len(rates)
-    if not isinstance(vegeta_kwargs, list):
+    use_vegeta_args: typing.Sequence[str] | typing.Sequence[None]
+    if vegeta_args is None:
+        use_vegeta_args = [vegeta_args] * len(rates)
+    elif isinstance(vegeta_args, str):
+        use_vegeta_args = [vegeta_args] * len(rates)
+    elif isinstance(vegeta_args, list):
+        use_vegeta_args = vegeta_args
+    else:
         raise Exception('invalid input')
 
     # partition calls into individual attacks
@@ -75,14 +78,15 @@ def create_load_test(
     # create load tests
     load_test: list[flood.VegetaAttack] = []
     for rate, duration, a_calls, attack_kwargs in zip(
-        rates, durations, attacks_calls, vegeta_kwargs
+        rates, durations, attacks_calls, use_vegeta_args
     ):
         attack: flood.VegetaAttack = {
             'rate': rate,
             'duration': duration,
             'calls': a_calls,
-            'vegeta_kwargs': attack_kwargs,
+            'vegeta_args': attack_kwargs,
         }
         load_test.append(attack)
 
     return load_test
+

@@ -17,7 +17,7 @@ def run(
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
     mode: flood.LoadTestMode | None = None,
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
     dry: bool = False,
     output_dir: str | None = None,
     figures: bool = True,
@@ -66,7 +66,7 @@ def run(
                 rates=rates,
                 duration=duration,
                 durations=durations,
-                vegeta_kwargs=vegeta_kwargs,
+                vegeta_args=vegeta_args,
                 #
                 test_name=test_name,
                 nodes=nodes,

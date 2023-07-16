@@ -18,7 +18,7 @@ def _run_single(
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
     mode: flood.LoadTestMode | None = None,
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
     dry: bool,
     output_dir: str,
     figures: bool,
@@ -33,13 +33,13 @@ def _run_single(
         include_deep_output = list(include_deep_output) + ['metrics']
 
     # get test parameters
-    rates, durations, vegeta_kwargs = _get_single_test_parameters(
+    rates, durations, vegeta_args = _get_single_test_parameters(
         test=test,
         rates=rates,
         duration=duration,
         durations=durations,
         mode=mode,
-        vegeta_kwargs=vegeta_kwargs,
+        vegeta_args=vegeta_args,
     )
 
     # print preamble
@@ -49,7 +49,7 @@ def _run_single(
             rerun_of=rerun_of,
             rates=rates,
             durations=durations,
-            vegeta_kwargs=vegeta_kwargs,
+            vegeta_args=vegeta_args,
             output_dir=output_dir,
         )
 
@@ -62,7 +62,7 @@ def _run_single(
             'test_name': test_name,
             'rates': rates,
             'durations': durations,
-            'vegeta_kwargs': vegeta_kwargs,
+            'vegeta_args': vegeta_args,
             'network': flood.parse_nodes_network(nodes),
             'random_seed': random_seed,
         }
@@ -124,17 +124,17 @@ def _get_single_test_parameters(
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
     mode: flood.LoadTestMode | None = None,
-    vegeta_kwargs: flood.VegetaKwargsShorthand | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
 ) -> tuple[
     typing.Sequence[int],
     typing.Sequence[int],
-    flood.VegetaKwargsShorthand | None,
+    flood.VegetaArgsShorthand | None,
 ]:
     if test is not None:
         test_data = flood.parse_test_data(test=test)
         rates = test_data['rates']
         durations = test_data['durations']
-        vegeta_kwargs = test_data['vegeta_kwargs']
+        vegeta_args = test_data['vegeta_args']
     else:
         rates, durations = flood.generate_timings(
             rates=rates,
@@ -142,5 +142,5 @@ def _get_single_test_parameters(
             durations=durations,
             mode=mode,
         )
-    return rates, durations, vegeta_kwargs
+    return rates, durations, vegeta_args
 

@@ -13,7 +13,7 @@ def run_vegeta_attack(
     rate: int,
     calls: typing.Sequence[typing.Any],
     duration: int,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    vegeta_args: str | None = None,
     verbose: bool = False,
     include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> spec.LoadTestOutputDatum:
@@ -26,7 +26,7 @@ def run_vegeta_attack(
         schedule_dir=attack['schedule_dir'],
         duration=duration,
         rate=rate,
-        vegeta_kwargs=vegeta_kwargs,
+        vegeta_args=vegeta_args,
         verbose=verbose,
     )
     report = _create_vegeta_report(
@@ -97,7 +97,7 @@ def _vegeta_attack(
     max_workers: int | None = None,
     n_cpus: int | None = None,
     report_path: str | None = None,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    vegeta_args: str | None = None,
     verbose: bool = False,
 ) -> bytes:
     import os
@@ -114,11 +114,8 @@ def _vegeta_attack(
         cmd += ' -max-connections=' + str(max_connections)
     if max_workers is not None:
         cmd += ' -max-workers=' + str(max_workers)
-    if vegeta_kwargs is not None:
-        for key, value in vegeta_kwargs.items():
-            cmd += ' -' + key
-            if value is not None:
-                cmd += '=' + str(value)
+    if vegeta_args is not None:
+        cmd += ' ' + vegeta_args
 
     if verbose:
         print('- command:', cmd)

@@ -31,7 +31,7 @@ def print_load_test_summary(test: flood.LoadTest) -> None:
     parsed = flood.parse_test_data(test)
     rates = parsed['rates']
     durations = parsed['durations']
-    vegeta_kwargs = parsed['vegeta_kwargs']
+    vegeta_args = parsed['vegeta_args']
 
     toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
     if len(set(durations)) == 1:
@@ -44,7 +44,7 @@ def print_load_test_summary(test: flood.LoadTest) -> None:
         toolstr.print_bullet(
             key='sample durations', value=durations, styles=flood.styles
         )
-    if vegeta_kwargs is None or len(vegeta_kwargs) == 0:
+    if vegeta_args is None or len(vegeta_args) == 0:
         toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
 
 
@@ -372,3 +372,4 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'inputs': [],
     },
 ]
+

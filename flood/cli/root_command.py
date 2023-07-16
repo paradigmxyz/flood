@@ -114,8 +114,14 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': ['--remote-update'],
                 'help': 'attempt to update nodes to latest flood version',
+                'hidden': True,
                 'action': 'store_true',
             },
+            {
+                'name': ['--vegeta-args'],
+                'help': 'extra args for vegeta, e.g. `"-timeout 5s -cpus 1"`',
+                'nargs': '+',
+            }
         ],
         'examples': [
             'eth_getBlockByNumber localhost:8545',
@@ -141,7 +147,9 @@ def root_command(
     save_raw_output: bool,
     deep_check: bool,
     remote_update: bool,
+    vegeta_args: typing.Sequence[str],
 ) -> None:
+
     verbose = not quiet
     if nodes is not None and len(nodes) == 0:
         nodes = None
@@ -192,5 +200,6 @@ def root_command(
             figures=figures,
             include_deep_output=include_deep_output,
             deep_check=deep_check,
+            vegeta_args=vegeta_args,
         )
 

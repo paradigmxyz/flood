@@ -79,18 +79,18 @@ if typing.TYPE_CHECKING:
         rate: int
         duration: int
         calls: typing.Sequence[typing.Any]
-        vegeta_kwargs: typing.Mapping[str, typing.Any]
+        vegeta_args: VegetaArgs
 
-    VegetaKwargs = typing.Mapping[str, typing.Union[str, None]]
-    MultiVegetaKwargs = typing.Sequence[VegetaKwargs]
-    VegetaKwargsShorthand = typing.Union[VegetaKwargs, MultiVegetaKwargs]
+    VegetaArgs = typing.Union[str, None]
+    MultiVegetaArgs = typing.Sequence[VegetaArgs]
+    VegetaArgsShorthand = typing.Union[VegetaArgs, MultiVegetaArgs]
 
     class TestGenerationParameters(typing.TypedDict):
         test_name: str
         random_seed: RandomSeed | None
         rates: typing.Sequence[int] | None
         durations: typing.Sequence[int] | None
-        vegeta_kwargs: VegetaKwargsShorthand | None
+        vegeta_args: VegetaArgsShorthand | None
         network: str
 
     # LoadTest = typing.Sequence[VegetaAttack]
@@ -102,7 +102,7 @@ if typing.TYPE_CHECKING:
         rates: typing.Sequence[int]
         durations: typing.Sequence[int]
         calls: typing.Sequence[typing.Sequence[typing.Any]]
-        vegeta_kwargs: typing.Sequence[typing.Any]
+        vegeta_args: typing.Sequence[typing.Any]
 
     LoadTestMode = typing.Literal['stress', 'spike', 'soak']
 

@@ -12,7 +12,7 @@ def generate_test_eth_get_logs(
     network: str,
     duration: int | None = None,
     durations: typing.Sequence[int] | None = None,
-    vegeta_kwargs: typing.Mapping[str, str | None] | None = None,
+    vegeta_args: flood.VegetaArgsShorthand | None = None,
     random_seed: flood.RandomSeed | None = None,
     contract_address: str | None = None,
     block_range_size: int | None = None,
@@ -32,6 +32,7 @@ def generate_test_eth_get_logs(
         rates=rates,
         duration=duration,
         durations=durations,
+        vegeta_args=vegeta_args,
     )
 
 

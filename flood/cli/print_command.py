@@ -34,7 +34,7 @@ def print_command(output_dir: str, metrics: typing.Sequence[str]) -> None:
         test_name=test_payload['name'],
         rates=[subtest['rate'] for subtest in test['attacks']],
         durations=[subtest['duration'] for subtest in test['attacks']],
-        vegeta_kwargs=[subtest['vegeta_kwargs'] for subtest in test['attacks']],
+        vegeta_args=[subtest['vegeta_args'] for subtest in test['attacks']],
         output_dir=output_dir,
     )
 
