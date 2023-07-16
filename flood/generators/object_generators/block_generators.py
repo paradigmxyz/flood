@@ -23,7 +23,7 @@ def generate_block_numbers(
 
     # generate blocks
     all_blocks = np.arange(start_block, end_block + 1)
-    chosen_array = rng.choice(all_blocks, size=n, replace=replace)
+    chosen_array = rng.choice(all_blocks, size=n, replace=(n > len(all_blocks)))
     chosen: list[int] = chosen_array.tolist()
 
     # sort
