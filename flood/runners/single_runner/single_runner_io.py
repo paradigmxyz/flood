@@ -41,7 +41,7 @@ def _save_single_run_test(
     test_parameters: flood.TestGenerationParameters,
 ) -> None:
     import os
-    import json
+    import orjson
 
     if not os.path.isdir(output_dir):
         if os.path.exists(output_dir):
@@ -56,8 +56,8 @@ def _save_single_run_test(
         'name': test_name,
         'test_parameters': test_parameters,
     }
-    with open(path, 'w') as f:
-        json.dump(payload, f)
+    with open(path, 'wb') as f:
+        f.write(orjson.dumps(payload))
 
 
 def _save_single_run_results(
@@ -69,7 +69,7 @@ def _save_single_run_results(
     test_name: str,
 ) -> None:
     import os
-    import json
+    import orjson
 
     if not os.path.isdir(output_dir):
         if os.path.exists(output_dir):
@@ -84,8 +84,8 @@ def _save_single_run_results(
         'nodes': nodes,
         'results': results,
     }
-    with open(path, 'w') as f:
-        json.dump(payload, f)
+    with open(path, 'wb') as f:
+        f.write(orjson.dumps(payload))
 
     if figures:
         figures_dir = get_single_run_figures_path(output_dir=output_dir)
@@ -108,14 +108,14 @@ def load_single_run_test_payload(
     allow_other_versions: bool = False,
 ) -> flood.SingleRunTestPayload:
     import os
-    import json
+    import orjson
 
     if os.path.isfile(path_spec):
         path = path_spec
     else:
         path = get_single_run_test_path(path_spec)
-    with open(path) as f:
-        test: flood.SingleRunTestPayload = json.load(f)
+    with open(path, 'rb') as f:
+        test: flood.SingleRunTestPayload = orjson.loads(f.read())
 
     if test['version'] != flood.__version__:
         if allow_other_versions:
@@ -135,10 +135,10 @@ def load_single_run_test_payload(
 def load_single_run_results_payload(
     output_dir: str,
 ) -> flood.SingleRunResultsPayload:
-    import json
+    import orjson
 
     path = get_single_run_results_path(output_dir=output_dir)
-    with open(path) as f:
-        results: flood.SingleRunResultsPayload = json.load(f)
+    with open(path, 'rb') as f:
+        results: flood.SingleRunResultsPayload = orjson.loads(f.read())
     return results
 

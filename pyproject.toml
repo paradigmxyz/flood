@@ -42,6 +42,7 @@ dependencies = [
     'nbconvert > 6, <7',
     'ipython_genutils > 0.1, <1',
     'ipykernel > 6, <7',
+    'orjson >=3.0.0, < 4',
 ]
 
 [project.optional-dependencies]
