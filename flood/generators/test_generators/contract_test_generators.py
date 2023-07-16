@@ -27,6 +27,7 @@ def generate_test_eth_get_code(
         rates=rates,
         duration=duration,
         durations=durations,
+        vegeta_kwargs=vegeta_kwargs,
     )
 
 
@@ -52,6 +53,7 @@ def generate_test_eth_get_storage_at(
         rates=rates,
         duration=duration,
         durations=durations,
+        vegeta_kwargs=vegeta_kwargs,
     )
 
 
@@ -77,4 +79,5 @@ def generate_test_eth_call(
         rates=rates,
         duration=duration,
         durations=durations,
+        vegeta_kwargs=vegeta_kwargs,
     )

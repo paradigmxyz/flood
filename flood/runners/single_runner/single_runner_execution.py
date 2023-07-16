@@ -39,6 +39,7 @@ def _run_single(
         duration=duration,
         durations=durations,
         mode=mode,
+        vegeta_kwargs=vegeta_kwargs,
     )
 
     # print preamble
