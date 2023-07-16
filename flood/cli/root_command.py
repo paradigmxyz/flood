@@ -119,7 +119,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': ['--vegeta-args'],
-                'help': 'extra args for vegeta, e.g. `"-timeout 5s -cpus 1"`\nneed to use --vegeta-args="..." (no space)',
+                'help': 'extra args for vegeta, e.g. `"-timeout 5s -cpus 1"`\nfor single args, use --vegeta-args="..." (no space)',  # noqa: E501
             },
         ],
         'examples': [
