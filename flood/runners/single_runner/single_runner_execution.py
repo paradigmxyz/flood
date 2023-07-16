@@ -57,8 +57,11 @@ def _run_single(
     nodes = flood.parse_nodes(nodes, verbose=verbose, request_metadata=True)
 
     # generate test and save to disk
+    use_test: flood.LoadTest | flood.TestGenerationParameters
+    test_parameters: flood.TestGenerationParameters
     if test is None:
-        test_parameters: flood.TestGenerationParameters = {
+        test_parameters = {
+            'flood_version': flood.get_flood_version(),
             'test_name': test_name,
             'rates': rates,
             'durations': durations,
@@ -66,12 +69,15 @@ def _run_single(
             'network': flood.parse_nodes_network(nodes),
             'random_seed': random_seed,
         }
-        test = flood.generate_test(**test_parameters)
         flood.runners.single_runner.single_runner_io._save_single_run_test(
             test_name=test_name,
             output_dir=output_dir,
             test_parameters=test_parameters,
         )
+        use_test = test_parameters
+    else:
+        test_parameters = test['test_parameters']
+        use_test = test
 
     # skip dry run
     if dry:
@@ -84,7 +90,7 @@ def _run_single(
         single_runner_summary._print_run_start()
     results = flood.run_load_tests(
         nodes=nodes,
-        test=test,
+        test=use_test,
         verbose=verbose,
         include_deep_output=include_deep_output,
     )
@@ -93,7 +99,6 @@ def _run_single(
     if output_dir is not None:
         single_runner_io._save_single_run_results(
             output_dir=output_dir,
-            test=test,
             nodes=nodes,
             results=results,
             figures=figures,
@@ -114,6 +119,7 @@ def _run_single(
     return {
         'output_dir': output_dir,
         'test': test,
+        'test_parameters': test_parameters,
         'results': results,
     }
 

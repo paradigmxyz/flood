@@ -115,11 +115,13 @@ def generate_test(
     vegeta_args: flood.VegetaArgsShorthand | None = None,
     network: str,
     # output_dir: str | None = None,
+    flood_version: str,
 ) -> flood.LoadTest:
     if test_name is None:
         raise Exception('must specify test_name')
     test_generator = get_test_generator(test_name)
     test_parameters: flood.TestGenerationParameters = {
+        'flood_version': flood.get_flood_version(),
         'test_name': test_name,
         'random_seed': random_seed,
         'rates': rates,

@@ -63,7 +63,6 @@ def _save_single_run_test(
 def _save_single_run_results(
     *,
     output_dir: str,
-    test: flood.LoadTest,
     nodes: flood.Nodes,
     results: typing.Mapping[str, flood.LoadTestOutput],
     figures: bool,

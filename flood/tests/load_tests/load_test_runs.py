@@ -15,8 +15,9 @@ def run_load_tests(
     *,
     node: spec.NodeShorthand | None = None,
     nodes: spec.NodesShorthand | None = None,
-    test: spec.LoadTest | None = None,
-    tests: typing.Mapping[str, spec.LoadTest] | None = None,
+    test: spec.LoadTest | spec.TestGenerationParameters | None = None,
+    tests: typing.Mapping[str, spec.LoadTest | spec.TestGenerationParameters]
+    | None = None,
     verbose: bool | int = False,
     include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
 ) -> typing.Mapping[str, spec.LoadTestOutput]:
@@ -112,7 +113,7 @@ def run_load_tests(
 def schedule_load_test(
     *,
     node: spec.NodeShorthand,
-    test: spec.LoadTest,
+    test: spec.LoadTest | spec.TestGenerationParameters,
     verbose: bool | int = False,
     include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
@@ -154,7 +155,7 @@ def schedule_load_test(
 def run_load_test(
     *,
     node: spec.NodeShorthand,
-    test: spec.LoadTest,
+    test: spec.LoadTest | spec.TestGenerationParameters,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     _container: multiprocessing.Queue[str] | None = None,
@@ -194,7 +195,7 @@ def run_load_test(
 def _run_load_test_locally(
     *,
     node: spec.Node,
-    test: spec.LoadTest,
+    test: spec.LoadTest | spec.TestGenerationParameters,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
@@ -218,9 +219,15 @@ def _run_load_test_locally(
         **_pbar_kwargs,
     )
 
+    use_test: spec.LoadTest
+    if 'attacks' in test:
+        use_test = test  # type: ignore
+    else:
+        use_test = flood.generate_test(**test)
+
     # perform tests
     results = []
-    for attack in tqdm.tqdm(test['attacks'], **tqdm_kwargs):
+    for attack in tqdm.tqdm(use_test['attacks'], **tqdm_kwargs):
         if verbose:
             flood.print_timestamped(
                 'Running attack at rate = ' + str(attack['rate']) + ' rps'
@@ -259,7 +266,7 @@ def _run_load_test_locally(
         deep_metrics = {}
         for category in categories:
             deep_metrics[category] = _list_of_maps_to_map_of_lists(
-                    [result['deep_metrics'][category] for result in results]  # type: ignore # noqa: E501
+                [result['deep_metrics'][category] for result in results]  # type: ignore # noqa: E501
             )
         output_data['deep_metrics'] = deep_metrics  # type: ignore
 
@@ -276,7 +283,7 @@ def _list_of_maps_to_map_of_lists(
 def _run_load_test_remotely(
     *,
     node: spec.Node,
-    test: spec.LoadTest,
+    test: spec.LoadTest | spec.TestGenerationParameters,
     verbose: bool | int = False,
     _pbar_kwargs: typing.Mapping[str, typing.Any] | None = None,
     include_deep_output: typing.Sequence[spec.DeepOutput] | None = None,
@@ -322,9 +329,14 @@ def _run_load_test_remotely(
     job_id = str(uuid.uuid4())
     tempdir = '/tmp/flood__' + job_id
     os.makedirs(tempdir)
+    test_parameters: flood.TestGenerationParameters
+    if 'test_parameters' in test:
+        test_parameters = test['test_parameters']  # type: ignore
+    else:
+        test_parameters = test
     flood.runners.single_runner.single_runner_io._save_single_run_test(
         test_name='',
-        test_parameters=test['test_parameters'],
+        test_parameters=test_parameters,
         output_dir=tempdir,
     )
 

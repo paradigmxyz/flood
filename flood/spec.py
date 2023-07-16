@@ -86,6 +86,7 @@ if typing.TYPE_CHECKING:
     VegetaArgsShorthand = typing.Union[VegetaArgs, MultiVegetaArgs]
 
     class TestGenerationParameters(typing.TypedDict):
+        flood_version: str
         test_name: str
         random_seed: RandomSeed | None
         rates: typing.Sequence[int] | None
@@ -266,7 +267,8 @@ if typing.TYPE_CHECKING:
 
     class SingleRunOutput(typing.TypedDict):
         output_dir: str
-        test: LoadTest
+        test: LoadTest | None
+        test_parameters: TestGenerationParameters
         results: typing.Mapping[str, LoadTestOutput]
 
     #

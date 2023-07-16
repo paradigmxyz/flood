@@ -5,6 +5,15 @@ import subprocess
 import flood
 
 
+def get_flood_version() -> str:
+    """get flood version including git commit hash if in an untagged commit"""
+    installation = get_local_installation()
+    flood_version = installation['flood_version']
+    if flood_version is None:
+        raise Exception('could not detect flood version')
+    return flood_version
+
+
 def get_local_installation() -> flood.FloodInstallation:
     result = subprocess.check_output(['which', 'vegeta'])
     vegeta_path = result.decode().rstrip()
