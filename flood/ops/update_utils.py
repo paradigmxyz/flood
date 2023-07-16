@@ -16,7 +16,7 @@ def _update_local_git(version: str | None = None) -> None:
 
     installation = installation_utils.get_local_installation()
     git_dir = installation['git_dir']
-    if git_dir:
+    if git_dir is None:
         raise Exception('git installation not specified')
     if version is None:
         # git pull
