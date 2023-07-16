@@ -28,6 +28,7 @@ def run_cli(raw_command: str | None = None) -> None:
         ('samples', 'ls'): 'flood.cli.samples_ls_command',
         ('version',): 'flood.cli.version_command',
         ('cd',): 'toolcli.command_utils.standard_subcommands.cd_command',
+        ('update',): 'flood.cli.update_command',
     }
 
     config: toolcli.CLIConfig = {
