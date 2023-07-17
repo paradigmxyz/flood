@@ -12,12 +12,6 @@ COPY ./ /home/$USERNAME/repos/flood/
 WORKDIR /home/$USERNAME/repos/flood
 RUN pip install ./
 
-# install ctc
-WORKDIR /home/$USERNAME/repos
-RUN git clone https://github.com/checkthechain/checkthechain
-WORKDIR /home/$USERNAME/repos/checkthechain
-RUN pip install ./
-
 # install vegeta
 RUN mkdir -p /home/$USERNAME/bin/vegeta_files
 WORKDIR /home/$USERNAME/bin/vegeta_files
