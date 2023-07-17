@@ -49,9 +49,11 @@ def compute_deep_datum(
         pl.Series('rpc_error', rpc_error),
     )
     all_df = all_df.with_columns(
-        (~pl.col('invalid_json_error') & ~pl.col('rpc_error')).alias(
-            'deep_success'
-        )
+        (
+            (pl.col('status_code') == 200)
+            & ~pl.col('invalid_json_error')
+            & ~pl.col('rpc_error')
+        ).alias('deep_success')
     )
 
     # get error pairs

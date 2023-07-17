@@ -152,7 +152,7 @@ def _print_single_run_conclusion_text(
 
         print()
         print()
-        flood.print_header('Saving results...')
+        flood.print_header('Saving results to output directory...')
         toolstr.print_bullet(
             key=os.path.relpath(test_path, output_dir),
             value='',
@@ -203,6 +203,10 @@ def _print_single_run_conclusion_text(
 
     # deep inspection tables
     if deep_check:
+        print()
+        print()
+        flood.print_header('Deep inspection of responses...')
+
         # extract data per category
         deep_results_by_category: typing.MutableMapping[
             flood.ResponseCategory,
@@ -220,6 +224,17 @@ def _print_single_run_conclusion_text(
             else:
                 raise Exception('deep metrics not available')
 
+        flood.print_metric_tables(
+            results=deep_results_by_category['failed'],
+            metrics=['n_invalid_json_errors'],
+            indent=4,
+        )
+        flood.print_metric_tables(
+            results=deep_results_by_category['failed'],
+            metrics=['n_rpc_errors'],
+            indent=4,
+        )
+
         metric_names = [
             m for m in metrics if m not in ['success', 'throughput']
         ]
@@ -227,6 +242,7 @@ def _print_single_run_conclusion_text(
             category,
             result_category_results,
         ) in deep_results_by_category.items():
+            print()
             flood.print_metric_tables(
                 results=result_category_results,
                 metrics=metric_names,
