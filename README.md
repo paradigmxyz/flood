@@ -6,9 +6,11 @@
 ![](./assets/cover.png)
 
 [![CI status](https://github.com/paradigmxyz/flood/workflows/Pytest/badge.svg)][gh-ci]
+[![Docker](https://github.com/paradigmxyz/flood/actions/workflows/docker.yml/badge.svg)][gh-docker]
 [![Telegram Chat][tg-badge]][tg-url]
 
 [gh-ci]: https://github.com/paradigmxyz/flood/actions/workflows/ci.yml
+[gh-docker]: https://github.com/paradigmxyz/flood/actions/workflows/docker.yml
 [tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fparadigm%5Fflood
 [tg-url]: https://t.me/paradigm_flood
 
