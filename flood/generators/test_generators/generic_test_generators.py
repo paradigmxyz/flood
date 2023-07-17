@@ -13,6 +13,7 @@ import flood
 def get_single_test_generators() -> (
     typing.Mapping[str, flood.LoadTestGenerator]
 ):
+    """get all single test generators"""
     return {
         get_test_generator_display_name(item): item  # type: ignore
         for item in dir(flood)
@@ -23,6 +24,7 @@ def get_single_test_generators() -> (
 def get_multi_test_generators() -> (
     typing.Mapping[str, flood.MultiLoadTestGenerator]
 ):
+    """get all multi test generators"""
     return {
         get_test_generator_display_name(item, multi=True): item  # type: ignore
         for item in dir(flood)
@@ -31,6 +33,7 @@ def get_multi_test_generators() -> (
 
 
 def get_test_generator(test_name: str) -> flood.LoadTestGenerator:
+    """get particular single test generator"""
     function_name = get_test_generator_function_name(test_name)
     if hasattr(flood, function_name):
         return getattr(flood, function_name)  # type: ignore
@@ -39,66 +42,12 @@ def get_test_generator(test_name: str) -> flood.LoadTestGenerator:
 
 
 def get_tests_generator(test_name: str) -> flood.MultiLoadTestGenerator:
+    """get particular multi test generator"""
     function_name = get_test_generator_function_name(test_name)
     if hasattr(flood, function_name):
         return getattr(flood, function_name)  # type: ignore
     else:
         raise Exception()
-
-
-def get_test_generator_display_name(
-    test: str | flood.LoadTestGenerator,
-    multi: bool = False,
-) -> str:
-    if multi:
-        prefix = 'generate_tests_'
-    else:
-        prefix = 'generate_test_'
-
-    if not isinstance(test, str):
-
-        test_id = id(test)
-        for key, value in vars(flood).items():
-            if id(value) == test_id:
-                test = key
-                break
-        else:
-            import types
-            if isinstance(test, types.FunctionType):
-                test = test.__name__
-            else:
-                raise Exception('should be str or function')
-
-    if not test.startswith(prefix):
-        raise Exception()
-    test = test[len(prefix) :]
-    head, tail = test.split('_', 1)
-    test = head + '_' + _snake_case_to_camel_case(tail)
-    return test
-
-
-def get_test_generator_function_name(
-    display_name: str, multi: bool = False
-) -> str:
-    if multi:
-        prefix = 'generate_tests_'
-    else:
-        prefix = 'generate_test_'
-
-    function_name = prefix + _camel_case_to_snake_case(display_name)
-    return function_name
-
-
-def _camel_case_to_snake_case(string: str) -> str:
-    # adapted from https://stackoverflow.com/a/1176023
-    import re
-
-    return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
-
-
-def _snake_case_to_camel_case(string: str) -> str:
-    pieces = string.split('_')
-    return pieces[0] + ''.join(piece.title() for piece in pieces[1:])
 
 
 #
@@ -203,4 +152,64 @@ def generate_tests(
 #         tests.append(test)
 
 #     return tests
+
+
+#
+# # name formatting
+#
+
+
+def get_test_generator_display_name(
+    test: str | flood.LoadTestGenerator,
+    multi: bool = False,
+) -> str:
+    if multi:
+        prefix = 'generate_tests_'
+    else:
+        prefix = 'generate_test_'
+
+    if not isinstance(test, str):
+        test_id = id(test)
+        for key, value in vars(flood).items():
+            if id(value) == test_id:
+                test = key
+                break
+        else:
+            import types
+
+            if isinstance(test, types.FunctionType):
+                test = test.__name__
+            else:
+                raise Exception('should be str or function')
+
+    if not test.startswith(prefix):
+        raise Exception()
+    test = test[len(prefix) :]
+    head, tail = test.split('_', 1)
+    test = head + '_' + _snake_case_to_camel_case(tail)
+    return test
+
+
+def get_test_generator_function_name(
+    display_name: str, multi: bool = False
+) -> str:
+    if multi:
+        prefix = 'generate_tests_'
+    else:
+        prefix = 'generate_test_'
+
+    function_name = prefix + _camel_case_to_snake_case(display_name)
+    return function_name
+
+
+def _camel_case_to_snake_case(string: str) -> str:
+    # adapted from https://stackoverflow.com/a/1176023
+    import re
+
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
+
+
+def _snake_case_to_camel_case(string: str) -> str:
+    pieces = string.split('_')
+    return pieces[0] + ''.join(piece.title() for piece in pieces[1:])
 

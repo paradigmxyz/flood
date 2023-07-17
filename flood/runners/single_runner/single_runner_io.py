@@ -51,7 +51,7 @@ def _save_single_run_test(
 
     path = _path_templates['single_run_test'].format(output_dir=output_dir)
     payload: flood.SingleRunTestPayload = {
-        'version': flood.__version__,
+        'flood_version': flood.__version__,
         'type': 'single_test',
         'name': test_name,
         'test_parameters': test_parameters,
@@ -67,7 +67,9 @@ def _save_single_run_results(
     results: typing.Mapping[str, flood.LoadTestOutput],
     figures: bool,
     test_name: str,
-) -> None:
+    t_run_start: float,
+    t_run_end: float,
+) -> flood.SingleRunResultsPayload:
     import os
     import orjson
 
@@ -79,8 +81,9 @@ def _save_single_run_results(
 
     path = _path_templates['single_run_results'].format(output_dir=output_dir)
     payload: flood.SingleRunResultsPayload = {
-        'version': flood.__version__,
         'type': 'single_test',
+        't_run_start': t_run_start,
+        't_run_end': t_run_end,
         'nodes': nodes,
         'results': results,
     }
@@ -96,6 +99,8 @@ def _save_single_run_results(
             output_dir=figures_dir,
             colors=colors,
         )
+
+    return payload
 
 
 #
@@ -117,13 +122,13 @@ def load_single_run_test_payload(
     with open(path, 'rb') as f:
         test: flood.SingleRunTestPayload = orjson.loads(f.read())
 
-    if test['version'] != flood.__version__:
+    if test['flood_version'] != flood.__version__:
         if allow_other_versions:
             pass
         else:
             raise Exception(
                 'loaded test version ('
-                + str(test['version'])
+                + str(test['flood_version'])
                 + ') does not match current flood version ('
                 + flood.__version__
                 + ')'

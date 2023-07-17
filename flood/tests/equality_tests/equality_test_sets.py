@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing
 
 import flood
-from flood import block_generators
 
 
 def get_all_equality_tests(
@@ -36,7 +35,7 @@ def get_vanilla_equality_tests(
 ) -> typing.Sequence[flood.EqualityTest]:
     import ctc.rpc
 
-    start_block, end_block = block_generators.generate_block_ranges(
+    start_block, end_block = flood.generate_block_ranges(
         n=1,
         range_size=range_size,
         start_block=start_block,
@@ -197,7 +196,7 @@ def get_trace_equality_tests(
     """
     import ctc.rpc
 
-    block_number = block_generators.generate_block_numbers(
+    block_number = flood.generate_block_numbers(
         n=1,
         start_block=start_block,
         end_block=end_block,
@@ -399,7 +398,6 @@ def get_trace_equality_tests(
             ],
             {'trace_type': ['vmTrace']},
         ),
-
         # debug
         (
             'debug_traceBlockByHash',

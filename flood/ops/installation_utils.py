@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import typing
 
 import flood
 
@@ -98,4 +99,32 @@ def get_remote_installation(
             'git_commit': None,
             'semver': None,
         }
+
+
+def get_dependency_versions() -> typing.Mapping[str, str | None]:
+    import importlib
+
+    versions = {}
+    for module_name in [
+        'ctc',
+        'ipykernel',
+        'ipython_genutils',
+        'matplotlib',
+        'nbconvert',
+        'nbformat',
+        'numpy',
+        'orjson',
+        'pdp',
+        'polars',
+        'requests',
+        'toolcli',
+        'toolplot',
+        'toolstr',
+        'tqdm',
+        'typing_extensions',
+    ]:
+        module = importlib.import_module(module_name)
+        versions[module_name] = getattr(module, '__version__', None)
+
+    return versions
 

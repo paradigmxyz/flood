@@ -27,6 +27,10 @@ def _run_single(
     include_deep_output: typing.Sequence[flood.DeepOutput] | None = None,
     deep_check: bool = False,
 ) -> flood.SingleRunOutput:
+    import time
+
+    t_start = time.time()
+
     if include_deep_output is None:
         include_deep_output = []
     if deep_check and 'metrics' not in include_deep_output:
@@ -96,14 +100,15 @@ def _run_single(
     )
 
     # output results to file
-    if output_dir is not None:
-        single_runner_io._save_single_run_results(
-            output_dir=output_dir,
-            nodes=nodes,
-            results=results,
-            figures=figures,
-            test_name=test_name,
-        )
+    payload = single_runner_io._save_single_run_results(
+        output_dir=output_dir,
+        nodes=nodes,
+        results=results,
+        figures=figures,
+        test_name=test_name,
+        t_run_start=t_start,
+        t_run_end=time.time()
+    )
 
     # print summary
     if verbose:
@@ -120,7 +125,7 @@ def _run_single(
         'output_dir': output_dir,
         'test': test,
         'test_parameters': test_parameters,
-        'results': results,
+        'payload': payload,
     }
 
 

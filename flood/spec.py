@@ -249,13 +249,14 @@ if typing.TYPE_CHECKING:
     DeepOutput = typing.Literal['raw', 'metrics']
 
     class SingleRunTestPayload(typing.TypedDict):
-        version: str
+        flood_version: str
         type: RunType
         name: str
         test_parameters: TestGenerationParameters
 
     class SingleRunResultsPayload(typing.TypedDict):
-        version: str
+        t_run_start: float
+        t_run_end: float
         type: RunType
         nodes: Nodes
         results: typing.Mapping[str, LoadTestOutput]
@@ -263,13 +264,16 @@ if typing.TYPE_CHECKING:
     # runner outputs
 
     class RunOutput(typing.TypedDict):
+        flood_version: str
+        dependency_versions: typing.Mapping[str, str | None]
+        cli_args: typing.Sequence[str]
         single_run: SingleRunOutput
 
     class SingleRunOutput(typing.TypedDict):
         output_dir: str
         test: LoadTest | None
         test_parameters: TestGenerationParameters
-        results: typing.Mapping[str, LoadTestOutput]
+        payload: SingleRunResultsPayload
 
     #
     # # env / ops management

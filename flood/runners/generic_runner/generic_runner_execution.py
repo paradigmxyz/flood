@@ -4,6 +4,7 @@ import typing
 
 import flood
 from flood.runners.single_runner import single_runner_execution
+
 # from flood.runners.multi_runner import multi_runner_execution
 
 
@@ -27,6 +28,7 @@ def run(
 ) -> flood.RunOutput:
     """generate and run tests against nodes"""
     import os
+    import sys
 
     # get output_dir
     use_output_dir = _get_output_dir(output_dir)
@@ -54,7 +56,12 @@ def run(
             include_deep_output=include_deep_output,
             deep_check=deep_check,
         )
-        return {'single_run': output}
+        return {
+            'flood_version': flood.__version__,
+            'dependency_versions': flood.get_dependency_versions(),
+            'cli_args': list(sys.argv),
+            'single_run': output,
+        }
 
     # generate new test
     else:
@@ -79,7 +86,12 @@ def run(
                 include_deep_output=include_deep_output,
                 deep_check=deep_check,
             )
-            return {'single_run': output}
+            return {
+                'flood_version': flood.__version__,
+                'dependency_versions': flood.get_dependency_versions(),
+                'cli_args': list(sys.argv),
+                'single_run': output,
+            }
         elif test_name in flood.get_multi_test_generators():
             raise NotImplementedError('multi tests not supported yet')
         else:
@@ -88,8 +100,10 @@ def run(
 
 def _get_output_dir(output_dir: str | None) -> str:
     import os
+
     if output_dir is None:
         import tempfile
+
         use_output_dir = tempfile.mkdtemp()
     else:
         use_output_dir = output_dir
