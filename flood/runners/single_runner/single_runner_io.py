@@ -71,6 +71,8 @@ def _save_single_run_results(
     t_run_end: float,
 ) -> flood.SingleRunResultsPayload:
     import os
+    import sys
+
     import orjson
 
     if not os.path.isdir(output_dir):
@@ -81,6 +83,9 @@ def _save_single_run_results(
 
     path = _path_templates['single_run_results'].format(output_dir=output_dir)
     payload: flood.SingleRunResultsPayload = {
+        'flood_version': flood.get_flood_version(),
+        'dependency_versions': flood.get_dependency_versions(),
+        'cli_args': list(sys.argv),
         'type': 'single_test',
         't_run_start': t_run_start,
         't_run_end': t_run_end,

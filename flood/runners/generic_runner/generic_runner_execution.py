@@ -28,7 +28,6 @@ def run(
 ) -> flood.RunOutput:
     """generate and run tests against nodes"""
     import os
-    import sys
 
     # get output_dir
     use_output_dir = _get_output_dir(output_dir)
@@ -56,12 +55,7 @@ def run(
             include_deep_output=include_deep_output,
             deep_check=deep_check,
         )
-        return {
-            'flood_version': flood.__version__,
-            'dependency_versions': flood.get_dependency_versions(),
-            'cli_args': list(sys.argv),
-            'single_run': output,
-        }
+        return {'single_run': output}
 
     # generate new test
     else:
@@ -86,12 +80,7 @@ def run(
                 include_deep_output=include_deep_output,
                 deep_check=deep_check,
             )
-            return {
-                'flood_version': flood.__version__,
-                'dependency_versions': flood.get_dependency_versions(),
-                'cli_args': list(sys.argv),
-                'single_run': output,
-            }
+            return {'single_run': output}
         elif test_name in flood.get_multi_test_generators():
             raise NotImplementedError('multi tests not supported yet')
         else:

@@ -255,18 +255,18 @@ if typing.TYPE_CHECKING:
         test_parameters: TestGenerationParameters
 
     class SingleRunResultsPayload(typing.TypedDict):
+        flood_version: str
+        dependency_versions: typing.Mapping[str, str | None]
+        cli_args: typing.Sequence[str]
+        type: RunType
         t_run_start: float
         t_run_end: float
-        type: RunType
         nodes: Nodes
         results: typing.Mapping[str, LoadTestOutput]
 
     # runner outputs
 
     class RunOutput(typing.TypedDict):
-        flood_version: str
-        dependency_versions: typing.Mapping[str, str | None]
-        cli_args: typing.Sequence[str]
         single_run: SingleRunOutput
 
     class SingleRunOutput(typing.TypedDict):
