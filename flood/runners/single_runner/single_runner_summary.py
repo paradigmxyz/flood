@@ -224,11 +224,13 @@ def _print_single_run_conclusion_text(
             else:
                 raise Exception('deep metrics not available')
 
+        print()
         flood.print_metric_tables(
             results=deep_results_by_category['failed'],
             metrics=['n_invalid_json_errors'],
             indent=4,
         )
+        print()
         flood.print_metric_tables(
             results=deep_results_by_category['failed'],
             metrics=['n_rpc_errors'],

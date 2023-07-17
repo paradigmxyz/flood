@@ -127,7 +127,7 @@ def print_metric_tables(
     rates = results[names[0]]['target_rate']
     for metric in metrics:
         # create labels
-        if metric == 'success':
+        if metric in ['success', 'n_invalid_json_errors', 'n_rpc_errors']:
             metric_suffix = ''
         else:
             metric_suffix = ' (s)'
