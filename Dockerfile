@@ -27,7 +27,7 @@ RUN adduser $USERNAME
 USER $USERNAME
 
 COPY --from=flood-builder /home/$USERNAME/.local /home/$USERNAME/.local
-COPY --from=vegeta-builder /vegeta/vegeta /home/$USERNAME/bin/vegeta
+COPY --from=vegeta-builder /vegeta/vegeta /home/$USERNAME/.local/bin/vegeta
 
 WORKDIR /home/$USERNAME
 ENTRYPOINT ["python", "-m", "flood"]
