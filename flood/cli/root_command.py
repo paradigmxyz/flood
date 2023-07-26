@@ -29,10 +29,7 @@ help_message = """Load test JSON RPC endpoints
 - Can omit the [metavar]user@[/metavar] prefix if ssh config has username specified
 - [metavar]flood[/metavar] must already be installed on each remote machine
 
-[bold][title]Parameter Randomization[/bold][/title]
-- [metavar]flood[/metavar] can call each RPC method multiple times using [metavar]-n <N>[/metavar]
-- For each call, parameters are randomized to minimize caching effects
-- Specify random seed [metavar]-s <seed>[/metavar] for repeatable set of randomized calls"""  # noqa: E501
+For more details, see the [metavar]README.md[/metavar] at [metavar]https://github.com/paradigmxyz/cryo[/metavar]"""  # noqa: E501
 
 
 def get_command_spec() -> toolcli.CommandSpec:
