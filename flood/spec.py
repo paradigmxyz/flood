@@ -245,7 +245,7 @@ if typing.TYPE_CHECKING:
         n_invalid_json_errors: typing.Sequence[int]
         n_rpc_errors: typing.Sequence[int]
 
-    RunType = typing.Literal['single_test']
+    RunType = typing.Literal['single_test']  # noqa: F821
     DeepOutput = typing.Literal['raw', 'metrics']
 
     class SingleRunTestPayload(typing.TypedDict):
