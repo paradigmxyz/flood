@@ -126,7 +126,9 @@ def run_equality_test(
         for name in sorted(successful):
             flood.user_io.print_bullet(key=name, value='', colon_str='')
     print()
-    flood.user_io.print_header('Differences detected (n = ' + str(len(failed)) + ')')
+    flood.user_io.print_header(
+        'Differences detected (n = ' + str(len(failed)) + ')'
+    )
     if len(failed) == 0:
         print('[none]')
     else:

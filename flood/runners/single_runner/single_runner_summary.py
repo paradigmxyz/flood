@@ -201,7 +201,9 @@ def _print_single_run_conclusion_text(
 
     # print metric values
     print()
-    flood.user_io.print_metric_tables(results=results, metrics=metrics, indent=4)
+    flood.user_io.print_metric_tables(
+        results=results, metrics=metrics, indent=4
+    )
 
     # deep inspection tables
     if deep_check:

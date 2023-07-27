@@ -312,7 +312,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
             # show result tables
 
             flood.user_io.print_metric_tables(results, metrics=metrics, comparison=True)
-        """,
+        """,  # noqa: E501
         'inputs': [],
     },
     {
@@ -328,7 +328,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
                 latency_yscale_log=True,
                 colors=colors,
             )
-        """,
+        """,  # noqa: E501
         'inputs': [],
     },
     {

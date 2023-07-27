@@ -96,7 +96,7 @@ def generate_test_trace_replay_block_transactions_state_diff(
     n_calls = load_tests.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generators.generate_calls_trace_replay_block_transactions_state_diff(
+    calls = flood.generators.generate_calls_trace_replay_block_transactions_state_diff(  # noqa: E501
         n_calls=n_calls,
         network=network,
         random_seed=random_seed,
@@ -122,7 +122,7 @@ def generate_test_trace_replay_block_transactions_vm_trace(
     n_calls = load_tests.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generators.generate_calls_trace_replay_block_transactions_vm_trace(
+    calls = flood.generators.generate_calls_trace_replay_block_transactions_vm_trace(  # noqa: E501
         n_calls=n_calls,
         network=network,
         random_seed=random_seed,

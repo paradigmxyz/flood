@@ -1,4 +1,5 @@
 """tool for benchmarking RPC endpoints"""
+# ruff: noqa: F401
 
 from .spec import *
 import flood.generators
