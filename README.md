@@ -26,6 +26,21 @@ For each RPC method, `flood` measures how load affects metrics such as:
 
 `flood` can generate tables, figures, and reports for easy sharing of results (example report [here](https://datasets.paradigm.xyz/notebooks/flood/example_report.html))
 
+## Contents
+1. ### [Installation](#installation)
+    1. [Prerequisites](#prerequisites)
+    2. [Installing Flood](#installing-flood)
+    3. [Docker](#docker)
+2. ### [Usage Guide](#usage-guide)
+    1. [Basic Load Tests](#basic-load-tests)
+    2. [Remote Load Tests](#remote-load-tests)
+    3. [Printing Test Results](#printing-test-results)
+    4. [Report Generation](#report-generation)
+    5. [Differential Tests](#differential-tests)
+    6. [From Python](#from-python)
+    7. [Performing Deep Checks](#performing-deep-checks)
+3. ### [Contributing](#contributing)
+
 
 ## Installation
 
@@ -51,24 +66,7 @@ Typing `flood help` in your terminal should show help output. If it does not, yo
 
 Alternatively, flood can be used as a [Docker image](https://github.com/paradigmxyz/flood/pkgs/container/flood).
 
-## Usage
-
-#### run test
-```
-flood eth_getBlockByNumber NODE1_NAME=NODE1_URL NODE2_NAME=NODE2_URL --rates 10 100 1000 --duration 30
-```
-
-#### orchestrate tests on remote nodes
-```
-flood eth_getBlockByNumber NODE1_NAME=NODE1_URL:localhost:8545 NODE2_NAME=NODE2_URL:localhost:8545
-```
-
-#### create report
-```
-flood report tests/test1_output tests/test2_output
-````
-
-## User guide
+## Usage guide
 
 `flood` works by bombarding an RPC endpoint with different patterns of RPC calls. Measurements of the RPC endpoint's performance under different controlled loads are then used to paint a detailed view of the node's performance.
 
@@ -78,7 +76,7 @@ Every time flood runs, it saves its parameters and test results to an output dir
 - `summary.txt`: printed summary of test that was output to the console
 - `test.json`: metadata and parameters used to create and run the test
 
-### Basic tests
+### Basic load tests
 
 Here is an example of a basic test with `flood`. It will benchmark block retrieval from two different nodes. It will test at 3 different rates (10, 100, and 1000 requests per second) and it will test them for 30 seconds each.
 
@@ -86,7 +84,7 @@ Here is an example of a basic test with `flood`. It will benchmark block retriev
 
 To see all of the parameters available for controlling `flood` tests use `flood --help`
 
-### Running remote tests
+### Remote load tests
 
 Instead of broadcasting RPC calls from whatever machine running the `flood` CLI command, `flood` can broadcast the calls from a remote process on a remote machine. In particular, `flood` can broadcast the calls from the same machine that is running the EVM node in order to eliminate any noise or bottlenecks associated with networking.
 
@@ -108,7 +106,7 @@ By default `flood` produces verbose output of each test as it runs. This can be 
 
 After running tests, you can generate an HTML + Jupyter report similar to [this] one. This is done by running `flood report <TEST_DIR>`. Multiple tests can be combined into one report with `flood repos <TEST_DIR_1> <TEST_DIR_2> ...`.
 
-### Differentual tests
+### Differential tests
 
 Instead of testing the raw performance of an RPC node, `flood` can be used to test the correctness of a node's responses using a differential testing approach. This works by using two nodes and making sure that their responses match under a variety of RPC calls. This is done using the `--equality` parameter. For example:
 
