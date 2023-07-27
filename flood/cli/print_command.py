@@ -56,8 +56,8 @@ def print_single(
 
     # print node data
     print()
-    flood.print_header('Nodes tested')
-    flood.print_nodes_table(results_payload['nodes'])
+    flood.user_io.print_header('Nodes tested')
+    flood.user_io.print_nodes_table(results_payload['nodes'])
 
     # decide metrics
     if metrics is None:
@@ -66,8 +66,8 @@ def print_single(
     # print performance metrics
     print()
     print()
-    flood.print_header('Summarizing performance metrics...')
-    flood.print_metric_tables(
+    flood.user_io.print_header('Summarizing performance metrics...')
+    flood.user_io.print_metric_tables(
         results=results,
         metrics=metrics,
         indent=4,
@@ -101,9 +101,9 @@ def print_multiple(output_dirs: typing.Sequence[str]) -> None:
         rows.append(row)
     labels = ['test'] + conditions + ['max tested']
 
-    flood.print_text_box('Max Throughput')
+    flood.user_io.print_text_box('Max Throughput')
     print()
     print('units = requests per second')
     print()
-    flood.print_table(rows, labels=labels)
+    flood.user_io.print_table(rows, labels=labels)
 

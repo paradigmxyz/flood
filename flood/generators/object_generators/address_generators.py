@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 import flood
+from flood import generators
 
 
 def generate_contract_addresses(
@@ -10,7 +11,7 @@ def generate_contract_addresses(
     network: str,
     random_seed: flood.RandomSeed | None = None,
 ) -> typing.Sequence[str]:
-    return flood.load_samples(
+    return generators.load_samples(
         network=network,
         datatype='contracts',
         n=n,
@@ -23,7 +24,7 @@ def generate_eoas(
     network: str,
     random_seed: flood.RandomSeed | None = None,
 ) -> typing.Sequence[str]:
-    return flood.load_samples(
+    return generators.load_samples(
         network=network,
         datatype='eoas',
         n=n,

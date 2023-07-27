@@ -4,6 +4,7 @@ import typing
 
 import flood
 from flood import spec
+from . import outputs
 
 
 def get_ctc_alias_url(url: str) -> str | None:
@@ -26,7 +27,7 @@ def parse_nodes(
 ) -> typing.Mapping[str, spec.Node]:
     """parse given nodes according to input specification"""
     if verbose:
-        flood.print_header('Gathering node data...')
+        outputs.print_header('Gathering node data...')
 
     new_nodes: typing.MutableMapping[str, spec.Node] = {}
     if isinstance(nodes, list):
@@ -64,7 +65,7 @@ def print_nodes_table(nodes: typing.Mapping[str, spec.Node]) -> None:
         rows.append(row)
     labels = ['node', 'url', 'metadata']
     print()
-    flood.print_multiline_table(
+    outputs.print_multiline_table(
         rows=rows,
         labels=labels,
         indent=4,

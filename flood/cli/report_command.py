@@ -46,7 +46,7 @@ def report_command(
 
         output = os.getcwd()
 
-    flood.create_load_test_report(
+    flood.tests.load_tests.create_load_test_report(
         test_paths=test_dirs,
         output_dir=output,
         metrics=metrics,

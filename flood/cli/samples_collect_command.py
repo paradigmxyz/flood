@@ -39,10 +39,10 @@ def samples_collect_command(
     datatypes: typing.Sequence[str] | None,
 ) -> None:
     if output_dir is None:
-        output_dir = flood.get_flood_samples_dir()
+        output_dir = flood.generators.get_flood_samples_dir()
     if network is None:
         network = 'ethereum'
-    flood.create_samples_dataset(
+    flood.generators.create_samples_dataset(
         output_dir=output_dir,
         network=network,
         sizes=sizes,

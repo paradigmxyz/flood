@@ -19,7 +19,7 @@ def run_equality_test(
     import requests
     import toolstr
 
-    nodes = flood.parse_nodes(nodes, request_metadata=True)
+    nodes = flood.user_io.parse_nodes(nodes, request_metadata=True)
     for node in nodes.values():
         if node['remote'] is not None:
             raise Exception('remote not supported for equality test')
@@ -42,19 +42,20 @@ def run_equality_test(
         output_dir = tempfile.mkdtemp()
 
     # print preamble
-    flood.print_text_box('Equality test: ' + test_name)
-    flood.print_bullet(key='methods', value='')
+    flood.user_io.print_text_box('Equality test: ' + test_name)
+    flood.user_io.print_bullet(key='methods', value='')
     for test in equality_tests:
-        flood.print_bullet(key=test[0], value='', colon_str='', indent=4)
-    flood.print_bullet(key='output_dir', value=output_dir)
-    flood.print_bullet(key='nodes', value='')
+        flood.user_io.print_bullet(
+            key=test[0], value='', colon_str='', indent=4
+        )
+    flood.user_io.print_bullet(key='output_dir', value=output_dir)
+    flood.user_io.print_bullet(key='nodes', value='')
+    styles = flood.user_io.styles
     for n, node in enumerate(nodes.values()):
         toolstr.print(
-            toolstr.add_style(str(n + 1), flood.styles['metavar'])
-            + '. '
-            + str(node),
+            toolstr.add_style(str(n + 1), styles['metavar']) + '. ' + str(node),
             indent=4,
-            style=flood.styles['description'],
+            style=styles['description'],
         )
 
     # run test
@@ -114,27 +115,27 @@ def run_equality_test(
 
     # summarize test
     print()
-    flood.print_text_box('Equality Test Summary')
+    flood.user_io.print_text_box('Equality Test Summary')
     print()
-    flood.print_header(
+    flood.user_io.print_header(
         'No differences detected (n = ' + str(len(successful)) + ')'
     )
     if len(successful) == 0:
         print('[none]')
     else:
         for name in sorted(successful):
-            flood.print_bullet(key=name, value='', colon_str='')
+            flood.user_io.print_bullet(key=name, value='', colon_str='')
     print()
-    flood.print_header('Differences detected (n = ' + str(len(failed)) + ')')
+    flood.user_io.print_header(
+        'Differences detected (n = ' + str(len(failed)) + ')'
+    )
     if len(failed) == 0:
         print('[none]')
     else:
         for name in sorted(failed):
-            flood.print_bullet(key=name, value='', colon_str='')
+            flood.user_io.print_bullet(key=name, value='', colon_str='')
     print()
-    toolstr.print(
-        'summary saved to: ' + file_path, style=flood.styles['comment']
-    )
+    toolstr.print('summary saved to: ' + file_path, style=styles['comment'])
 
 
 def _summarize_result(
@@ -146,30 +147,30 @@ def _summarize_result(
 ) -> bool:
     import toolstr
 
+    styles = flood.user_io.styles
+
     test_name, constructor, args, kwargs = test
 
     if results[0] is None or not toolstr.nested_equal(results[0], results[1]):
         print()
-        flood.print_text_box('Discrepancies in ' + test_name)
+        flood.user_io.print_text_box('Discrepancies in ' + test_name)
         print()
-        flood.print_header('args')
+        flood.user_io.print_header('args')
         if len(args) > 0:
             for arg in args:
-                flood.print_bullet(key=arg, value='', colon_str='')
+                flood.user_io.print_bullet(key=arg, value='', colon_str='')
         if len(kwargs) > 0:
             for key, value in kwargs.items():
-                flood.print_bullet(key=key, value=value)
+                flood.user_io.print_bullet(key=key, value=value)
         print()
-        flood.print_header('call')
+        flood.user_io.print_header('call')
         print(call)
 
         if any(result is None for result in results):
             print()
         for node, result, response in zip(nodes.values(), results, responses):
             if result is None:
-                toolstr.print(
-                    node['name'] + ' failed', style=flood.styles['title']
-                )
+                toolstr.print(node['name'] + ' failed', style=styles['title'])
                 if response is None:
                     print('response: no response')
                 elif response.status_code == 200:
@@ -183,13 +184,13 @@ def _summarize_result(
         if len(results) == 2:
             node0, node1 = list(nodes.values())
             print()
-            flood.print_header('differences in response')
+            flood.user_io.print_header('differences in response')
             as_str = toolstr.create_nested_diff_str(
                 lhs=results[0],
                 rhs=results[1],
                 lhs_name=node0['name'],
                 rhs_name=node1['name'],
-                styles=flood.styles,
+                styles=styles,
                 indent=4,
             )
             lines = [line for line in as_str.split('\n')]

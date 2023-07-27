@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 import flood
+from flood import generators
 from flood.runners.single_runner import single_runner_execution
 
 # from flood.runners.multi_runner import multi_runner_execution
@@ -62,7 +63,7 @@ def run(
         if nodes is None:
             raise Exception('must specify nodes')
 
-        if test_name in flood.get_single_test_generators():
+        if test_name in generators.get_single_test_generators():
             output = single_runner_execution._run_single(
                 rates=rates,
                 duration=duration,
@@ -81,7 +82,7 @@ def run(
                 deep_check=deep_check,
             )
             return {'single_run': output}
-        elif test_name in flood.get_multi_test_generators():
+        elif test_name in generators.get_multi_test_generators():
             raise NotImplementedError('multi tests not supported yet')
         else:
             raise Exception('invalid test name')
@@ -106,7 +107,7 @@ def _load_old_test_data(
 
     try:
         test_payload = flood.load_single_run_test_payload(path_spec)
-        test = flood.generate_test(**test_payload['test_parameters'])
+        test = generators.generate_test(**test_payload['test_parameters'])
         test_name = test_payload['name']
     except Exception:
         raise Exception('invalid test path: ' + str(path_spec))

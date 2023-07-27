@@ -28,24 +28,25 @@ def create_load_test_report(
 def print_load_test_summary(test: flood.LoadTest) -> None:
     import toolstr
 
-    parsed = flood.parse_test_data(test)
+    parsed = flood.user_io.parse_test_data(test)
     rates = parsed['rates']
     durations = parsed['durations']
     vegeta_args = parsed['vegeta_args']
+    styles = flood.user_io.styles
 
-    toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
+    toolstr.print_bullet(key='sample rates', value=rates, styles=styles)
     if len(set(durations)) == 1:
         toolstr.print_bullet(
             key='sample duration',
             value=durations[0],
-            styles=flood.styles,
+            styles=styles,
         )
     else:
         toolstr.print_bullet(
-            key='sample durations', value=durations, styles=flood.styles
+            key='sample durations', value=durations, styles=styles
         )
     if vegeta_args is None or len(vegeta_args) == 0:
-        toolstr.print_bullet(key='extra args', value=None, styles=flood.styles)
+        toolstr.print_bullet(key='extra args', value=None, styles=styles)
 
 
 def _create_load_test_report_html(
@@ -176,7 +177,7 @@ _report_template_cells: notebook_io.NotebookTemplate = [
 
             import flood
 
-            flood.styles = {{}}
+            flood.user_io.styles = {{}}
         """,
         'inputs': [],
     },
@@ -297,7 +298,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
             # show test metadata
 
             toolstr.print_text_box(test_name + ' parameters')
-            flood.print_load_test_summary(results_payload['test'])
+            flood.user_io.print_load_test_summary(results_payload['test'])
             toolstr.print('- nodes tested:')
             nodes_df = pl.from_records(list(results_payload['nodes'].values()))
             toolstr.print_dataframe_as_table(nodes_df)
@@ -310,8 +311,8 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'content': """
             # show result tables
 
-            flood.print_metric_tables(results, metrics=metrics, comparison=True)
-        """,
+            flood.user_io.print_metric_tables(results, metrics=metrics, comparison=True)
+        """,  # noqa: E501
         'inputs': [],
     },
     {
@@ -320,14 +321,14 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'content': """
             # show result figures
 
-            colors = flood.get_nodes_plot_colors(nodes=results_payload['nodes'])
-            flood.plot_load_test_results(
+            colors = flood.user_io.get_nodes_plot_colors(nodes=results_payload['nodes'])
+            flood.user_io.plot_load_test_results(
                 test_name=test_name,
                 outputs=results,
                 latency_yscale_log=True,
                 colors=colors,
             )
-        """,
+        """,  # noqa: E501
         'inputs': [],
     },
     {

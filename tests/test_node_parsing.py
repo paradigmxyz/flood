@@ -43,7 +43,7 @@ def test_parse_node(
     if name is not None:
         node_str = name + '=' + node_str
 
-    parsed = flood.parse_node(node_str, request_metadata=False)
+    parsed = flood.user_io.parse_node(node_str, request_metadata=False)
 
     if name is not None:
         assert parsed['name'] == name

@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from flood import spec
+from flood.tests import load_tests
 import flood
 
 
@@ -15,15 +16,15 @@ def generate_test_eth_get_block_by_number(
     vegeta_args: flood.VegetaArgsShorthand | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[flood.VegetaAttack]:
-    n_calls = flood.estimate_call_count(
+    n_calls = load_tests.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generate_calls_eth_get_block_by_number(
+    calls = flood.generators.generate_calls_eth_get_block_by_number(
         n_calls=n_calls,
         network=network,
         random_seed=random_seed,
     )
-    return flood.create_load_test(
+    return load_tests.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -41,15 +42,15 @@ def generate_test_eth_fee_history(
     vegeta_args: flood.VegetaArgsShorthand | None = None,
     random_seed: spec.RandomSeed | None = None,
 ) -> typing.Sequence[flood.VegetaAttack]:
-    n_calls = flood.estimate_call_count(
+    n_calls = load_tests.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generate_calls_eth_fee_history(
+    calls = flood.generators.generate_calls_eth_fee_history(
         n_calls=n_calls,
         network=network,
         random_seed=random_seed,
     )
-    return flood.create_load_test(
+    return load_tests.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,
@@ -67,7 +68,7 @@ def generate_test_eth_fee_history(
 #     vegeta_args: typing.Mapping[str, str | None] | None = None,
 #     random_seed: spec.RandomSeed | None = None,
 # ) -> typing.Sequence[flood.VegetaAttack]:
-#     n_calls = flood.estimate_call_count(
+#     n_calls = load_tests.estimate_call_count(
 #         rates=rates, duration=duration, durations=durations
 #     )
 #     calls = flood.generate_calls_eth_get_block_by_hash(
@@ -75,7 +76,7 @@ def generate_test_eth_fee_history(
 #         network=network,
 #         random_seed=random_seed,
 #     )
-#     return flood.create_load_test(
+#     return load_tests.create_load_test(
 #         calls=calls,
 #         rates=rates,
 #         duration=duration,

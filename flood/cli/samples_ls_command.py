@@ -19,7 +19,7 @@ def samples_ls_command() -> None:
     version = 'v1_0_0'
 
     # parse contents of flood samples dir
-    samples_dir = flood.get_flood_samples_dir()
+    samples_dir = flood.generators.get_flood_samples_dir()
     files_by_network: dict[str, list[str]] = {}
     for filename in os.listdir(samples_dir):
         if filename.endswith('parquet'):
@@ -39,9 +39,9 @@ def samples_ls_command() -> None:
             print('-', filename)
 
         missing = []
-        for size in flood.default_sizes:
-            for datatype in flood.default_datatypes:
-                filename = flood.raw_data_file_template.format(
+        for size in flood.generators.default_sizes:
+            for datatype in flood.generators.default_datatypes:
+                filename = flood.generators.raw_data_file_template.format(
                     network=network,
                     size=size,
                     datatype=datatype,
