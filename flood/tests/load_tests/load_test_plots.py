@@ -156,7 +156,7 @@ def plot_load_test_latencies(
     import matplotlib.pyplot as plt
 
     if colors is None:
-        colors = dict(zip(results.keys(), flood.plot_colors.values()))
+        colors = dict(zip(results.keys(), flood.user_io.plot_colors.values()))
 
     if yscale_log:
         ymin = None
@@ -196,20 +196,20 @@ def plot_load_test_result_metrics(
     import matplotlib.pyplot as plt
     import toolplot
 
+    plot_colors = flood.user_io.plot_colors
+
     if colors is None:
-        colors = {
-            key: color for key, color in zip(results.keys(), flood.plot_colors)
-        }
+        colors = {key: color for key, color in zip(results.keys(), plot_colors)}
 
     for name, result in results.items():
         # determine colors
         result_colors = colors.get(name)
         if isinstance(result_colors, str):
-            if result_colors in flood.plot_colors:
+            if result_colors in plot_colors:
                 if len(metrics) == 1:
-                    result_colors = [flood.plot_colors[result_colors][1]]
+                    result_colors = [plot_colors[result_colors][1]]
                 else:
-                    result_colors = flood.plot_colors[result_colors]
+                    result_colors = plot_colors[result_colors]
             else:
                 result_colors = [result_colors] * len(metrics)
         elif isinstance(result_colors, list):

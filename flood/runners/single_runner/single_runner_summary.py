@@ -50,31 +50,29 @@ def _print_single_run_preamble_copy(
 ) -> None:
     import toolstr
 
+    styles = flood.user_io.styles
+
     toolstr.print_text_box(
-        toolstr.add_style('Load test: ' + test_name, flood.styles['metavar']),
-        style=flood.styles['content'],
+        toolstr.add_style('Load test: ' + test_name, styles['metavar']),
+        style=flood.user_io.styles['content'],
     )
-    toolstr.print_bullet(key='sample rates', value=rates, styles=flood.styles)
+    toolstr.print_bullet(key='sample rates', value=rates, styles=styles)
     if len(set(durations)) == 1:
         toolstr.print_bullet(
             key='sample duration',
             value=durations[0],
-            styles=flood.styles,
+            styles=styles,
         )
     else:
         toolstr.print_bullet(
-            key='sample durations', value=durations, styles=flood.styles
+            key='sample durations', value=durations, styles=styles
         )
-    toolstr.print_bullet(
-        key='extra args', value=vegeta_args, styles=flood.styles
-    )
+    toolstr.print_bullet(key='extra args', value=vegeta_args, styles=styles)
 
     if rerun_of is not None:
-        toolstr.print_bullet(
-            key='rerun of', value=rerun_of, styles=flood.styles
-        )
+        toolstr.print_bullet(key='rerun of', value=rerun_of, styles=styles)
     toolstr.print_bullet(
-        key='output directory', value=output_dir, styles=flood.styles
+        key='output directory', value=output_dir, styles=styles
     )
     print()
 
@@ -82,14 +80,16 @@ def _print_single_run_preamble_copy(
 def _print_run_start() -> None:
     import toolstr
 
+    styles = flood.user_io.styles
+
     print()
     print()
     toolstr.print_header(
         'Running load tests...',
-        style=flood.styles['content'],
-        text_style=flood.styles['metavar'],
+        style=styles['content'],
+        text_style=styles['metavar'],
     )
-    flood.print_timestamped('Starting')
+    flood.user_io.print_timestamped('Starting')
 
 
 def _print_single_run_conclusion(
@@ -136,7 +136,9 @@ def _print_single_run_conclusion_text(
     import os
     import toolstr
 
-    flood.print_timestamped('Load tests completed.')
+    styles = flood.user_io.styles
+
+    flood.user_io.print_timestamped('Load tests completed.')
 
     # print message about metrics file
     if output_dir is not None:
@@ -152,25 +154,25 @@ def _print_single_run_conclusion_text(
 
         print()
         print()
-        flood.print_header('Saving results to output directory...')
+        flood.user_io.print_header('Saving results to output directory...')
         toolstr.print_bullet(
             key=os.path.relpath(test_path, output_dir),
             value='',
             colon_str='',
-            styles=flood.styles,
+            styles=styles,
         )
         toolstr.print_bullet(
             key=os.path.relpath(result_path, output_dir),
             value='',
             colon_str='',
-            styles=flood.styles,
+            styles=styles,
         )
         if figures:
             toolstr.print_bullet(
                 key=os.path.relpath(figures_path, output_dir),
                 value='',
                 colon_str='',
-                styles=flood.styles,
+                styles=styles,
             )
 
     # decide metrics
@@ -180,12 +182,12 @@ def _print_single_run_conclusion_text(
     # print metrics
     print()
     print()
-    flood.print_header('Summarizing performance metrics...')
+    flood.user_io.print_header('Summarizing performance metrics...')
     if verbose > 1:
         toolstr.print_bullet(
             key='metrics shown below',
             value=', '.join(metrics),
-            styles=flood.styles,
+            styles=styles,
         )
         example_result = list(results.values())[0]
         additional = [
@@ -194,18 +196,18 @@ def _print_single_run_conclusion_text(
         toolstr.print_bullet(
             key='additional metrics available',
             value=', '.join(additional),
-            styles=flood.styles,
+            styles=styles,
         )
 
     # print metric values
     print()
-    flood.print_metric_tables(results=results, metrics=metrics, indent=4)
+    flood.user_io.print_metric_tables(results=results, metrics=metrics, indent=4)
 
     # deep inspection tables
     if deep_check:
         print()
         print()
-        flood.print_header('Deep inspection of responses...')
+        flood.user_io.print_header('Deep inspection of responses...')
 
         # extract data per category
         deep_results_by_category: typing.MutableMapping[
@@ -225,13 +227,13 @@ def _print_single_run_conclusion_text(
                 raise Exception('deep metrics not available')
 
         print()
-        flood.print_metric_tables(
+        flood.user_io.print_metric_tables(
             results=deep_results_by_category['failed'],
             metrics=['n_invalid_json_errors'],
             indent=4,
         )
         print()
-        flood.print_metric_tables(
+        flood.user_io.print_metric_tables(
             results=deep_results_by_category['failed'],
             metrics=['n_rpc_errors'],
             indent=4,
@@ -245,7 +247,7 @@ def _print_single_run_conclusion_text(
             result_category_results,
         ) in deep_results_by_category.items():
             print()
-            flood.print_metric_tables(
+            flood.user_io.print_metric_tables(
                 results=result_category_results,
                 metrics=metric_names,
                 suffix=', ' + category + ' calls',

@@ -50,11 +50,11 @@ def download_samples_command(
     if sizes is None:
         sizes = ['L']
     if sizes == 'all':
-        sizes = list(flood.default_sizes.keys())
+        sizes = list(flood.generators.default_sizes.keys())
     if output_dir is None:
-        output_dir = flood.get_flood_samples_dir()
+        output_dir = flood.generators.get_flood_samples_dir()
 
-    flood.download_raw_data(
+    flood.generators.download_raw_data(
         network=network,
         sizes=sizes,
         datatypes=datatypes,

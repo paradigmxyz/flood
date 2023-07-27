@@ -40,8 +40,8 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def update_command(version: str | None, nodes: typing.Sequence[str]) -> None:
     if nodes is None or len(nodes) == 0:
-        flood.update_local(version=version)
+        flood.ops.update_local(version=version)
     else:
         for node in nodes:
-            flood.update_remote(hostname=node, version=version)
+            flood.ops.update_remote(hostname=node, version=version)
 

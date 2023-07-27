@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 import flood
+from flood import generators
 from . import raw_data_spec
 from . import raw_download_utils
 
@@ -21,7 +22,7 @@ def get_raw_samples_path(
     import os
 
     if samples_dir is None:
-        samples_dir = flood.get_flood_samples_dir()
+        samples_dir = generators.get_flood_samples_dir()
 
     # get largest_available file present
     if size is None:
@@ -153,7 +154,7 @@ def load_samples(
         n_copies = math.ceil(n / len(df))
         df = pl.concat(n_copies * [df])
     if n < len(df):
-        rng = flood.get_rng(random_seed=random_seed)
+        rng = generators.get_rng(random_seed=random_seed)
         seed = rng.integers(1_000_000_000, size=1)[0]
         df = df.sample(n, shuffle=True, seed=seed)
 

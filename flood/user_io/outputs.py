@@ -172,9 +172,9 @@ def print_metric_tables(
         # print header
         toolstr.print_text_box(
             toolstr.add_style(
-                metric + ' vs load' + suffix, flood.styles.get('metavar')
+                metric + ' vs load' + suffix, styles.get('metavar')
             ),
-            style=flood.styles.get('content'),
+            style=styles.get('content'),
             indent=indent,
         )
 
@@ -183,8 +183,8 @@ def print_metric_tables(
             rows,
             labels=labels,
             column_formats=column_formats,  # type: ignore
-            label_style=flood.styles.get('metavar'),
-            border=flood.styles.get('content'),
+            label_style=styles.get('metavar'),
+            border=styles.get('content'),
             indent=indent,
         )
         if metric != metrics[-1]:
@@ -201,8 +201,8 @@ def print_text_box(text: str) -> None:
 
     toolstr.print_text_box(
         text,
-        text_style=flood.styles.get('metavar'),
-        style=flood.styles.get('content'),
+        text_style=styles.get('metavar'),
+        style=styles.get('content'),
     )
 
 
@@ -211,8 +211,8 @@ def print_header(text: str) -> None:
 
     toolstr.print_header(
         text,
-        text_style=flood.styles.get('metavar'),
-        style=flood.styles.get('content'),
+        text_style=styles.get('metavar'),
+        style=styles.get('content'),
     )
 
 
@@ -222,7 +222,7 @@ def print_bullet(*args: typing.Any, **kwargs: typing.Any) -> None:
     toolstr.print_bullet(
         *args,
         **kwargs,
-        styles=flood.styles,
+        styles=styles,
     )
 
 
@@ -232,8 +232,8 @@ def print_table(*args: typing.Any, **kwargs: typing.Any) -> None:
     toolstr.print_table(
         *args,
         **kwargs,
-        label_style=flood.styles.get('metavar'),
-        border=flood.styles.get('content'),
+        label_style=styles.get('metavar'),
+        border=styles.get('content'),
     )
 
 
@@ -243,8 +243,8 @@ def print_multiline_table(*args: typing.Any, **kwargs: typing.Any) -> None:
     toolstr.print_multiline_table(
         *args,
         **kwargs,
-        label_style=flood.styles.get('metavar'),
-        border=flood.styles.get('content'),
+        label_style=styles.get('metavar'),
+        border=styles.get('content'),
     )
 
 
@@ -258,9 +258,9 @@ def print_timestamped(message: str) -> None:
     else:
         dt = dt - datetime.timedelta(microseconds=dt.microsecond)
     timestamp = (
-        toolstr.add_style('\[', flood.styles['content'])
-        + toolstr.add_style(str(dt), flood.styles['metavar'])
-        + toolstr.add_style(']', flood.styles['content'])
+        toolstr.add_style('\[', styles['content'])
+        + toolstr.add_style(str(dt), styles['metavar'])
+        + toolstr.add_style(']', styles['content'])
     )
     toolstr.print(timestamp + ' ' + message)
 

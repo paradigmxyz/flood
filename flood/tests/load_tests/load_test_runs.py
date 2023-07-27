@@ -36,7 +36,7 @@ def run_load_tests(
         'leave': False,
         'desc': 'nodes',
         'position': 0,
-        'colour': flood.styles['content'],
+        'colour': flood.user_io.styles['content'],
         # 'disable': not verbose,
         'disable': True,
     }
@@ -203,7 +203,7 @@ def _run_load_test_locally(
     """run a load test from local node"""
 
     if verbose:
-        flood.print_timestamped('Running load test for ' + node['name'])
+        flood.user_io.print_timestamped('Running load test for ' + node['name'])
 
     # construct progress bar
     if _pbar_kwargs is None:
@@ -213,7 +213,7 @@ def _run_load_test_locally(
         leave=False,
         desc='samples',
         position=1,
-        colour=flood.styles['content'],
+        colour=flood.user_io.styles['content'],
         # disable=not verbose,
         disable=True,
         **_pbar_kwargs,
@@ -229,7 +229,7 @@ def _run_load_test_locally(
     results = []
     for attack in tqdm.tqdm(use_test['attacks'], **tqdm_kwargs):
         if verbose:
-            flood.print_timestamped(
+            flood.user_io.print_timestamped(
                 'Running attack at rate = ' + str(attack['rate']) + ' rps'
             )
 
@@ -342,20 +342,25 @@ def _run_load_test_remotely(
 
     # send call data to remote server
     if verbose:
+        styles = flood.user_io.styles
         node_name = (
-            toolstr.add_style('\[', flood.styles['content'])
-            + toolstr.add_style('node', flood.styles['metavar'])
-            + toolstr.add_style('=', flood.styles['content'])
+            toolstr.add_style('\[', styles['content'])
+            + toolstr.add_style('node', styles['metavar'])
+            + toolstr.add_style('=', styles['content'])
             + node['name']
-            + toolstr.add_style(']', flood.styles['content'])
+            + toolstr.add_style(']', styles['content'])
         )
-        flood.print_timestamped(node_name + ' Sending tests to remote node')
+        flood.user_io.print_timestamped(
+            node_name + ' Sending tests to remote node'
+        )
     cmd = 'rsync -r ' + tempdir + ' ' + remote + ':' + os.path.dirname(tempdir)
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)
 
     # initiate benchmarks
     if verbose:
-        flood.print_timestamped(node_name + ' Executing test on remote node')
+        flood.user_io.print_timestamped(
+            node_name + ' Executing test on remote node'
+        )
     cmd_template = "ssh {host} bash -c 'source ~/.profile; python3 -m flood {test} {name}={url} --output {output} --no-figures {extra_kwargs}'"  # noqa: E501
     extra_kwargs = ''
     if include_deep_output is not None:
@@ -376,7 +381,7 @@ def _run_load_test_remotely(
 
     # retrieve benchmark results
     if verbose:
-        flood.print_timestamped(node_name + ' Retrieving results')
+        flood.user_io.print_timestamped(node_name + ' Retrieving results')
     results_path = os.path.join(tempdir, 'results.json')
     cmd = 'rsync ' + remote + ':' + results_path + ' ' + results_path
     subprocess.call(cmd.split(' '), stderr=subprocess.DEVNULL)

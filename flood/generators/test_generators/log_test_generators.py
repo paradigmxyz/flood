@@ -4,6 +4,7 @@ import functools
 import typing
 
 import flood
+from flood.tests import load_tests
 
 
 def generate_test_eth_get_logs(
@@ -17,17 +18,17 @@ def generate_test_eth_get_logs(
     contract_address: str | None = None,
     block_range_size: int | None = None,
 ) -> typing.Sequence[flood.VegetaAttack]:
-    n_calls = flood.estimate_call_count(
+    n_calls = load_tests.estimate_call_count(
         rates=rates, duration=duration, durations=durations
     )
-    calls = flood.generate_calls_eth_get_logs(
+    calls = flood.generators.generate_calls_eth_get_logs(
         n_calls,
         network=network,
         random_seed=random_seed,
         contract_address=contract_address,
         block_range_size=block_range_size,
     )
-    return flood.create_load_test(
+    return load_tests.create_load_test(
         calls=calls,
         rates=rates,
         duration=duration,

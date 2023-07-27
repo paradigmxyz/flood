@@ -58,7 +58,9 @@ def _run_single(
         )
 
     # parse nodes
-    nodes = flood.parse_nodes(nodes, verbose=verbose, request_metadata=True)
+    nodes = flood.user_io.parse_nodes(
+        nodes, verbose=verbose, request_metadata=True
+    )
 
     # generate test and save to disk
     use_test: flood.LoadTest | flood.TestGenerationParameters
@@ -70,7 +72,7 @@ def _run_single(
             'rates': rates,
             'durations': durations,
             'vegeta_args': vegeta_args,
-            'network': flood.parse_nodes_network(nodes),
+            'network': flood.user_io.parse_nodes_network(nodes),
             'random_seed': random_seed,
         }
         flood.runners.single_runner.single_runner_io._save_single_run_test(
@@ -107,7 +109,7 @@ def _run_single(
         figures=figures,
         test_name=test_name,
         t_run_start=t_start,
-        t_run_end=time.time()
+        t_run_end=time.time(),
     )
 
     # print summary
@@ -142,12 +144,12 @@ def _get_single_test_parameters(
     flood.VegetaArgsShorthand | None,
 ]:
     if test is not None:
-        test_data = flood.parse_test_data(test=test)
+        test_data = flood.user_io.parse_test_data(test=test)
         rates = test_data['rates']
         durations = test_data['durations']
         vegeta_args = test_data['vegeta_args']
     else:
-        rates, durations = flood.generate_timings(
+        rates, durations = flood.generators.generate_timings(
             rates=rates,
             duration=duration,
             durations=durations,

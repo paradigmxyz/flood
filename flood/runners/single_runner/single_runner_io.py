@@ -97,8 +97,8 @@ def _save_single_run_results(
 
     if figures:
         figures_dir = get_single_run_figures_path(output_dir=output_dir)
-        colors = flood.get_nodes_plot_colors(nodes=nodes)
-        flood.plot_load_test_results(
+        colors = flood.user_io.get_nodes_plot_colors(nodes=nodes)
+        flood.tests.load_tests.plot_load_test_results(
             outputs=results,
             test_name=test_name,
             output_dir=figures_dir,

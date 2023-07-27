@@ -16,7 +16,7 @@ def get_single_test_generators() -> (
     """get all single test generators"""
     return {
         get_test_generator_display_name(item): item  # type: ignore
-        for item in dir(flood)
+        for item in dir(flood.generators)
         if item.startswith('generate_test_')
     }
 
@@ -27,7 +27,7 @@ def get_multi_test_generators() -> (
     """get all multi test generators"""
     return {
         get_test_generator_display_name(item, multi=True): item  # type: ignore
-        for item in dir(flood)
+        for item in dir(flood.generators)
         if item.startswith('generate_tests_')
     }
 
@@ -35,8 +35,8 @@ def get_multi_test_generators() -> (
 def get_test_generator(test_name: str) -> flood.LoadTestGenerator:
     """get particular single test generator"""
     function_name = get_test_generator_function_name(test_name)
-    if hasattr(flood, function_name):
-        return getattr(flood, function_name)  # type: ignore
+    if hasattr(flood.generators, function_name):
+        return getattr(flood.generators, function_name)  # type: ignore
     else:
         raise Exception()
 
@@ -44,8 +44,8 @@ def get_test_generator(test_name: str) -> flood.LoadTestGenerator:
 def get_tests_generator(test_name: str) -> flood.MultiLoadTestGenerator:
     """get particular multi test generator"""
     function_name = get_test_generator_function_name(test_name)
-    if hasattr(flood, function_name):
-        return getattr(flood, function_name)  # type: ignore
+    if hasattr(flood.generators, function_name):
+        return getattr(flood.generators, function_name)  # type: ignore
     else:
         raise Exception()
 
@@ -170,7 +170,7 @@ def get_test_generator_display_name(
 
     if not isinstance(test, str):
         test_id = id(test)
-        for key, value in vars(flood).items():
+        for key, value in vars(flood.generators).items():
             if id(value) == test_id:
                 test = key
                 break

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 import flood
-from flood import spec
+from flood import generators
 from . import address_generators
 from . import block_generators
 from . import slot_generators
@@ -20,13 +20,13 @@ def generate_calls_eth_get_block_by_number(
     *,
     network: str | None = None,
     block_numbers: typing.Sequence[int] | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             n=n_calls,
             random_seed=random_seed,
@@ -45,13 +45,13 @@ def generate_calls_eth_get_block_by_hash(
     *,
     network: str | None = None,
     block_hashes: typing.Sequence[str] | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_hashes = block_generators.generate_block_hashes(
             n=n_calls,
             network=network,
@@ -67,15 +67,15 @@ def generate_calls_eth_fee_history(
     n_calls: int | None = None,
     *,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
+    random_seed: flood.RandomSeed | None = None,
     block_numbers: typing.Sequence[int] | None = None,
     block_count: int | None = None
-) -> typing.Sequence[spec.Call]:
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             n=n_calls,
             random_seed=random_seed,
@@ -106,13 +106,13 @@ def generate_calls_eth_get_eth_balance(
     network: str,
     addresses: typing.Sequence[str] | None = None,
     block_numbers: typing.Sequence[int] | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             start_block=10_000_000,
             end_block=16_000_000,
@@ -122,7 +122,7 @@ def generate_calls_eth_get_eth_balance(
         )
     if addresses is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         addresses = address_generators.generate_contract_addresses(
             n_calls,
             network=network,
@@ -143,13 +143,13 @@ def generate_calls_eth_get_transaction_count(
     network: str,
     addresses: typing.Sequence[str] | None = None,
     block_numbers: typing.Sequence[int] | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             start_block=10_000_000,
             end_block=16_000_000,
@@ -159,7 +159,7 @@ def generate_calls_eth_get_transaction_count(
         )
     if addresses is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         addresses = address_generators.generate_eoas(
             n_calls,
             network=network,
@@ -184,13 +184,13 @@ def generate_calls_eth_get_transaction_by_hash(
     *,
     network: str,
     transaction_hashes: typing.Sequence[str] | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if transaction_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
             n_calls,
             network=network,
@@ -209,13 +209,13 @@ def generate_calls_eth_get_transaction_receipt(
     *,
     network: str,
     transaction_hashes: typing.Sequence[str] | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if transaction_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
             n_calls,
             network=network,
@@ -253,15 +253,15 @@ def generate_calls_eth_get_logs(
     block_ranges: typing.Sequence[tuple[int, int]] | None = None,
     block_range_size: int | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if contract_address is None:
         contract_address = _default_contracts['USDC']
     if block_ranges is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         if block_range_size is None:
             block_range_size = 100
         block_ranges = block_generators.generate_block_ranges(
@@ -297,13 +297,13 @@ def generate_calls_eth_get_code(
     addresses: typing.Sequence[str] | None = None,
     block_numbers: typing.Sequence[int | typing.Literal['latest']]
     | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             start_block=10_000_000,
             end_block=16_000_000,
@@ -313,7 +313,7 @@ def generate_calls_eth_get_code(
         )
     if addresses is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         addresses = address_generators.generate_contract_addresses(
             n_calls,
             network=network,
@@ -334,13 +334,13 @@ def generate_calls_eth_get_storage_at(
     slots: typing.Sequence[tuple[str, str]] | None = None,
     block_numbers: typing.Sequence[int | typing.Literal['latest']]
     | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             start_block=10_000_000,
             end_block=16_000_000,
@@ -350,7 +350,7 @@ def generate_calls_eth_get_storage_at(
         )
     if slots is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         slots = slot_generators.generate_slots(
             n_calls, network=network, random_seed=random_seed
         )
@@ -372,14 +372,14 @@ _default_call_datas = {
 def generate_calls_eth_call(
     n_calls: int,
     network: str,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if network != 'ethereum':
         raise Exception('only ethereum supported for eth_call')
 
-    rng = flood.get_rng(random_seed=random_seed)
+    rng = generators.get_rng(random_seed=random_seed)
     contract_addresses = rng.choice(
         list(_default_contracts.values()),
         size=n_calls,
@@ -418,13 +418,13 @@ def generate_calls_trace_block(
     *,
     block_numbers: typing.Sequence[int] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             n=n_calls,
             random_seed=0,
@@ -443,15 +443,15 @@ def generate_calls_trace_transaction(
     *,
     transaction_hashes: typing.Sequence[str] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if transaction_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         if network is None:
-            raise Exception('must specify network')
+            raise Exception('must floodify network')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
             n=n_calls,
             network=network,
@@ -468,13 +468,13 @@ def generate_calls_trace_replay_block_transactions(
     *,
     block_numbers: typing.Sequence[int] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             n=n_calls,
             random_seed=random_seed,
@@ -496,13 +496,13 @@ def generate_calls_trace_replay_block_transactions_state_diff(
     *,
     block_numbers: typing.Sequence[int] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             n=n_calls,
             random_seed=random_seed,
@@ -524,13 +524,13 @@ def generate_calls_trace_replay_block_transactions_vm_trace(
     *,
     block_numbers: typing.Sequence[int] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if block_numbers is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         block_numbers = block_generators.generate_block_numbers(
             n=n_calls,
             random_seed=random_seed,
@@ -552,15 +552,15 @@ def generate_calls_trace_replay_transaction(
     *,
     transaction_hashes: typing.Sequence[str] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if transaction_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         if network is None:
-            raise Exception('must specify network')
+            raise Exception('must floodify network')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
             n=n_calls,
             random_seed=random_seed,
@@ -580,15 +580,15 @@ def generate_calls_trace_replay_transaction_state_diff(
     *,
     transaction_hashes: typing.Sequence[str] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if transaction_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         if network is None:
-            raise Exception('must specify network')
+            raise Exception('must floodify network')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
             n=n_calls,
             random_seed=random_seed,
@@ -608,15 +608,15 @@ def generate_calls_trace_replay_transaction_vm_trace(
     *,
     transaction_hashes: typing.Sequence[str] | None = None,
     network: str | None = None,
-    random_seed: spec.RandomSeed | None = None,
-) -> typing.Sequence[spec.Call]:
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
     import ctc.rpc
 
     if transaction_hashes is None:
         if n_calls is None:
-            raise Exception('must specify more parameters')
+            raise Exception('must floodify more parameters')
         if network is None:
-            raise Exception('must specify network')
+            raise Exception('must floodify network')
         transaction_hashes = transaction_generators.generate_transaction_hashes(
             n=n_calls,
             random_seed=random_seed,
