@@ -22,3 +22,6 @@ notebooks/*
 roadmap/*
 todo/*
 graveyard.py
+
+*.ipynb
+*.html

@@ -286,6 +286,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
             # load test results
 
             test_name = '{test_name}'
+            test_payload = test_payloads[test_name]
             results_payload = results_payloads[test_name]
             results = results_payload['results']
         """,
@@ -298,7 +299,8 @@ _test_template_cells: notebook_io.NotebookTemplate = [
             # show test metadata
 
             toolstr.print_text_box(test_name + ' parameters')
-            flood.user_io.print_load_test_summary(results_payload['test'])
+            test = flood.generate_test(**test_payload['test_parameters'])
+            flood.tests.load_tests.print_load_test_summary(test)
             toolstr.print('- nodes tested:')
             nodes_df = pl.from_records(list(results_payload['nodes'].values()))
             toolstr.print_dataframe_as_table(nodes_df)
@@ -322,7 +324,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
             # show result figures
 
             colors = flood.user_io.get_nodes_plot_colors(nodes=results_payload['nodes'])
-            flood.user_io.plot_load_test_results(
+            flood.tests.load_tests.plot_load_test_results(
                 test_name=test_name,
                 outputs=results,
                 latency_yscale_log=True,
