@@ -21,11 +21,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
                 'dest': 'as_json',
             },
+            {'name': ('-V', '--version'), 'action': 'store_true'},
         ],
     }
 
 
-def version_command(node_url: str | None, as_json: bool) -> None:
+def version_command(node_url: str | None, as_json: bool, version: bool) -> None:
     if node_url is None:
         installation = flood.get_local_installation()
     else:

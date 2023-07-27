@@ -119,6 +119,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': ['--vegeta-args'],
                 'help': 'extra args for vegeta, e.g. [metavar]"-timeout 5s -cpus 1"[/metavar]\nfor single args, use [metavar]--vegeta-args="..."[/metavar] (no space)',  # noqa: E501
             },
+            {
+                'name': ['-V', '--version'],
+                'help': 'print flood version and exit',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             'eth_getBlockByNumber localhost:8545',
@@ -145,6 +150,7 @@ def root_command(
     deep_check: bool,
     remote_update: bool,
     vegeta_args: str,
+    version: bool,
 ) -> None:
 
     verbose = not quiet
