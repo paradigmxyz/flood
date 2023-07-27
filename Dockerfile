@@ -1,3 +1,6 @@
+# uploaded to GitHub Container Registry
+# https://github.com/paradigmxyz/flood/pkgs/container/flood
+
 # Stage 1: Install flood
 FROM python:3.11.3-slim AS flood-builder
 ENV USERNAME="flood"

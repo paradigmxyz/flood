@@ -47,6 +47,10 @@ pip install paradigm-flood
 
 Typing `flood help` in your terminal should show help output. If it does not, you probably have not set up `pip` to install items to your `$PATH`. You may need to add something like `export PATH=$PATH:~/.local/bin` to your terminal config file (e.g. `~/.profile`). Alternatively, you can avoid setting up your `$PATH` and just type `python3 -m flood` instead of `flood`.
 
+#### Docker
+
+Alternatively, flood can be used as a [Docker image](https://github.com/paradigmxyz/flood/pkgs/container/flood).
+
 ## Usage
 
 #### run test
