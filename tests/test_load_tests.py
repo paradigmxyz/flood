@@ -13,7 +13,9 @@ cmd_templates = {
 }
 
 
-@pytest.mark.parametrize('test_name', flood.get_single_test_generators().keys())
+@pytest.mark.parametrize(
+    'test_name', flood.generators.get_single_test_generators().keys()
+)
 @pytest.mark.parametrize('cmd_template', cmd_templates.keys())
 def test_load_test(
     test_name,
