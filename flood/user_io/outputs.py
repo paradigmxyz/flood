@@ -114,7 +114,7 @@ def print_metric_tables(
     *,
     suffix: str = '',
     decimals: int | None = None,
-    comparison: bool = False,
+    comparison: bool | None = None,
     indent: int | str | None = None,
 ) -> None:
     import toolstr
@@ -122,6 +122,8 @@ def print_metric_tables(
     if len(results) == 0:
         toolstr.print('no results', indent=indent)
         print()
+    if comparison is None:
+        comparison = len(results) == 2
 
     names = list(results.keys())
     rates = results[names[0]]['target_rate']
@@ -129,6 +131,8 @@ def print_metric_tables(
         # create labels
         if metric in ['success', 'n_invalid_json_errors', 'n_rpc_errors']:
             metric_suffix = ''
+        elif metric == 'throughput':
+            metric_suffix = ' (rps)'
         else:
             metric_suffix = ' (s)'
         unitted_names = [name + metric_suffix for name in names]
@@ -177,6 +181,12 @@ def print_metric_tables(
             style=styles.get('content'),
             indent=indent,
         )
+
+        if metric == 'success':
+            for label in labels[1:]:
+                column_formats.setdefault(label, {})
+                column_formats[label]['percentage'] = True
+                column_formats[label]['decimals'] = 1
 
         # print table
         toolstr.print_table(
