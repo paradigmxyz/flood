@@ -313,7 +313,7 @@ _test_template_cells: notebook_io.NotebookTemplate = [
         'content': """
             # show result tables
 
-            flood.user_io.print_metric_tables(results, metrics=metrics, comparison=True)
+            flood.user_io.print_metric_tables(results, metrics=metrics, comparison=len(results) == 2)
         """,  # noqa: E501
         'inputs': [],
     },
