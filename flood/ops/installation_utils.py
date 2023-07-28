@@ -37,7 +37,11 @@ def get_local_installation() -> flood.FloodInstallation:
             try:
                 cmd = 'git --git-dir={git_dir} describe --tags --exact-match'
                 cmd = cmd.format(git_dir=git_dir)
-                subprocess.check_call(cmd.split(' '), stderr=subprocess.DEVNULL)
+                subprocess.check_call(
+                    cmd.split(' '),
+                    stderr=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                )
             except subprocess.CalledProcessError:
                 # get git commit
                 cmd = 'git --git-dir={git_dir} rev-parse HEAD'.format(
