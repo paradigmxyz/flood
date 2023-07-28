@@ -264,3 +264,8 @@ def print_timestamped(message: str) -> None:
     )
     toolstr.print(timestamp + ' ' + message)
 
+
+def disable_text_colors() -> None:
+    for key in list(styles.keys()):
+        del styles[key]  # type: ignore
+

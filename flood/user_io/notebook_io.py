@@ -64,7 +64,7 @@ def create_cell(
             for line in lines
             if not set(line).issubset({' '})
         ]
-        cut = min(left_spaces[1:])
+        cut = min(left_spaces[:])
         content = '\n'.join(line[cut:] for line in lines)
 
     content = content.strip()
