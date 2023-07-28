@@ -21,7 +21,7 @@ from flood.tests.load_tests import run_load_test
 from flood.tests.load_tests import run_load_tests
 
 
-__version__ = '0.3.0a'
+__version__ = '0.3.0'
 
 
 def _clean_package_imports() -> None:
