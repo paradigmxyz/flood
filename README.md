@@ -104,7 +104,7 @@ By default `flood` produces verbose output of each test as it runs. This can be 
 
 ### Report generation
 
-After running tests, you can generate an HTML + Jupyter report similar to [this] one. This is done by running `flood report <TEST_DIR>`. Multiple tests can be combined into one report with `flood repos <TEST_DIR_1> <TEST_DIR_2> ...`.
+After running tests, you can generate an HTML + Jupyter report similar to [this](https://datasets.paradigm.xyz/notebooks/flood/example_report.html) one. This is done by running `flood report <TEST_DIR>`. Multiple tests can be combined into one report with `flood repos <TEST_DIR_1> <TEST_DIR_2> ...`.
 
 ### Differential tests
 
