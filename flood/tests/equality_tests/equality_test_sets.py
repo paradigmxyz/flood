@@ -477,5 +477,26 @@ def get_trace_equality_tests(
             ],
             {},
         ),
+        (
+            'debug_traceTransaction',
+            ctc.rpc.construct_debug_trace_transaction,
+            [
+                '0xd01212e8ab48d2fd2ea9c4f33f8670fd1cf0cfb09d2e3c6ceddfaf54152386e5'
+            ],
+            # we're enabling memory by default to unify behaviour across clients
+            {
+               'trace_opts': {
+                    'enableMemory': True
+                }
+            },
+        ),
+        # (
+        #     'debug_traceBlockByNumber',
+        #     ctc.rpc.construct_debug_trace_block_by_number,
+        #     [],
+        #     {
+        #         'block_number': block_number,    
+        #     },
+        # )
     ]
 
