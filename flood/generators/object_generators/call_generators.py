@@ -575,6 +575,33 @@ def generate_calls_trace_replay_transaction(
     ]
 
 
+def generate_calls_debug_trace_transaction(
+    n_calls: int | None = None,
+    *,
+    transaction_hashes: typing.Sequence[str] | None = None,
+    network: str | None = None,
+    random_seed: flood.RandomSeed | None = None,
+) -> typing.Sequence[flood.Call]:
+    import ctc.rpc
+
+    if transaction_hashes is None:
+        if n_calls is None:
+            raise Exception('must floodify more parameters')
+        if network is None:
+            raise Exception('must floodify network')
+        transaction_hashes = transaction_generators.generate_transaction_hashes(
+            n=n_calls,
+            random_seed=random_seed,
+            network=network,
+        )
+    return [
+        ctc.rpc.construct_debug_trace_transaction(
+            transaction_hash
+        )
+        for transaction_hash in transaction_hashes
+    ]
+
+
 def generate_calls_trace_replay_transaction_state_diff(
     n_calls: int | None = None,
     *,
