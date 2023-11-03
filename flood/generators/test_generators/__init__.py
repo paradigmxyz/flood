@@ -6,3 +6,4 @@ from .log_test_generators import *
 from .multi_test_generators import *
 from .transaction_test_generators import *
 from .trace_test_generators import *
+from .debug_test_generators import *
