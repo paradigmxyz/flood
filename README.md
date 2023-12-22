@@ -112,6 +112,12 @@ Instead of testing the raw performance of an RPC node, `flood` can be used to te
 
 `flood all reth=91.91.91.91 erigon=92.92.92.92 --equality`
 
+There is a possibility to run only specific test or a subset of tests using regular expression like this:
+
+`flood debug_* reth=91.91.91.91 erigon=92.92.92.92 --equality`
+
+Above will run all the test scenarios which contain prefix "debug_".
+
 ### From python
 
 All of `flood`'s functionality can be used from python instead of the CLI. Some functions:

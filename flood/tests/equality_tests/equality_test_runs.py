@@ -18,6 +18,7 @@ def run_equality_test(
     import os
     import requests
     import toolstr
+    import re
 
     nodes = flood.user_io.parse_nodes(nodes, request_metadata=True)
     for node in nodes.values():
@@ -30,7 +31,8 @@ def run_equality_test(
 
     # get tests
     if test_name != 'all':
-        equality_tests = [t for t in equality_tests if t[0] == test_name]
+        pattern = f"^{test_name}"  # Creates a regex pattern starting with test_name
+        equality_tests = [t for t in equality_tests if re.match(pattern, t[0])]
         if not equality_tests:
             raise NotImplementedError(
                 'no matching test found for name "' + test_name + '"'
