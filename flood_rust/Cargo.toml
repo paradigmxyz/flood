@@ -1,0 +1,97 @@
+[package]
+name = "latte-cli"
+description = "A database benchmarking tool for Apache Cassandra"
+version = "0.25.0"
+authors = ["Piotr Kołaczkowski <pkolaczk@gmail.com>"]
+edition = "2021"
+readme = "README.md"
+license = "Apache-2.0"
+
+[[bin]]
+name = "latte"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+anyhow = "1.0"
+base64 = "0.21"
+rmp = "0.8.10"
+rmp-serde = "1.0.0-beta.2"
+chrono = { version = "0.4.18", features = ["serde"] }
+clap = { version = "4", features = ["derive", "cargo", "env"] }
+console = "0.15.0"
+cpu-time = "1.0.0"
+ctrlc = "3.2.1"
+err-derive = "0.3"
+futures = "0.3"
+hdrhistogram = "7.1.0"
+hytra = "0.1.2"
+itertools = "0.12"
+jemallocator = "0.5"
+lazy_static = "1.4.0"
+metrohash = "1.0"
+num_cpus = "1.13.0"
+openssl = "0.10.38"
+parse_duration = "2.1.1"
+plotters = "0.3.4"
+plotters-svg = "0.3.3"
+rand = "0.8"
+regex = "1.5"
+rune = "0.12"
+rust-embed = "8"
+scylla = { version = "0.12", features = ["ssl"] }
+search_path = "0.1"
+serde = { version = "1.0.116", features = ["derive"] }
+serde_json = "1.0.57"
+statrs = "0.16"
+status-line = "0.2.0"
+strum = { version = "0.26", features = ["derive"] }
+strum_macros = "0.26"
+time = "0.3"
+thiserror = "1.0.26"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "time", "parking_lot"] }
+tokio-stream = "0.1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+try-lock = "0.2.3"
+uuid = { version = "1.1", features = ["v4"] }
+alloy-primitives = "0.6.0"
+alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "d5967ab" }
+alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy", rev = "d5967ab" }
+alloy-rpc-client = { git = "https://github.com/alloy-rs/alloy", rev = "d5967ab" }
+alloy-transport-http = { git = "https://github.com/alloy-rs/alloy", rev = "d5967ab" }
+alloy-transport = { git = "https://github.com/alloy-rs/alloy", rev = "d5967ab" }
+reqwest = "0.11.24"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "test-util", "macros"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+
+[profile.dev-opt]
+inherits = "dev"
+opt-level = 2
+
+[package.metadata.deb]
+name = "latte"
+maintainer = "Piotr Kołaczkowski <pkolaczk@gmail.com>"
+copyright = "2020, Piotr Kołaczkowski <pkolaczk@gmail.com>"
+license-file = ["LICENSE", "4"]
+extended-description = """
+A database benchmarking tool for Apache Cassandra.
+Runs CQL queries in parallel, measures throughput and response times.
+Can compute statistical significance of differences between two runs.
+"""
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    ["target/release/latte", "usr/bin/", "755"],
+    ["workloads/basic/*.rn", "/usr/share/latte/workloads/basic/", "644"],
+    ["workloads/sai/new/*.rn", "/usr/share/latte/workloads/sai/new/", "644"],
+    ["workloads/sai/orig/*.rn", "/usr/share/latte/workloads/sai/orig/", "644"],
+    ["README.md", "usr/share/doc/latte/README", "644"],
+]

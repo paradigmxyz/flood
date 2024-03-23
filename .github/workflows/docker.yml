@@ -8,15 +8,18 @@ on:
 
 jobs:
   docker:
+    strategy:
+      matrix:
+        test: ["eth_getBalance", "eth_getBlockByNumber"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v2
       - run: docker build --tag paradigmxyz/flood:latest .
       - run: docker run --rm paradigmxyz/flood:latest version
-      - run: |
+      - name: ${{ matrix.test }}
+        run: |
           docker run --rm paradigmxyz/flood:latest \
-          eth_getBlockByNumber \
+          ${{ matrix.test }} \
           node1=https://eth.llamarpc.com \
-          node2=https://eth.llamarpc.com \
           --duration 3 --rate 1
