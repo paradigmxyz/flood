@@ -1,0 +1,14 @@
+[
+    {
+        "method": "eth_getStorageAt",
+        "params": [ "0x295a70b2de5e3953354a6a8344e616ed314d7251", "0x0", "latest" ]
+    },
+    {
+        "method": "eth_getStorageAt",
+        "params": [ "0x295a70b2de5e3953354a6a8344e616ed314d7251", "0x1", "latest" ]
+    },
+    {
+        "method": "eth_getStorageAt",
+        "params": [ "0x295a70b2de5e3953354a6a8344e616ed314d7251", "0x2", "latest" ]
+    }
+]

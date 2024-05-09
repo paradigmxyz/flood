@@ -1,0 +1,10 @@
+[
+    {
+        "method": "eth_getBlockByNumber",
+        "params": [ "0x1b4", true ]
+    },
+    {
+        "method": "eth_getBlockByNumber",
+        "params": [ "0x1ba", true ]
+    }
+]
