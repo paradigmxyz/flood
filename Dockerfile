@@ -10,7 +10,8 @@ USER $USERNAME
 
 COPY ./ /home/$USERNAME/repos/flood/
 WORKDIR /home/$USERNAME/repos/flood
-RUN pip install --user --no-cache-dir ./
+RUN python -m pip install --user --upgrade pip==26.2.2 && \
+    python -m pip install --user --no-cache-dir ./
 
 # Stage 2: Install vegeta
 FROM debian:stable-slim AS vegeta-builder
